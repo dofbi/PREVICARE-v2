@@ -1,0 +1,198 @@
+
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../components/DashboardShell.astro';
+import { IPRESCalculator } from '../../../components/employee/_IPRESCalculator.tsx';
+import { ContributionChart } from '../../../components/employee/_ContributionChart.tsx';
+
+const { user } = Astro.locals;
+
+if (!user) {
+  return Astro.redirect('/connexion');
+}
+
+if (user.user_metadata?.role !== 'employee') {
+  return Astro.redirect('/connexion');
+}
+---
+
+<DashboardLayout title="Suivi IPRES - PREVICARE EMPLOI">
+  <DashboardShell title="Suivi IPRES">
+    
+    <!-- Breadcrumbs -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+      <ol class="flex items-center space-x-4">
+        <li>
+          <a href="/espace-employes" class="text-gray-400 hover:text-gray-500">
+            <svg class="flex-shrink-0 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <svg class="flex-shrink-0 h-5 w-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            </svg>
+            <span class="ml-4 text-sm font-medium text-gray-500">Suivi IPRES</span>
+          </div>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Stats Cards -->
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="flex items-center justify-center h-8 w-8 bg-green-100 rounded-md">
+              <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Statut</dt>
+              <dd class="text-lg font-medium text-gray-900">À jour</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="flex items-center justify-center h-8 w-8 bg-blue-100 rounded-md">
+              <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Cotisations 2024</dt>
+              <dd class="text-lg font-medium text-gray-900">847 500 CFA</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="flex items-center justify-center h-8 w-8 bg-purple-100 rounded-md">
+              <svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Années cotisées</dt>
+              <dd class="text-lg font-medium text-gray-900">8 ans</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="flex items-center justify-center h-8 w-8 bg-yellow-100 rounded-md">
+              <svg class="h-5 w-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Retraite estimée</dt>
+              <dd class="text-lg font-medium text-gray-900">37 ans</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid gap-8 lg:grid-cols-2">
+      
+      <!-- Graphique des cotisations -->
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">Historique des cotisations</h3>
+          <p class="text-sm text-gray-500">Evolution de vos cotisations IPRES sur les dernières années</p>
+        </div>
+        <div class="p-6">
+          <ContributionChart client:load />
+        </div>
+      </div>
+
+      <!-- Calculateur IPRES -->
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">Calculateur de retraite</h3>
+          <p class="text-sm text-gray-500">Estimez votre pension de retraite IPRES</p>
+        </div>
+        <div class="p-6">
+          <IPRESCalculator client:load />
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="mt-8 bg-white rounded-lg shadow">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Actions rapides</h3>
+      </div>
+      <div class="p-6">
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <a href="/espace-employes/ipres/cotisations" class="group relative rounded-lg p-6 hover:bg-gray-50 flex items-start space-x-4">
+            <div class="flex-shrink-0">
+              <div class="flex items-center justify-center h-10 w-10 rounded-lg bg-blue-500 text-white">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h2m0 0V9a2 2 0 012-2h2a2 2 0 012 2v6a2 2 0 01-2 2H9m-4 0h4m0 0V9a2 2 0 012-2h2a2 2 0 012 2v6a2 2 0 01-2 2h-2"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <h4 class="text-sm font-medium text-gray-900">Historique détaillé</h4>
+              <p class="text-sm text-gray-500">Consultez l'historique complet de vos cotisations</p>
+            </div>
+          </a>
+
+          <a href="/espace-employes/ipres/simulateur" class="group relative rounded-lg p-6 hover:bg-gray-50 flex items-start space-x-4">
+            <div class="flex-shrink-0">
+              <div class="flex items-center justify-center h-10 w-10 rounded-lg bg-green-500 text-white">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <h4 class="text-sm font-medium text-gray-900">Simulateur avancé</h4>
+              <p class="text-sm text-gray-500">Simulez différents scénarios de retraite</p>
+            </div>
+          </a>
+
+          <button class="group relative rounded-lg p-6 hover:bg-gray-50 flex items-start space-x-4">
+            <div class="flex-shrink-0">
+              <div class="flex items-center justify-center h-10 w-10 rounded-lg bg-yellow-500 text-white">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <h4 class="text-sm font-medium text-gray-900">Signaler un problème</h4>
+              <p class="text-sm text-gray-500">Signaler une anomalie dans vos cotisations</p>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </DashboardShell>
+</DashboardLayout>

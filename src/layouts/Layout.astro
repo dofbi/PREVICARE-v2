@@ -1,0 +1,49 @@
+
+---
+export interface Props {
+  title: string;
+  description?: string;
+  noNavFooter?: boolean;
+}
+
+const { title, description = "Plateforme RH 360° pour le Sénégal : droit du travail, signature électronique, coffre-fort numérique, offres d'emploi vérifiées, consultations juridiques.", noNavFooter = false } = Astro.props;
+
+import "../styles/global.css";
+import Navbar from "../components/Navbar.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0B1D3A" />
+    <meta name="author" content="Previcare SARL" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Previcare Emploi" />
+    <meta property="og:locale" content="fr_SN" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+
+    <!-- Polices : Cormorant Garamond (display/serif) + Inter (sans) + JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>{title}</title>
+  </head>
+  <body>
+    {!noNavFooter && <Navbar />}
+    <slot />
+    {!noNavFooter && <SiteFooter />}
+  </body>
+</html>

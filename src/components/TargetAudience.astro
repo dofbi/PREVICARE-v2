@@ -1,0 +1,225 @@
+---
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
+import { Button } from "./ui/button";
+import { ArrowRight, Users, Building2, UserCheck, Globe, Calendar, CreditCard } from "lucide-react";
+import { Image } from 'astro:assets';
+
+const localAudiences = [
+  {
+    name: "Employés",
+    description: "Suivez vos cotisations, archivez vos documents et gérez votre carrière en toute simplicité.",
+    link: "/employes",
+    image: "/images/audience-employees.png",
+    icon: "Users",
+  },
+  {
+    name: "Employeurs",
+    description: "Optimisez votre gestion RH, assurez votre conformité légale et améliorez le climat social.",
+    link: "/employeurs",
+    image: "/images/audience-employers.png",
+    icon: "Building2",
+  },
+  {
+    name: "Délégués du personnel",
+    description: "Accédez à des outils et des ressources pour mieux représenter et défendre les salariés.",
+    link: "/delegues",
+    image: "/images/audience-delegates.png",
+    icon: "UserCheck",
+  },
+];
+
+const internationalAudience = {
+  name: "Expatriés",
+  description: "Facilitez votre intégration et la gestion de vos contrats de travail au Sénégal.",
+  link: "/expatries",
+  image: "/images/audience-expatriates.png",
+  icon: "Globe",
+  features: ["Permis de travail", "Contrats expatriés", "Fiscalité internationale", "Accompagnement personnalisé"],
+};
+
+const consultationAudience = {
+  name: "Consultation Ponctuelle",
+  description: "Besoin d'un conseil rapide ? Prenez rendez-vous avec nos experts sans abonnement.",
+  link: "/contact",
+  image: "/images/consultation-ponctuelle.png",
+  icon: "Calendar",
+  features: ["Rendez-vous à l'acte", "Paiement mobile money", "Experts certifiés", "Réponse immédiate"],
+};
+---
+
+<div class="space-y-16">
+  <!-- Secteur Privé Local -->
+  <div>
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 text-primary font-medium mb-4">
+        <Users className="h-5 w-5 mr-2" />
+        Secteur Privé Local
+      </div>
+      <h3 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+        Solutions pour les entreprises sénégalaises
+      </h3>
+      <p class="text-primary/80 max-w-3xl mx-auto">
+        Des outils conçus pour les réalités du marché du travail sénégalais, que vous soyez employé, employeur ou
+        représentant du personnel.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {localAudiences.map((audience) => (
+        <a href={audience.link} class="group block">
+          <Card className="h-full overflow-hidden transition-all duration-300 shadow-card hover:shadow-card-hover hover:-translate-y-2 border-primary/10" client:load>
+            <div class="relative h-48 w-full">
+              <Image
+                src={audience.image || "/placeholder.svg"}
+                alt={`${audience.name}`}
+                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                width={400}
+                height={192}
+              />
+              <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm p-2 rounded-full">
+                <div class="text-primary">
+                  {audience.icon === "Users" && <Users className="h-6 w-6" />}
+                  {audience.icon === "Building2" && <Building2 className="h-6 w-6" />}
+                  {audience.icon === "UserCheck" && <UserCheck className="h-6 w-6" />}
+                </div>
+              </div>
+            </div>
+            <CardHeader client:load>
+              <CardTitle className="text-primary group-hover:text-secondary transition-colors" client:load>
+                {audience.name}
+              </CardTitle>
+            </CardHeader>
+            <CardContent client:load>
+              <CardDescription className="mb-4 text-primary/80" client:load>{audience.description}</CardDescription>
+              <div class="flex items-center text-sm font-semibold text-secondary-dark group-hover:text-primary transition-colors">
+                Découvrir l'espace
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </div>
+            </CardContent>
+          </Card>
+        </a>
+      ))}
+    </div>
+  </div>
+
+  <!-- Internationaux & Visiteurs -->
+  <div>
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center px-4 py-2 rounded-full bg-tertiary/10 text-tertiary font-medium mb-4">
+        <Globe className="h-5 w-5 mr-2" />
+        Internationaux & Visiteurs
+      </div>
+      <h3 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+        Services spécialisés et consultations ponctuelles
+      </h3>
+      <p class="text-primary/80 max-w-3xl mx-auto">
+        Des solutions adaptées aux professionnels expatriés et aux utilisateurs ayant un besoin ponctuel.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+      <!-- Expatriés - Mise en avant -->
+      <div class="lg:col-span-1">
+        <a href={internationalAudience.link} class="group block">
+          <Card className="h-full overflow-hidden transition-all duration-300 shadow-card hover:shadow-card-hover hover:-translate-y-2 border-tertiary/20 bg-gradient-to-br from-tertiary/5 to-white" client:load>
+            <div class="relative h-64 w-full">
+              <Image
+                src={internationalAudience.image || "/placeholder.svg"}
+                alt={`${internationalAudience.name}`}
+                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                width={500}
+                height={256}
+              />
+              <div class="absolute top-4 left-4 bg-tertiary/90 backdrop-blur-sm p-3 rounded-full">
+                <div class="text-white">
+                  <Globe className="h-8 w-8" />
+                </div>
+              </div>
+              <div class="absolute top-4 right-4 bg-tertiary text-white px-3 py-1 rounded-full text-sm font-medium">
+                Spécialisé
+              </div>
+            </div>
+            <CardHeader client:load>
+              <CardTitle className="text-tertiary text-xl group-hover:text-primary transition-colors" client:load>
+                {internationalAudience.name}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4" client:load>
+              <CardDescription className="text-primary/80" client:load>{internationalAudience.description}</CardDescription>
+
+              <div class="grid grid-cols-2 gap-2">
+                {internationalAudience.features.map((feature) => (
+                  <div class="flex items-center text-sm text-primary/70">
+                    <div class="w-1.5 h-1.5 bg-tertiary rounded-full mr-2 flex-shrink-0"></div>
+                    {feature}
+                  </div>
+                ))}
+              </div>
+
+              <Button
+                variant="outline"
+                className="w-full border-tertiary text-tertiary hover:bg-tertiary hover:text-white transition-all duration-300 bg-transparent"
+                client:load
+              >
+                Découvrir l'espace expatriés
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </CardContent>
+          </Card>
+        </a>
+      </div>
+
+      <!-- Consultation Ponctuelle -->
+      <div class="lg:col-span-1">
+        <a href={consultationAudience.link} class="group block">
+          <Card className="h-full overflow-hidden transition-all duration-300 shadow-card hover:shadow-card-hover hover:-translate-y-2 border-secondary/20 bg-gradient-to-br from-secondary/5 to-white" client:load>
+            <div class="relative h-64 w-full">
+              <Image
+                src={consultationAudience.image || "/placeholder.svg"}
+                alt={`${consultationAudience.name}`}
+                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                width={500}
+                height={256}
+              />
+              <div class="absolute top-4 left-4 bg-secondary/90 backdrop-blur-sm p-3 rounded-full">
+                <div class="text-white">
+                  <Calendar className="h-8 w-8" />
+                </div>
+              </div>
+              <div class="absolute top-4 right-4 bg-secondary text-white px-3 py-1 rounded-full text-sm font-medium">
+                Sans abonnement
+              </div>
+            </div>
+            <CardHeader client:load>
+              <CardTitle className="text-secondary-dark text-xl group-hover:text-primary transition-colors" client:load>
+                {consultationAudience.name}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4" client:load>
+              <CardDescription className="text-primary/80" client:load>{consultationAudience.description}</CardDescription>
+
+              <div class="grid grid-cols-2 gap-2">
+                {consultationAudience.features.map((feature) => (
+                  <div class="flex items-center text-sm text-primary/70">
+                    <div class="w-1.5 h-1.5 bg-secondary rounded-full mr-2 flex-shrink-0"></div>
+                    {feature}
+                  </div>
+                ))}
+              </div>
+
+              <Button
+                variant="outline"
+                className="w-full border-secondary text-secondary-dark hover:bg-secondary hover:text-white transition-all duration-300 bg-transparent"
+                client:load
+              >
+                <CreditCard className="mr-2 h-4 w-4" />
+                Prendre rendez-vous
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </CardContent>
+          </Card>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

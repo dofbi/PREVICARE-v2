@@ -1,0 +1,48 @@
+
+[
+  {
+    "id": "career_001",
+    "type": "hiring",
+    "title": "Embauche",
+    "date": "2024-01-15",
+    "description": "Embauche en tant que Développeur Senior",
+    "position": "Développeur Senior",
+    "department": "IT",
+    "salary": 7500000,
+    "contract_type": "CDI",
+    "location": "Dakar, Sénégal",
+    "status": "active"
+  },
+  {
+    "id": "career_002", 
+    "type": "training",
+    "title": "Formation sécurité",
+    "date": "2024-02-20",
+    "description": "Formation obligatoire en sécurité au travail",
+    "provider": "Centre de Formation PREVICARE",
+    "duration": "2 jours",
+    "certificate": true,
+    "status": "completed"
+  },
+  {
+    "id": "career_003",
+    "type": "evaluation",
+    "title": "Évaluation annuelle",
+    "date": "2024-03-15",
+    "description": "Évaluation de performance annuelle",
+    "score": 4.2,
+    "max_score": 5.0,
+    "evaluator": "Marie Diop",
+    "status": "completed"
+  },
+  {
+    "id": "career_004",
+    "type": "promotion",
+    "title": "Promotion prévue",
+    "date": "2024-07-01",
+    "description": "Promotion au poste de Lead Developer",
+    "new_position": "Lead Developer",
+    "new_salary": 9000000,
+    "status": "planned"
+  }
+]

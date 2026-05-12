@@ -1,0 +1,302 @@
+
+@import 'tailwindcss';
+
+/* ===================================================
+   PREVICARE GOLD — Charte CSS "Gravitas"
+   Palette : marine + or + papier ivoire
+   ================================================== */
+
+@layer base {
+  :root {
+    /* -------- Palette Gravitas -------- */
+    --ink:       #0B1D3A;
+    --ink-2:     #142849;
+    --ink-3:     rgba(11,29,58,.70);
+    --ink-4:     rgba(11,29,58,.45);
+    --gold:      #C9A961;
+    --gold-2:    #E4C57C;
+    --gold-3:    #9E803F;
+    --paper:     #F6F4EE;
+    --paper-2:   #FDFBF4;
+    --rule:      rgba(11,29,58,.14);
+    --rule-gold: rgba(201,169,97,.35);
+
+    /* -------- Typographies -------- */
+    --serif:   "Cormorant Garamond","Georgia","Times New Roman",serif;
+    --display: "Cormorant Garamond","Georgia",serif;
+    --sans:    "Inter","Helvetica Neue",system-ui,sans-serif;
+    --mono:    "JetBrains Mono","Menlo",monospace;
+
+    /* -------- Rayons -------- */
+    --r-lg: 16px;
+    --r-md: 10px;
+    --r-sm: 6px;
+
+    /* -------- Tokens Tailwind (compatibilité shadcn/ui) -------- */
+    --background: 39 36% 95%;        /* ~#F6F4EE */
+    --foreground: 218 67% 14%;       /* ~#0B1D3A */
+    --card: 0 0% 100%;
+    --card-foreground: 218 67% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 218 67% 14%;
+    --primary: 218 67% 14%;          /* --ink */
+    --primary-dark: 218 67% 10%;
+    --primary-foreground: 39 36% 95%;
+    --secondary: 38 47% 58%;         /* --gold */
+    --secondary-dark: 38 43% 43%;    /* --gold-3 */
+    --secondary-foreground: 218 67% 14%;
+    --tertiary: 142 76% 36%;
+    --tertiary-foreground: 0 0% 100%;
+    --senegal-green: 142 76% 36%;
+    --muted: 39 20% 93%;
+    --muted-foreground: 218 30% 40%;
+    --accent: 39 20% 93%;
+    --accent-foreground: 218 67% 14%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 218 20% 86%;
+    --input: 218 20% 86%;
+    --ring: 218 67% 14%;
+    --radius: 0.5rem;
+    --chart-1: 38 47% 58%;
+    --chart-2: 218 67% 14%;
+    --chart-3: 142 76% 36%;
+    --chart-4: 38 43% 43%;
+    --chart-5: 218 30% 40%;
+  }
+
+  .dark {
+    --background: 218 67% 8%;
+    --foreground: 39 36% 95%;
+    --card: 218 67% 10%;
+    --card-foreground: 39 36% 95%;
+    --popover: 218 67% 10%;
+    --popover-foreground: 39 36% 95%;
+    --primary: 39 36% 95%;
+    --primary-dark: 39 36% 85%;
+    --primary-foreground: 218 67% 14%;
+    --secondary: 38 47% 58%;
+    --secondary-foreground: 218 67% 14%;
+    --secondary-dark: 38 43% 43%;
+    --muted: 218 30% 18%;
+    --muted-foreground: 218 20% 60%;
+    --accent: 218 30% 18%;
+    --accent-foreground: 39 36% 95%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 218 30% 20%;
+    --input: 218 30% 20%;
+    --ring: 38 47% 58%;
+  }
+
+  * {
+    box-sizing: border-box;
+    border-color: hsl(var(--border));
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  img, svg { max-width: 100%; display: block; }
+  a { color: inherit; text-decoration: none; }
+}
+
+/* ===================================================
+   CHARTE — Composants réutilisables (px-nav, px-foot, etc.)
+   ================================================== */
+
+/* ---------- Navigation globale ---------- */
+.px-nav {
+  position: sticky; top: 0; z-index: 40;
+  background: rgba(246,244,238,.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--rule);
+}
+.px-nav-inner {
+  max-width: 1320px; margin: 0 auto;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 40px;
+}
+.px-logo {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--sans); font-weight: 600;
+  letter-spacing: 5px; text-transform: uppercase; font-size: 13px;
+  color: var(--ink);
+}
+.px-logo .dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; }
+.px-logo .sub { opacity: .5; letter-spacing: 4px; }
+.px-nav ul {
+  display: flex; gap: 28px; list-style: none; margin: 0; padding: 0;
+  font-family: var(--sans); font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+}
+.px-nav a { color: var(--ink); opacity: .7; transition: opacity .2s; }
+.px-nav a:hover { opacity: 1; color: var(--gold-3); }
+.px-nav .cta {
+  border: 1px solid var(--ink); padding: 8px 16px; border-radius: 99px;
+  opacity: 1; transition: background .2s, color .2s;
+}
+.px-nav .cta:hover { background: var(--ink); color: var(--paper); }
+
+/* ---------- Conteneurs ---------- */
+.px-wrap { max-width: 1320px; margin: 0 auto; padding: 0 40px; }
+.px-narrow { max-width: 900px; margin: 0 auto; padding: 0 40px; }
+
+/* ---------- Hero générique ---------- */
+.px-hero {
+  position: relative; min-height: 560px;
+  display: flex; align-items: center;
+  padding: 80px 40px; overflow: hidden;
+}
+.px-hero .bg { position: absolute; inset: 0; z-index: 0; }
+.px-hero .bg svg { width: 100%; height: 100%; }
+.px-hero .content { position: relative; z-index: 2; max-width: 1240px; margin: 0 auto; width: 100%; }
+
+/* ---------- Typographie utilitaire ---------- */
+.kicker {
+  font-family: var(--sans); font-size: 11px; letter-spacing: 6px;
+  color: var(--ink-4); text-transform: uppercase; margin: 0 0 16px;
+}
+.display {
+  font-family: var(--display); font-style: italic; font-weight: 400;
+  font-size: clamp(44px, 6vw, 84px); line-height: 1.02; margin: 0; letter-spacing: -.5px;
+}
+.display em { font-style: normal; color: var(--gold-3); }
+.lead { font-size: 18px; color: var(--ink-3); max-width: 640px; margin: 20px 0 0; }
+
+/* ---------- Marqueurs / règles ---------- */
+.tick {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-family: var(--sans); font-size: 11px; letter-spacing: 4px;
+  text-transform: uppercase; color: var(--ink-4);
+}
+.tick::before { content: ""; width: 18px; height: 1px; background: var(--ink-4); }
+
+.rule { height: 1px; background: var(--rule); margin: 48px 0; }
+.rule-gold { height: 1px; background: var(--rule-gold); margin: 32px 0; }
+
+/* ---------- Boutons Gravitas ---------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--sans); font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+  padding: 14px 28px; border-radius: 99px; cursor: pointer; transition: .25s;
+  border: none;
+}
+.btn-primary { background: var(--ink); color: var(--paper); border: 1px solid var(--ink); }
+.btn-primary:hover { background: var(--gold-3); border-color: var(--gold-3); }
+.btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+.btn-ghost:hover { background: var(--ink); color: var(--paper); }
+.btn-gold { background: var(--gold); color: var(--ink); border: 1px solid var(--gold-3); }
+.btn-gold:hover { background: var(--gold-2); }
+
+/* ---------- Cartes ---------- */
+.card {
+  background: #fff; border: 1px solid var(--rule); border-radius: var(--r-lg);
+  overflow: hidden; transition: transform .4s, box-shadow .4s;
+}
+.card:hover { transform: translateY(-4px); box-shadow: 0 24px 60px -24px rgba(11,29,58,.22); }
+
+/* ---------- Footer ---------- */
+.px-foot {
+  border-top: 1px solid var(--rule); margin-top: 96px;
+  padding: 48px 40px 32px; background: #fff;
+}
+.px-foot-inner {
+  max-width: 1320px; margin: 0 auto;
+  display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 40px;
+}
+.px-foot h4 {
+  font-family: var(--sans); font-size: 11px; letter-spacing: 4px;
+  text-transform: uppercase; color: var(--ink-4); margin: 0 0 16px; font-weight: 500;
+}
+.px-foot ul { list-style: none; padding: 0; margin: 0; font-family: var(--sans); font-size: 13px; }
+.px-foot li { margin: 8px 0; color: var(--ink-3); }
+.px-foot li a:hover { color: var(--gold-3); }
+.px-foot-low {
+  max-width: 1320px; margin: 32px auto 0; padding-top: 24px;
+  border-top: 1px solid var(--rule); display: flex; justify-content: space-between;
+  font-family: var(--sans); font-size: 11px; letter-spacing: 2px;
+  color: var(--ink-4); text-transform: uppercase;
+}
+
+/* ---------- Signet réutilisable ---------- */
+.signet { display: inline-block; width: 28px; height: 34px; vertical-align: middle; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 920px) {
+  .px-nav ul { display: none; }
+  .px-nav-inner { padding: 14px 20px; }
+  .px-foot-inner { grid-template-columns: 1fr 1fr; }
+  .px-wrap, .px-narrow { padding: 0 20px; }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+}
+
+@layer components {
+  /* Badges */
+  .badge { @apply inline-flex items-center rounded-full px-3 py-1 text-sm font-medium; }
+  .badge-primary { @apply bg-white/20 text-white; }
+  .badge-secondary { background-color: var(--gold) !important; color: var(--ink) !important; }
+  .badge-tertiary { background-color: hsl(var(--tertiary)) !important; color: hsl(var(--tertiary-foreground)) !important; }
+
+  /* Forcer couleurs primaire/secondaire pour compatibilité shadcn */
+  .bg-primary { background-color: var(--ink) !important; }
+  .text-primary { color: var(--ink) !important; }
+  .border-primary { border-color: var(--ink) !important; }
+  .bg-secondary { background-color: var(--gold) !important; }
+  .text-secondary { color: var(--gold) !important; }
+  .border-secondary { border-color: var(--gold-3) !important; }
+
+  /* Animations */
+  .btn-glow { position: relative; overflow: hidden; transition: all 0.3s ease; }
+  .btn-glow::before {
+    content: ''; position: absolute; top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+    transition: left .5s;
+  }
+  .btn-glow:hover::before { left: 100%; }
+  .btn-glow:hover { transform: translateY(-2px); }
+
+  .animate-pulse-slow { animation: pulse-slow 3s cubic-bezier(.4,0,.6,1) infinite; }
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .5; }
+  }
+
+  .animation-delay-1000 { animation-delay: 1000ms; }
+
+  /* Keyframes Accordéon (shadcn/ui) */
+  @keyframes accordion-down {
+    from { height: 0; }
+    to { height: var(--radix-accordion-content-height); }
+  }
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height); }
+    to { height: 0; }
+  }
+  @keyframes slide-in-left {
+    0% { opacity: 0; transform: translateX(-50px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes slide-in-right {
+    0% { opacity: 0; transform: translateX(50px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Footer override — s'assure que le footer HTML hérite du bon style */
+  footer.px-foot {
+    background: #fff !important;
+    color: var(--ink) !important;
+  }
+}

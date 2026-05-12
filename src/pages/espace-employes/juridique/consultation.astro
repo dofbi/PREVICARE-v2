@@ -1,0 +1,177 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../components/DashboardShell.astro';
+
+const { user } = Astro.locals;
+
+if (!user) {
+  return Astro.redirect('/connexion');
+}
+---
+
+<DashboardLayout title="Consultation Juridique - PREVICARE EMPLOI">
+  <DashboardShell title="Consultation Juridique">
+
+    <!-- Breadcrumbs -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+      <ol class="flex items-center space-x-4">
+        <li><a href="/espace-employes" class="text-gray-400 hover:text-gray-500">Tableau de bord</a></li>
+        <li><span class="text-gray-300">/</span></li>
+        <li><a href="/espace-employes/juridique" class="text-gray-400 hover:text-gray-500">Juridique</a></li>
+        <li><span class="text-gray-300">/</span></li>
+        <li><span class="text-gray-500">Consultation</span></li>
+      </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-900">Consultation Juridique Illimitée</h1>
+      <p class="text-gray-600 mt-2">Obtenez des conseils juridiques personnalisés de nos experts</p>
+    </div>
+
+    <!-- Options de consultation -->
+    <div class="grid gap-6 md:grid-cols-2 mb-8">
+      <!-- Consultation téléphonique -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center mb-4">
+          <div class="flex-shrink-0">
+            <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-lg font-medium text-gray-900">Consultation téléphonique</h3>
+            <p class="text-sm text-gray-500">Disponible du lundi au vendredi</p>
+          </div>
+        </div>
+        <p class="text-gray-600 text-sm mb-4">Échangez directement avec un avocat spécialisé en droit du travail.</p>
+        <div class="space-y-2 mb-4">
+          <p class="text-sm"><span class="font-medium">Horaires :</span> 9h - 18h</p>
+          <p class="text-sm"><span class="font-medium">Durée :</span> Jusqu'à 30 minutes</p>
+          <p class="text-sm"><span class="font-medium">Délai :</span> Rendez-vous sous 48h</p>
+        </div>
+        <button class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+          <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+          </svg>
+          Prendre rendez-vous
+        </button>
+      </div>
+
+      <!-- Consultation écrite -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center mb-4">
+          <div class="flex-shrink-0">
+            <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-lg font-medium text-gray-900">Consultation écrite</h3>
+            <p class="text-sm text-gray-500">Question-réponse par email</p>
+          </div>
+        </div>
+        <p class="text-gray-600 text-sm mb-4">Posez votre question par écrit et recevez une réponse détaillée.</p>
+        <div class="space-y-2 mb-4">
+          <p class="text-sm"><span class="font-medium">Réponse :</span> Sous 72h ouvrées</p>
+          <p class="text-sm"><span class="font-medium">Format :</span> Email détaillé</p>
+          <p class="text-sm"><span class="font-medium">Suivi :</span> Questions complémentaires incluses</p>
+        </div>
+        <button class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+          <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+          </svg>
+          Poser ma question
+        </button>
+      </div>
+    </div>
+
+    <!-- Formulaire de demande -->
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Nouvelle demande de consultation</h3>
+        <p class="text-sm text-gray-500">Décrivez votre situation pour une consultation personnalisée</p>
+      </div>
+      <div class="px-6 py-6">
+        <form class="space-y-6">
+          <div>
+            <label for="consultation-type" class="block text-sm font-medium text-gray-700">Type de consultation</label>
+            <select id="consultation-type" name="consultation-type" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+              <option>Choisir le type de consultation</option>
+              <option value="phone">Consultation téléphonique</option>
+              <option value="email">Consultation écrite</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="subject" class="block text-sm font-medium text-gray-700">Sujet de la consultation</label>
+            <select id="subject" name="subject" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+              <option>Sélectionner un domaine</option>
+              <option value="contract">Contrat de travail</option>
+              <option value="salary">Salaire et rémunération</option>
+              <option value="dismissal">Licenciement</option>
+              <option value="harassment">Harcèlement</option>
+              <option value="accident">Accident du travail</option>
+              <option value="discrimination">Discrimination</option>
+              <option value="leave">Congés et absences</option>
+              <option value="other">Autre</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="urgency" class="block text-sm font-medium text-gray-700">Niveau d'urgence</label>
+            <div class="mt-2 space-y-2">
+              <div class="flex items-center">
+                <input id="urgency-low" name="urgency" type="radio" value="low" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                <label for="urgency-low" class="ml-2 text-sm text-gray-700">Normal (réponse sous 72h)</label>
+              </div>
+              <div class="flex items-center">
+                <input id="urgency-medium" name="urgency" type="radio" value="medium" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                <label for="urgency-medium" class="ml-2 text-sm text-gray-700">Urgent (réponse sous 48h)</label>
+              </div>
+              <div class="flex items-center">
+                <input id="urgency-high" name="urgency" type="radio" value="high" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                <label for="urgency-high" class="ml-2 text-sm text-gray-700">Très urgent (réponse sous 24h)</label>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label for="description" class="block text-sm font-medium text-gray-700">Description de votre situation</label>
+            <textarea id="description" name="description" rows="6" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Décrivez votre situation en détail..."></textarea>
+            <p class="mt-2 text-sm text-gray-500">Soyez le plus précis possible pour obtenir un conseil adapté à votre situation.</p>
+          </div>
+
+          <div>
+            <label for="documents" class="block text-sm font-medium text-gray-700">Documents annexes (optionnel)</label>
+            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+              <div class="space-y-1 text-center">
+                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                  <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+                <div class="flex text-sm text-gray-600">
+                  <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                    <span>Télécharger des fichiers</span>
+                    <input id="file-upload" name="file-upload" type="file" class="sr-only" multiple>
+                  </label>
+                  <p class="pl-1">ou glisser-déposer</p>
+                </div>
+                <p class="text-xs text-gray-500">PNG, JPG, PDF jusqu'à 10MB</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end space-x-3">
+            <button type="button" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Annuler
+            </button>
+            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Envoyer la demande
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </DashboardShell>
+</DashboardLayout>

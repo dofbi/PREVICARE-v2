@@ -1,0 +1,292 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Outils — Previcare Emploi" description="Six outils RH complémentaires : Setlou, Visionneuse, Coffre-fort, Xalima, Consultation, Offres d'emploi.">
+
+<style>
+  /* ── HERO ────────────────────────────────────────────────────── */
+  .ot-hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 140px 40px 100px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .ot-hero-inner { position: relative; z-index: 2; max-width: 820px; margin: 0 auto; }
+  .ot-kicker {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 7px;
+    text-transform: uppercase;
+    color: var(--gold-2);
+    margin-bottom: 32px;
+  }
+  .ot-h1 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(52px, 8vw, 100px);
+    line-height: .95;
+    margin: 0;
+    color: var(--paper);
+  }
+  .ot-h1 em { font-style: normal; color: var(--gold-2); }
+  .ot-sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 20px;
+    color: rgba(246,244,238,.65);
+    margin: 32px auto 0;
+    max-width: 560px;
+    line-height: 1.6;
+  }
+  .ot-rule {
+    display: block;
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+    margin: 36px auto 0;
+    opacity: .6;
+  }
+  /* bg texture */
+  .ot-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(201,169,97,.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(201,169,97,.06) 0%, transparent 50%);
+  }
+
+  /* ── GRILLE OUTILS ───────────────────────────────────────────── */
+  .ot-section {
+    padding: 100px 40px;
+    background: var(--paper);
+  }
+  .ot-grid {
+    max-width: 1320px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+
+  /* Carte outil */
+  .ot-card {
+    background: var(--paper);
+    padding: 60px 48px;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    transition: background .25s;
+    position: relative;
+  }
+  .ot-card:hover { background: #fff; }
+  .ot-card-num {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 80px;
+    color: var(--rule);
+    line-height: 1;
+    position: absolute;
+    top: 20px;
+    right: 32px;
+    transition: color .25s;
+    user-select: none;
+  }
+  .ot-card:hover .ot-card-num { color: var(--gold); opacity: .3; }
+  .ot-card-icon {
+    width: 56px;
+    height: 56px;
+    color: var(--gold-3);
+    margin-bottom: 28px;
+    flex-shrink: 0;
+  }
+  .ot-card-kicker {
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    margin-bottom: 12px;
+  }
+  .ot-card-name {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 36px;
+    margin: 0 0 16px;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .ot-card-desc {
+    font-size: 15px;
+    color: var(--ink-3);
+    line-height: 1.7;
+    margin: 0 0 32px;
+    flex: 1;
+  }
+  .ot-card-link {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink);
+    border-bottom: 1px solid var(--gold);
+    padding-bottom: 4px;
+    align-self: flex-start;
+    transition: color .2s;
+  }
+  .ot-card:hover .ot-card-link { color: var(--gold-3); }
+
+  /* Carte large (span 2) */
+  .ot-card-wide {
+    grid-column: span 2;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .ot-card-wide:hover { background: #142849; }
+  .ot-card-wide .ot-card-icon { color: var(--gold-2); }
+  .ot-card-wide .ot-card-kicker { color: var(--gold-2); }
+  .ot-card-wide .ot-card-name { color: var(--paper); }
+  .ot-card-wide .ot-card-desc { color: rgba(246,244,238,.72); }
+  .ot-card-wide .ot-card-link { color: var(--paper); border-color: var(--gold); }
+  .ot-card-wide:hover .ot-card-link { color: var(--gold-2); }
+
+  /* ── SECTION FORMULES ─────────────────────────────────────────── */
+  .ot-cta {
+    padding: 100px 40px;
+    background: var(--paper-2, #EDE6D4);
+    text-align: center;
+  }
+  .ot-cta-inner { max-width: 640px; margin: 0 auto; }
+  .ot-cta-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(36px, 5vw, 56px);
+    margin: 16px 0 20px;
+  }
+  .ot-cta-h2 em { font-style: normal; color: var(--gold-3); }
+  .ot-cta-p { font-size: 17px; color: var(--ink-3); margin: 0 0 40px; line-height: 1.7; }
+
+  @media (max-width: 960px) {
+    .ot-grid { grid-template-columns: 1fr; }
+    .ot-card-wide { grid-column: span 1; }
+  }
+</style>
+
+<!-- HERO -->
+<section class="ot-hero">
+  <div class="ot-hero-inner">
+    <p class="ot-kicker">— Six outils complémentaires</p>
+    <h1 class="ot-h1">La boîte à<br/>outils <em>RH</em></h1>
+    <p class="ot-sub">Un ensemble cohérent d'instruments pensés pour accompagner chaque étape de votre vie professionnelle au Sénégal.</p>
+    <span class="ot-rule"></span>
+  </div>
+</section>
+
+<!-- GRILLE -->
+<section class="ot-section">
+  <div class="ot-grid">
+
+    <!-- Setlou -->
+    <a href="/setlou" class="ot-card">
+      <span class="ot-card-num">I</span>
+      <svg class="ot-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+      <p class="ot-card-kicker">Outil I · Conseil juridique</p>
+      <h2 class="ot-card-name">Setlou</h2>
+      <p class="ot-card-desc">Conseiller juridique IA spécialisé en droit du travail sénégalais. Maîtrise le Code du Travail (Loi n° 97-17), les conventions collectives, la jurisprudence et les procédures IPRES. Répond en langue claire, avec références légales à l'appui.</p>
+      <span class="ot-card-link">Accéder à Setlou →</span>
+    </a>
+
+    <!-- Visionneuse -->
+    <a href="/visionneuse" class="ot-card">
+      <span class="ot-card-num">II</span>
+      <svg class="ot-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+      <p class="ot-card-kicker">Outil II · Lecture</p>
+      <h2 class="ot-card-name">Visionneuse</h2>
+      <p class="ot-card-desc">Bibliothèque juridique numérique : Code du Travail, décrets d'application, conventions collectives sectorielles. Navigation par article, recherche plein texte, annotation personnelle. Sans téléchargement.</p>
+      <span class="ot-card-link">Ouvrir la visionneuse →</span>
+    </a>
+
+    <!-- Coffre-fort -->
+    <a href="/coffre-fort" class="ot-card ot-card-wide">
+      <span class="ot-card-num" style="color:rgba(201,169,97,.15)">III</span>
+      <svg class="ot-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="3"/>
+        <circle cx="12" cy="12" r="4"/>
+        <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>
+        <path d="M12 5v2M12 17v2M5 12h2M17 12h2"/>
+      </svg>
+      <p class="ot-card-kicker">Outil III · Archivage sécurisé</p>
+      <h2 class="ot-card-name">Coffre-fort documentaire</h2>
+      <p class="ot-card-desc" style="max-width:640px">Coffre-fort numérique chiffré AES-256 conforme aux lois sénégalaises 2008-08 et 2008-12 sur la protection des données. Archivez bulletins de paie, contrats, attestations, relevés IPRES et tout document RH. Durée de conservation légale : 10 ans minimum. Accès multi-appareils, partage sécurisé par lien temporisé, notification en cas d'accès non autorisé.</p>
+      <span class="ot-card-link">Accéder au coffre-fort →</span>
+    </a>
+
+    <!-- Xalima -->
+    <a href="/xalima" class="ot-card">
+      <span class="ot-card-num">IV</span>
+      <svg class="ot-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.24 4.24a2.83 2.83 0 00-4 0L4 16.48V20h3.52L19.76 7.76a2.83 2.83 0 000-4z"/>
+        <line x1="16" y1="8" x2="19" y2="5"/>
+      </svg>
+      <p class="ot-card-kicker">Outil IV · Rédaction guidée</p>
+      <h2 class="ot-card-name">Xalima</h2>
+      <p class="ot-card-desc">Assistant de rédaction de courriers professionnels. Formulaire en 3 étapes → courrier complet, correctement structuré, conforme aux usages sénégalais. 10 types de courriers disponibles.</p>
+      <span class="ot-card-link">Rédiger un courrier →</span>
+    </a>
+
+    <!-- Consultation -->
+    <a href="/rdv-consultation" class="ot-card">
+      <span class="ot-card-num">V</span>
+      <svg class="ot-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/>
+        <circle cx="8" cy="16" r="1.5" fill="currentColor" stroke="none"/>
+        <circle cx="12" cy="16" r="1.5" fill="currentColor" stroke="none"/>
+        <circle cx="16" cy="16" r="1.5" fill="currentColor" stroke="none"/>
+      </svg>
+      <p class="ot-card-kicker">Outil V · Expertises</p>
+      <h2 class="ot-card-name">Consultation</h2>
+      <p class="ot-card-desc">Rendez-vous visio avec un juriste ou expert RH certifié. Séance d'une heure. Compte-rendu archivé automatiquement. Prise en charge immédiate pour urgences.</p>
+      <span class="ot-card-link">Prendre rendez-vous →</span>
+    </a>
+
+    <!-- Offres d'emploi -->
+    <a href="/offres-emploi" class="ot-card">
+      <span class="ot-card-num">VI</span>
+      <svg class="ot-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="7" width="18" height="13" rx="2"/>
+        <path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2M12 12v2M10 14h4"/>
+      </svg>
+      <p class="ot-card-kicker">Outil VI · Marché</p>
+      <h2 class="ot-card-name">Offres d'emploi</h2>
+      <p class="ot-card-desc">Tableau de bord emploi premium : offres vérifiées par secteur, candidature en un clic, alertes personnalisées. Partenariats avec employeurs engagés dans la conformité sociale.</p>
+      <span class="ot-card-link">Voir les offres →</span>
+    </a>
+
+  </div>
+</section>
+
+<!-- CTA FORMULES -->
+<section class="ot-cta">
+  <div class="ot-cta-inner">
+    <p class="ot-kicker">— Accès selon formule</p>
+    <h2 class="ot-cta-h2">Choisissez votre <em>formule</em></h2>
+    <p class="ot-cta-p">Les outils sont accessibles progressivement selon votre abonnement. La formule Basique donne accès à la Visionneuse et à un usage limité de Setlou et Xalima.</p>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <a href="/formules" class="btn btn-primary">Voir les formules</a>
+      <a href="/souscripteurs" class="btn btn-ghost">Qui peut souscrire</a>
+    </div>
+  </div>
+</section>
+
+</Layout>

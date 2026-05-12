@@ -1,0 +1,189 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../components/DashboardShell.astro';
+import { AssistanceChat } from '../../../components/employee/AssistanceChat.tsx';
+import { SetlouDelegate } from '../../../components/shared/SetlouDelegate.tsx';
+import { XalimaDelegate } from '../../../components/shared/XalimaDelegate.tsx';
+import { createClient } from '../../../lib/supabase';
+import { SubscriptionService } from '../../../lib/subscriptionService';
+import { requireRole } from '../../../lib/guards';
+
+const guard = await requireRole(Astro, 'delegate');
+if (guard) return guard;
+
+const { user } = Astro.locals;
+const supabase = createClient({ request: Astro.request, cookies: Astro.cookies });
+const subscriptionService = new SubscriptionService(supabase);
+const subscription = await subscriptionService.getUserSubscription(user.id);
+const userTier = subscription?.plan?.name || null;
+---
+
+<DashboardLayout title="Centre d'Aide - PREVICARE EMPLOI">
+  <DashboardShell role="delegate">
+
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+      <ol class="flex items-center gap-2 text-sm" style="color:var(--ink-4)">
+        <li><a href="/espace-delegues" class="hover:opacity-80 transition-opacity" style="color:var(--ink-4)">Tableau de bord</a></li>
+        <li><span>/</span></li>
+        <li class="font-medium" style="color:var(--ink)">Assistance</li>
+      </ol>
+    </nav>
+
+    <div class="mb-8 rounded-xl overflow-hidden relative" style="background:var(--ink)">
+      <div class="absolute inset-0 opacity-5" style="background:radial-gradient(ellipse at top right, var(--gold) 0%, transparent 60%)"></div>
+      <div class="absolute left-0 top-0 bottom-0 w-1" style="background:var(--gold)"></div>
+      <div class="relative px-6 py-6 flex flex-col md:flex-row md:items-center gap-4">
+        <div class="flex items-center gap-4 flex-1">
+          <div class="flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center" style="background:rgba(201,169,97,.15)">
+            <svg class="w-7 h-7" style="color:var(--gold)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold" style="font-family:var(--display);color:#fff">Centre d'Aide</h1>
+            <p class="text-sm" style="color:rgba(255,255,255,.65)">SETLOU, XALIMA et ressources pour délégués du personnel</p>
+          </div>
+        </div>
+        <a href="/espace-delegues/tickets/nouveau"
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg"
+          style="background:rgba(201,169,97,.15);color:var(--gold);border:1px solid rgba(201,169,97,.30)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Créer un ticket
+        </a>
+      </div>
+    </div>
+
+    <div class="grid gap-4 mb-8 md:grid-cols-2">
+      <a href="/espace-delegues/juridique/setlou" class="bg-white rounded-xl border hover:shadow-md transition-shadow p-5" style="border-color:var(--rule)">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(201,169,97,.12)">
+            <svg class="w-5 h-5" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-semibold text-sm" style="color:var(--ink)">SETLOU — Conseil Représentation</p>
+            <p class="text-xs" style="color:var(--ink-4)">Assistant IA spécialisé en droit social</p>
+          </div>
+        </div>
+        <p class="text-xs font-semibold mt-3" style="color:var(--gold-3)">Ouvrir SETLOU →</p>
+      </a>
+
+      <a href="/espace-delegues/juridique/courriers" class="bg-white rounded-xl border hover:shadow-md transition-shadow p-5" style="border-color:var(--rule)">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(201,169,97,.12)">
+            <svg class="w-5 h-5" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-semibold text-sm" style="color:var(--ink)">XALIMA — Rédaction Délégué</p>
+            <p class="text-xs" style="color:var(--ink-4)">Rédaction de PV, réclamations, accords</p>
+          </div>
+        </div>
+        <p class="text-xs font-semibold mt-3" style="color:var(--gold-3)">Ouvrir XALIMA →</p>
+      </a>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-2 mb-8">
+      <div class="bg-white rounded-xl border" style="border-color:var(--rule)">
+        <div class="px-6 py-4 border-b flex items-center justify-between" style="border-color:var(--rule)">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:var(--ink)">
+              <svg class="w-5 h-5" style="color:var(--gold)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold" style="color:var(--ink)">SETLOU</h3>
+              <p class="text-sm mt-0.5" style="color:var(--ink-4)">Droit de la représentation & prérogatives</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+            <span class="text-xs" style="color:var(--ink-4)">Disponible</span>
+          </div>
+        </div>
+        <div class="p-6">
+          <SetlouDelegate client:load userId={user.id} userTier={userTier} variant="full" />
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border" style="border-color:var(--rule)">
+        <div class="px-6 py-4 border-b flex items-center justify-between" style="border-color:var(--rule)">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:var(--ink)">
+              <svg class="w-5 h-5" style="color:var(--gold)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold" style="color:var(--ink)">XALIMA</h3>
+              <p class="text-sm mt-0.5" style="color:var(--ink-4)">Documents sociaux & réclamations</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-6">
+          <XalimaDelegate client:load userTier={userTier} />
+        </div>
+      </div>
+    </div>
+
+    <div class="grid gap-4 mb-8 md:grid-cols-2">
+      <a href="/espace-delegues/assistance/faq" class="bg-white rounded-xl border hover:shadow-md transition-shadow p-5" style="border-color:var(--rule)">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(201,169,97,.12)">
+            <svg class="w-5 h-5" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-semibold text-sm" style="color:var(--ink)">Foire aux Questions</p>
+            <p class="text-xs" style="color:var(--ink-4)">Réponses aux questions courantes</p>
+          </div>
+        </div>
+        <p class="text-xs font-semibold mt-3" style="color:var(--gold-3)">Consulter la FAQ →</p>
+      </a>
+
+      <a href="/espace-delegues/tickets" class="bg-white rounded-xl border hover:shadow-md transition-shadow p-5" style="border-color:var(--rule)">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(201,169,97,.12)">
+            <svg class="w-5 h-5" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-semibold text-sm" style="color:var(--ink)">Mes Tickets</p>
+            <p class="text-xs" style="color:var(--ink-4)">Suivi de vos demandes de support</p>
+          </div>
+        </div>
+        <p class="text-xs font-semibold mt-3" style="color:var(--gold-3)">Voir mes tickets →</p>
+      </a>
+    </div>
+
+    <div class="bg-white rounded-xl border mb-8" style="border-color:var(--rule)">
+      <div class="px-6 py-4 border-b flex items-center justify-between" style="border-color:var(--rule)">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:var(--ink)">
+            <svg class="w-5 h-5" style="color:var(--gold)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-semibold" style="color:var(--ink)">Assistant PREVICARE</h3>
+            <p class="text-sm mt-0.5" style="color:var(--ink-4)">Guide interactif — navigation et fonctionnalités de l'application</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+          <span class="text-xs" style="color:var(--ink-4)">Disponible</span>
+        </div>
+      </div>
+      <div class="p-6">
+        <AssistanceChat variant="full" assistantType="previcare" client:load />
+      </div>
+    </div>
+  </DashboardShell>
+</DashboardLayout>

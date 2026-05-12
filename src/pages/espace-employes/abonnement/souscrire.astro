@@ -1,0 +1,254 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../components/DashboardShell.astro';
+import { createClient } from '../../../lib/supabase';
+import { SubscriptionService } from '../../../lib/subscriptionService';
+import { formatCurrency } from '../../../types/payments';
+import { isQuoteRequired, getBillingLabel } from '../../../types/subscription';
+
+const { user } = Astro.locals;
+
+if (!user) {
+  return Astro.redirect('/connexion?redirect=/formules');
+}
+
+const supabase = createClient({ request: Astro.request, cookies: Astro.cookies });
+const subscriptionService = new SubscriptionService(supabase);
+
+const planName = Astro.url.searchParams.get('plan') || 'essentiel';
+const plan = await subscriptionService.getPlanByName(planName);
+
+if (!plan) {
+  return Astro.redirect('/formules');
+}
+
+if (isQuoteRequired(plan)) {
+  return Astro.redirect('/formules');
+}
+
+const billingLabel = getBillingLabel(plan.billing_period);
+
+const existingSubscription = await subscriptionService.getUserSubscription(user.id);
+
+const isDevelopment = import.meta.env.DEV;
+---
+
+<DashboardLayout title={`Souscrire à ${plan.display_name} - PREVICARE EMPLOI`}>
+  <DashboardShell title="Souscrire à une offre">
+    
+    <div class="max-w-3xl mx-auto">
+      {existingSubscription && existingSubscription.status === 'active' && (
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <div class="flex">
+            <svg class="h-5 w-5 text-yellow-400 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+            </svg>
+            <div>
+              <p class="text-sm text-yellow-800">
+                Vous avez déjà un abonnement actif ({existingSubscription.plan?.display_name}). 
+                En souscrivant à cette offre, votre abonnement actuel sera remplacé.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+        <div class="p-6" style="background: linear-gradient(to right, #1e3a5f, #c9a227);">
+          <h2 class="text-2xl font-bold text-white">{plan.display_name}</h2>
+          <p class="text-white/90 mt-1">{plan.description}</p>
+          <div class="mt-4">
+            <span class="text-4xl font-bold text-white">{formatCurrency(plan.price!)}</span>
+            <span class="text-lg text-white/80">{billingLabel}</span>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <h3 class="font-semibold text-gray-900 mb-3">Avantages inclus</h3>
+          <ul class="space-y-2 mb-6">
+            {plan.features.map((feature: string) => (
+              <li class="flex items-center text-gray-600">
+                <svg class="h-5 w-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                {feature}
+              </li>
+            ))}
+          </ul>
+
+          <hr class="my-6" />
+
+          <form id="subscriptionForm" class="space-y-6">
+            <input type="hidden" name="planId" value={plan.id} />
+            <input type="hidden" name="planName" value={plan.name} />
+            <input type="hidden" name="amount" value={plan.price} />
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-3">
+                Mode de paiement
+              </label>
+              <div class="grid grid-cols-1 gap-4">
+                <label class="relative flex items-center p-4 border rounded-lg cursor-pointer hover:border-primary transition-colors payment-option">
+                  <input type="radio" name="paymentMethod" value="dexchange" class="sr-only" checked />
+                  <div class="flex items-center flex-1">
+                    <div class="flex items-center justify-center w-12 h-12 bg-blue-50 rounded-lg mr-4 flex-shrink-0">
+                      <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <p class="font-semibold text-gray-900">Mobile Money</p>
+                      <p class="text-sm text-gray-500">Orange Money · Wave · Free Money · Wizall</p>
+                    </div>
+                    <div class="ml-auto flex items-center gap-2">
+                      <span class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full font-medium">Recommandé</span>
+                    </div>
+                  </div>
+                  <div class="absolute inset-0 border-2 border-transparent rounded-lg pointer-events-none payment-check"></div>
+                </label>
+
+                {isDevelopment && (
+                  <label class="relative flex items-center p-4 border rounded-lg cursor-pointer hover:border-primary transition-colors payment-option">
+                    <input type="radio" name="paymentMethod" value="mock" class="sr-only" />
+                    <div class="flex items-center">
+                      <span class="text-2xl mr-3">🧪</span>
+                      <div>
+                        <p class="font-medium text-gray-900">Mode Test</p>
+                        <p class="text-xs text-gray-500">Environnement de développement uniquement</p>
+                      </div>
+                    </div>
+                    <div class="absolute inset-0 border-2 border-transparent rounded-lg pointer-events-none payment-check"></div>
+                  </label>
+                )}
+              </div>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-100 rounded-lg p-4 text-sm text-blue-800">
+              <div class="flex items-start">
+                <svg class="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p>
+                  Vous serez redirigé vers la plateforme sécurisée <strong>Dexchange</strong> pour finaliser votre paiement. 
+                  Choisissez ensuite votre opérateur mobile money et confirmez le paiement sur votre téléphone.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <input
+                type="checkbox"
+                id="terms"
+                name="terms"
+                required
+                class="mt-1 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <label for="terms" class="ml-3 text-sm text-gray-600">
+                J'accepte les <a href="/cga-cgu" class="text-primary hover:underline">conditions d'utilisation</a> 
+                et la <a href="/cga-cgu#donnees" class="text-primary hover:underline">politique de confidentialité</a>
+              </label>
+            </div>
+
+            <div class="flex items-start mt-3 p-3 rounded-lg" style="border:1px solid var(--rule);background:var(--paper)">
+              <input
+                type="checkbox"
+                id="cga"
+                name="cgaAccepted"
+                required
+                class="mt-1 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <label for="cga" class="ml-3 text-sm text-gray-600">
+                J'accepte les <a href="/cga-cgu#cga" class="text-primary hover:underline font-semibold">Conditions Générales d'Abonnement (CGA)</a>
+              </label>
+            </div>
+
+            <input type="hidden" name="cgaVersion" value="1.0" />
+
+            <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg"></div>
+
+            <button
+              type="submit"
+              id="submitBtn"
+              class="w-full bg-primary text-white py-4 px-6 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center"
+            >
+              <span id="btnText">Confirmer et payer {formatCurrency(plan.price!)}</span>
+              <svg id="btnSpinner" class="hidden animate-spin ml-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="mt-6 text-center">
+        <a href="/formules" class="text-gray-600 hover:text-primary">
+          ← Retour aux offres
+        </a>
+      </div>
+    </div>
+
+  </DashboardShell>
+</DashboardLayout>
+
+<style>
+  .payment-option input:checked ~ .payment-check {
+    border-color: var(--color-primary, #3b82f6);
+  }
+  .payment-option:has(input:checked) {
+    border-color: var(--color-primary, #3b82f6);
+    background-color: rgb(239 246 255);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('subscriptionForm') as HTMLFormElement;
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const btnSpinner = document.getElementById('btnSpinner');
+    const errorMessage = document.getElementById('errorMessage');
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (submitBtn) submitBtn.setAttribute('disabled', 'true');
+      if (btnText) btnText.textContent = 'Traitement en cours...';
+      if (btnSpinner) btnSpinner.classList.remove('hidden');
+      if (errorMessage) errorMessage.classList.add('hidden');
+
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch('/api/subscribe', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          if (result.paymentUrl) {
+            if (btnText) btnText.textContent = 'Redirection vers le paiement...';
+            window.location.href = result.paymentUrl;
+          } else if (result.redirect) {
+            window.location.href = result.redirect;
+          } else {
+            window.location.href = '/espace-employes/abonnement';
+          }
+        } else {
+          throw new Error(result.message || 'Une erreur est survenue');
+        }
+      } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : 'Une erreur est survenue. Veuillez réessayer.';
+        if (errorMessage) {
+          errorMessage.textContent = msg;
+          errorMessage.classList.remove('hidden');
+        }
+        if (submitBtn) submitBtn.removeAttribute('disabled');
+        if (btnText) btnText.textContent = `Confirmer et payer`;
+        if (btnSpinner) btnSpinner.classList.add('hidden');
+      }
+    });
+  });
+</script>

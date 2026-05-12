@@ -1,0 +1,157 @@
+
+---
+import Layout from '../../layouts/Layout.astro';
+import SectionContainer from '../../components/SectionContainer.astro';
+import SectionTitle from '../../components/SectionTitle.astro';
+import { Card, CardContent } from '../../components/ui/card';
+import { Shield, FileText, MessageSquare, ArrowRight, Scale, BookOpen, Users } from 'lucide-react';
+---
+
+<Layout title="Conseil Juridique - PREVICARE EMPLOI">
+  <main class="flex min-h-screen flex-col">
+    <!-- Hero Section -->
+    <section class="relative w-full py-20 md:py-28 overflow-hidden">
+      <!-- Image de fond -->
+      <div
+        class="absolute inset-0 z-0"
+        style="background-image: url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center;"
+      >
+        <!-- Overlay pour améliorer la lisibilité -->
+        <div class="absolute inset-0 bg-gradient-to-r from-tertiary/90 to-tertiary/70"></div>
+      </div>
+
+      <div class="container relative px-4 md:px-6 z-10">
+        <div class="grid gap-12 lg:grid-cols-2 items-center">
+          <div class="space-y-6">
+            <div class="badge badge-primary inline-flex items-center mb-2">
+              Service Juridique
+            </div>
+            <h1 class="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl text-white">
+              Assistance Juridique
+            </h1>
+            <p class="text-xl text-white/90 max-w-[600px]">
+              Conseil juridique spécialisé en droit du travail sénégalais pour tous vos besoins professionnels.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3 pt-4">
+              <a
+                href="/inscription"
+                class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-md bg-white text-blue-900 hover:bg-white/90 shadow-button-glow btn-glow transition-all"
+              >
+                Commencer maintenant 
+                <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </a>
+              <a
+                href="/contact"
+                class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-md border border-white text-white bg-white/20 hover:bg-white/30 transition-colors"
+              >
+                Nous contacter
+              </a>
+            </div>
+          </div>
+          <div class="relative">
+            <div class="absolute -top-6 -left-6 w-24 h-24 bg-white/10 rounded-full animate-pulse-slow"></div>
+            <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-white/10 rounded-full animate-pulse-slow animation-delay-1000"></div>
+
+            <div class="relative rounded-2xl overflow-hidden shadow-card card-3d">
+              <img
+                src="https://images.unsplash.com/photo-1589391886645-d51941baf7fb?q=80&w=1000&auto=format&fit=crop"
+                alt="Assistance juridique"
+                class="w-full h-auto object-cover aspect-video"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-blue-900/30 to-transparent"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Section -->
+    <SectionContainer background="accent">
+      <SectionTitle
+        title="Nos services juridiques"
+        badge="Expertise"
+        badgeVariant="tertiary"
+        subtitle="Une gamme complète de services juridiques adaptés aux besoins des travailleurs et employeurs au Sénégal."
+      />
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {[
+          {
+            icon: Scale,
+            title: "Conseil en droit du travail",
+            description: "Consultation personnalisée sur tous les aspects du droit du travail sénégalais.",
+          },
+          {
+            icon: FileText,
+            title: "Rédaction de contrats",
+            description: "Élaboration et révision de contrats de travail conformes à la législation en vigueur.",
+          },
+          {
+            icon: Shield,
+            title: "Gestion des litiges",
+            description: "Accompagnement dans la résolution des conflits employeur-employé.",
+          },
+          {
+            icon: BookOpen,
+            title: "Veille juridique",
+            description: "Information régulière sur les évolutions législatives et réglementaires.",
+          },
+          {
+            icon: Users,
+            title: "Médiation sociale",
+            description: "Facilitation du dialogue social et résolution amiable des conflits.",
+          },
+          {
+            icon: MessageSquare,
+            title: "Hotline juridique",
+            description: "Assistance téléphonique pour répondre à vos questions urgentes.",
+          },
+        ].map((service, index) => (
+          <Card
+            key={index}
+            className="border-none shadow-card transition-all duration-300 hover:shadow-lg group card-hover"
+            client:load
+          >
+            <CardContent className="p-6 flex flex-col items-center text-center">
+              <div class="p-3 rounded-full bg-green-600/10 group-hover:bg-green-600/20 transition-colors mb-4">
+                <div class="group-hover:animate-wave">
+                  <service.icon className="h-8 w-8 text-green-700" />
+                </div>
+              </div>
+              <h3 class="text-xl font-bold mb-2 text-blue-900 group-hover:text-green-700 transition-colors">{service.title}</h3>
+              <p class="text-gray-600">{service.description}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </SectionContainer>
+
+    <!-- CTA Section -->
+    <SectionContainer background="gradient-tertiary">
+      <div class="flex flex-col items-center justify-center space-y-4 text-center">
+        <h2 class="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-white">
+          Besoin d'un conseil juridique ?
+        </h2>
+        <p class="max-w-[700px] md:text-xl/relaxed text-white">
+          Ne restez pas dans l'incertitude. Nos experts sont là pour vous accompagner dans toutes vos démarches.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 mt-6">
+          <a
+            href="/inscription"
+            class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-md bg-white text-green-700 hover:bg-white/90 shadow-button-glow btn-glow transition-all"
+          >
+            Obtenir un conseil
+          </a>
+          <a
+            href="/contact"
+            class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-md border border-white text-white hover:bg-white/10 transition-colors"
+          >
+            Nous contacter
+          </a>
+        </div>
+      </div>
+    </SectionContainer>
+  </main>
+</Layout>

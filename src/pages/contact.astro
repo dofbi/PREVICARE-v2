@@ -1,0 +1,293 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const { user } = Astro.locals;
+const success = Astro.url.searchParams.get('success') === '1';
+---
+
+<Layout title="Contact — Previcare Emploi" description="Contactez l'équipe Previcare Emploi pour toute question sur nos services, devis ou support technique.">
+
+<style>
+  .ct-hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 130px 40px 100px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .ct-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(201,169,97,.12) 0%, transparent 65%);
+  }
+  .ct-hero-inner { position: relative; z-index: 2; max-width: 700px; margin: 0 auto; }
+  .ct-kicker {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 7px;
+    text-transform: uppercase;
+    color: var(--gold-2);
+    margin-bottom: 32px;
+  }
+  .ct-h1 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(48px, 7vw, 80px);
+    line-height: .95;
+    margin: 0 0 24px;
+  }
+  .ct-h1 em { font-style: normal; color: var(--gold-2); }
+  .ct-hero-p {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 18px;
+    color: rgba(246,244,238,.7);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .ct-form-section {
+    padding: 80px 40px;
+    background: var(--paper);
+  }
+  .ct-form-inner {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .ct-form-card {
+    background: #fff;
+    border: 1px solid var(--rule);
+    padding: 48px;
+  }
+  .ct-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+  .ct-label {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--ink-4);
+  }
+  .ct-input,
+  .ct-select,
+  .ct-textarea {
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .ct-input:focus,
+  .ct-select:focus,
+  .ct-textarea:focus {
+    border-color: var(--gold);
+  }
+  .ct-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .ct-success {
+    background: rgba(22,163,74,.08);
+    border: 1px solid rgba(22,163,74,.25);
+    border-radius: 4px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .ct-success-icon { font-size: 32px; margin-bottom: 12px; }
+  .ct-success-title {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 24px;
+    color: var(--ink);
+    margin: 0 0 8px;
+  }
+  .ct-success-p { font-size: 14px; color: var(--ink-3); margin: 0; }
+  .ct-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .ct-error.visible { display: block; }
+
+  .ct-info-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin-top: 48px;
+  }
+  .ct-info-item {
+    background: #fff;
+    padding: 32px 24px;
+    text-align: center;
+  }
+  .ct-info-item svg { margin: 0 auto 12px; }
+  .ct-info-title {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    margin-bottom: 4px;
+  }
+  .ct-info-text { font-size: 14px; color: var(--ink-3); line-height: 1.6; }
+
+  @media (max-width: 800px) {
+    .ct-row { grid-template-columns: 1fr; }
+    .ct-form-card { padding: 28px 20px; }
+    .ct-info-row { grid-template-columns: 1fr; }
+  }
+</style>
+
+<!-- HERO -->
+<section class="ct-hero">
+  <div class="ct-hero-inner">
+    <p class="ct-kicker">— Contact</p>
+    <h1 class="ct-h1">Parlons <em>ensemble</em></h1>
+    <p class="ct-hero-p">Une question, un besoin, un projet ? Notre équipe est à votre écoute.</p>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="ct-form-section">
+  <div class="ct-form-inner">
+    {success && (
+      <div class="ct-success">
+        <div class="ct-success-icon">&#10003;</div>
+        <h2 class="ct-success-title">Message envoyé</h2>
+        <p class="ct-success-p">Nous vous répondrons dans les plus brefs délais.</p>
+      </div>
+    )}
+
+    <div class="ct-form-card">
+      <form id="contactForm">
+        <div class="ct-row">
+          <div class="ct-field">
+            <label class="ct-label" for="name">Nom complet</label>
+            <input type="text" id="name" name="name" required class="ct-input" placeholder="Votre nom" value={user?.user_metadata?.full_name || ''} />
+          </div>
+          <div class="ct-field">
+            <label class="ct-label" for="email">E-mail</label>
+            <input type="email" id="email" name="email" required class="ct-input" placeholder="vous@exemple.com" value={user?.email || ''} />
+          </div>
+        </div>
+
+        <div class="ct-field">
+          <label class="ct-label" for="category">Catégorie</label>
+          <select id="category" name="category" class="ct-select" required>
+            <option value="general">Question générale</option>
+            <option value="devis">Demande de devis</option>
+            <option value="support">Support technique</option>
+            <option value="billing">Facturation & paiements</option>
+            <option value="technical">Problème technique</option>
+          </select>
+        </div>
+
+        <div class="ct-field">
+          <label class="ct-label" for="subject">Sujet</label>
+          <input type="text" id="subject" name="subject" required class="ct-input" placeholder="L'objet de votre message" />
+        </div>
+
+        <div class="ct-field">
+          <label class="ct-label" for="message">Message</label>
+          <textarea id="message" name="message" rows={5} required class="ct-textarea" placeholder="Décrivez votre besoin…"></textarea>
+        </div>
+
+        <div id="contactError" class="ct-error"></div>
+
+        <button type="submit" id="contactSubmit" class="btn btn-gold" style="width:100%;text-align:center;padding:16px">
+          <span id="contactBtnText">Envoyer le message</span>
+          <svg id="contactSpinner" class="hidden animate-spin" style="display:inline;vertical-align:middle;margin-left:8px;width:18px;height:18px" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </button>
+      </form>
+    </div>
+
+    <div class="ct-info-row">
+      <div class="ct-info-item">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--gold-3)"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <p class="ct-info-title">— E-mail</p>
+        <p class="ct-info-text">contact@previcare.sn</p>
+      </div>
+      <div class="ct-info-item">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--gold-3)"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+        <p class="ct-info-title">— Téléphone</p>
+        <p class="ct-info-text">+221 33 800 00 00</p>
+      </div>
+      <div class="ct-info-item">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--gold-3)"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <p class="ct-info-title">— Adresse</p>
+        <p class="ct-info-text">Dakar, Sénégal</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const form = document.getElementById('contactForm') as HTMLFormElement | null;
+  const submitBtn = document.getElementById('contactSubmit') as HTMLButtonElement | null;
+  const btnText = document.getElementById('contactBtnText');
+  const spinner = document.getElementById('contactSpinner');
+  const errorEl = document.getElementById('contactError');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (submitBtn) submitBtn.disabled = true;
+    if (btnText) btnText.textContent = 'Envoi en cours…';
+    if (spinner) spinner.classList.remove('hidden');
+    if (errorEl) { errorEl.classList.remove('visible'); errorEl.textContent = ''; }
+
+    const formData = new FormData(form);
+    const body = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      category: formData.get('category'),
+      subject: formData.get('subject'),
+      message: formData.get('message'),
+    };
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const result = await res.json();
+      if (result.success) {
+        window.location.href = '/contact?success=1';
+      } else {
+        throw new Error(result.message || 'Une erreur est survenue');
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Une erreur est survenue. Veuillez réessayer.';
+      if (errorEl) { errorEl.textContent = msg; errorEl.classList.add('visible'); }
+      if (submitBtn) submitBtn.disabled = false;
+      if (btnText) btnText.textContent = 'Envoyer le message';
+      if (spinner) spinner.classList.add('hidden');
+    }
+  });
+</script>
+
+</Layout>

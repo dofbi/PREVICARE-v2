@@ -1,0 +1,221 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../components/DashboardShell.astro';
+import AvatarUpload from '../../components/AvatarUpload';
+import { createClient } from '../../lib/supabase';
+import { requireRole } from '../../lib/guards';
+
+const guard = await requireRole(Astro, 'expatriate');
+if (guard) return guard;
+
+const { user } = Astro.locals;
+const supabase = createClient({ request: Astro.request, cookies: Astro.cookies });
+
+const { data: profile } = await supabase
+  .from('profiles')
+  .select('*')
+  .eq('id', user.id)
+  .single();
+
+const isProfileComplete = profile &&
+  profile.first_name &&
+  profile.last_name &&
+  profile.email &&
+  profile.phone;
+
+const countries = [
+  "Sénégal", "France", "Côte d'Ivoire", "Mali", "Burkina Faso", "Niger",
+  "Guinée", "Mauritanie", "Bénin", "Togo", "Ghana", "Cameroun", "Gabon",
+  "Maroc", "Tunisie", "Algérie", "Canada", "États-Unis", "Belgique", "Suisse",
+  "Allemagne", "Italie", "Espagne", "Royaume-Uni", "Pays-Bas", "Autre"
+];
+---
+
+<DashboardLayout title="Paramètres - PREVICARE EMPLOI">
+  <DashboardShell role="expatriate">
+
+    <!-- Breadcrumb -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+      <ol class="flex items-center gap-2 text-sm" style="color:var(--ink-4)">
+        <li><a href="/espace-expatries" class="hover:opacity-80 transition-opacity" style="color:var(--ink-4)">Tableau de bord</a></li>
+        <li><span>/</span></li>
+        <li class="font-medium" style="color:var(--ink)">Paramètres</li>
+      </ol>
+    </nav>
+
+    {!isProfileComplete && (
+      <div class="mb-6 p-4 rounded-xl border flex items-start gap-3" style="background:rgba(201,169,97,.08);border-color:rgba(201,169,97,.30)">
+        <svg class="h-5 w-5 flex-shrink-0 mt-0.5" style="color:var(--gold-3)" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        <div>
+          <h3 class="text-sm font-semibold" style="color:var(--ink)">Profil incomplet</h3>
+          <p class="text-sm mt-0.5" style="color:var(--ink-4)">Veuillez compléter vos informations personnelles pour accéder à tous les services.</p>
+        </div>
+      </div>
+    )}
+
+    <!-- Onglets -->
+    <div class="mb-6">
+      <div class="flex gap-1 p-1 rounded-xl w-full max-w-xs" style="background:rgba(11,29,58,.06)">
+        <button class="tab-button flex-1 text-xs font-semibold py-2 px-3 rounded-lg transition-all focus:outline-none" data-tab="personal"
+          style="background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(11,29,58,.12)">
+          Profil Personnel
+        </button>
+        <button class="tab-button flex-1 text-xs font-semibold py-2 px-3 rounded-lg transition-all focus:outline-none" data-tab="residence"
+          style="color:var(--ink-4)">
+          Résidence
+        </button>
+      </div>
+    </div>
+
+    <div class="space-y-5">
+      <!-- Onglet personnel -->
+      <div id="personal-tab" class="tab-content">
+        <div class="bg-white rounded-xl border" style="border-color:var(--rule)">
+          <div class="p-6 border-b" style="border-color:var(--rule)">
+            <h3 class="font-semibold" style="color:var(--ink)">Profil Personnel</h3>
+            <p class="text-sm mt-0.5" style="color:var(--ink-4)">Mettez à jour vos informations personnelles et de contact.</p>
+          </div>
+          <div class="p-6 border-b" style="border-color:var(--rule)">
+            <AvatarUpload client:load currentAvatarUrl={profile?.avatar_url} userId={user.id} />
+          </div>
+          <form id="personal-form" class="p-6 space-y-5">
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <div>
+                <label for="first_name" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Prénom *</label>
+                <input type="text" id="first_name" name="first_name" value={profile?.first_name || ''} required
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+              <div>
+                <label for="last_name" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Nom *</label>
+                <input type="text" id="last_name" name="last_name" value={profile?.last_name || ''} required
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+              <div>
+                <label for="email" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Email *</label>
+                <input type="email" id="email" name="email" value={profile?.email || user.email || ''} required
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+              <div>
+                <label for="phone" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Téléphone</label>
+                <input type="tel" id="phone" name="phone" value={profile?.phone || ''}
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+              <div class="sm:col-span-2">
+                <label for="address" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Adresse à l'étranger</label>
+                <textarea id="address" name="address" rows="3"
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff">{profile?.address || ''}</textarea>
+              </div>
+            </div>
+            <div class="flex justify-end pt-2">
+              <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg transition-opacity hover:opacity-90" style="background:var(--ink);color:var(--gold)">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                Sauvegarder
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Onglet résidence -->
+      <div id="residence-tab" class="tab-content hidden">
+        <div class="bg-white rounded-xl border" style="border-color:var(--rule)">
+          <div class="p-6 border-b" style="border-color:var(--rule)">
+            <h3 class="font-semibold" style="color:var(--ink)">Informations de Résidence</h3>
+            <p class="text-sm mt-0.5" style="color:var(--ink-4)">Gérez votre pays de résidence et votre employeur au Sénégal.</p>
+          </div>
+          <form id="residence-form" class="p-6 space-y-5">
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <div>
+                <label for="country" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Pays de résidence</label>
+                <select id="country" name="country"
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff">
+                  <option value="">-- Choisir un pays --</option>
+                  {countries.map(c => <option value={c} selected={profile?.country === c}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <label for="organization" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Employeur au Sénégal</label>
+                <input type="text" id="organization" name="organization" value={profile?.organization || ''} placeholder="Nom de l'entreprise"
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+            </div>
+            <div class="flex justify-end pt-2">
+              <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg transition-opacity hover:opacity-90" style="background:var(--ink);color:var(--gold)">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                Sauvegarder
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="message" class="hidden mt-5 p-4 rounded-xl border text-sm">
+      <p id="message-text"></p>
+    </div>
+
+    <script>
+      import { actions } from 'astro:actions';
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(tab => {
+          tab.addEventListener('click', function(this: HTMLElement) {
+            const targetTab = this.getAttribute('data-tab');
+            tabButtons.forEach(btn => {
+              (btn as HTMLElement).style.background = 'transparent';
+              (btn as HTMLElement).style.color = 'var(--ink-4)';
+              (btn as HTMLElement).style.boxShadow = '';
+            });
+            this.style.background = '#fff';
+            this.style.color = 'var(--ink)';
+            this.style.boxShadow = '0 1px 3px rgba(11,29,58,.12)';
+            tabContents.forEach(c => c.classList.add('hidden'));
+            document.getElementById(targetTab + '-tab')?.classList.remove('hidden');
+          });
+        });
+
+        const personalForm = document.getElementById('personal-form') as HTMLFormElement;
+        personalForm?.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          try {
+            const result = await actions.profile.updateProfile(new FormData(personalForm));
+            result.data?.success ? showMessage('Profil mis à jour avec succès', 'success') : showMessage(result.data?.message || 'Erreur', 'error');
+            if (result.data?.success) setTimeout(() => location.reload(), 1500);
+          } catch { showMessage('Une erreur inattendue s\'est produite', 'error'); }
+        });
+
+        const residenceForm = document.getElementById('residence-form') as HTMLFormElement;
+        residenceForm?.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          try {
+            const result = await actions.profile.updateProfile(new FormData(residenceForm));
+            result.data?.success ? showMessage('Informations de résidence mises à jour', 'success') : showMessage(result.data?.message || 'Erreur', 'error');
+            if (result.data?.success) setTimeout(() => location.reload(), 1500);
+          } catch { showMessage('Une erreur inattendue s\'est produite', 'error'); }
+        });
+
+        function showMessage(text: string, type: 'success' | 'error') {
+          const d = document.getElementById('message') as HTMLElement;
+          const t = document.getElementById('message-text') as HTMLElement;
+          t.textContent = text;
+          d.classList.remove('hidden');
+          if (type === 'success') { d.style.background='rgba(22,163,74,.08)'; d.style.borderColor='rgba(22,163,74,.25)'; d.style.color='#15803d'; }
+          else { d.style.background='rgba(239,68,68,.08)'; d.style.borderColor='rgba(239,68,68,.25)'; d.style.color='#dc2626'; }
+          setTimeout(() => d.classList.add('hidden'), 5000);
+        }
+      });
+    </script>
+  </DashboardShell>
+</DashboardLayout>

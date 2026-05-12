@@ -1,0 +1,130 @@
+
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../components/DashboardShell.astro';
+
+const { user } = Astro.locals;
+
+if (!user) {
+  return Astro.redirect('/connexion');
+}
+
+// Mock data des cotisations
+const cotisationsData = [
+  { year: 2024, months: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Août'], amount: 105937.5, status: 'En cours' },
+  { year: 2023, months: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'], amount: 831600, status: 'Complet' },
+  { year: 2022, months: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'], amount: 825600, status: 'Complet' },
+  { year: 2021, months: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'], amount: 792000, status: 'Complet' }
+];
+---
+
+<DashboardLayout title="Historique Cotisations IPRES - PREVICARE EMPLOI">
+  <DashboardShell title="Historique des cotisations">
+    
+    <!-- Breadcrumbs -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+      <ol class="flex items-center space-x-4">
+        <li><a href="/espace-employes" class="text-gray-400 hover:text-gray-500">Tableau de bord</a></li>
+        <li><span class="text-gray-300">/</span></li>
+        <li><a href="/espace-employes/ipres" class="text-gray-400 hover:text-gray-500">Suivi IPRES</a></li>
+        <li><span class="text-gray-300">/</span></li>
+        <li><span class="text-gray-500">Historique</span></li>
+      </ol>
+    </nav>
+
+    <!-- Filtres -->
+    <div class="bg-white rounded-lg shadow mb-6">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Filtres</h3>
+      </div>
+      <div class="p-6">
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Année</label>
+            <select class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+              <option>Toutes les années</option>
+              <option>2024</option>
+              <option>2023</option>
+              <option>2022</option>
+              <option>2021</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Statut</label>
+            <select class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+              <option>Tous les statuts</option>
+              <option>Complet</option>
+              <option>En cours</option>
+              <option>Retard</option>
+            </select>
+          </div>
+          <div class="flex items-end">
+            <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+              Appliquer les filtres
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tableau des cotisations -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-medium text-gray-900">Détail des cotisations par année</h3>
+          <button class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+            Télécharger PDF
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Année</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mois cotisés</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montant total</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {cotisationsData.map((row, index) => (
+              <tr data-key={index} class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {row.year}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <div class="flex flex-wrap gap-1">
+                    {row.months.map((month, i) => (
+                      <span key={i} class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                        {month}
+                      </span>
+                    ))}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {row.amount.toLocaleString()} CFA
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    row.status === 'Complet' ? 'bg-green-100 text-green-800' :
+                    row.status === 'En cours' ? 'bg-blue-100 text-blue-800' :
+                    'bg-red-100 text-red-800'
+                  }`}>
+                    {row.status}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <button class="text-blue-600 hover:text-blue-700">Détails</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </DashboardShell>
+</DashboardLayout>

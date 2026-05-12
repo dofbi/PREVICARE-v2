@@ -1,0 +1,147 @@
+
+[
+  {
+    "id": "notif_001",
+    "type": "info",
+    "priority": "high",
+    "category": "documents",
+    "title": "Nouvelle fiche de paie disponible",
+    "message": "Votre fiche de paie de mars 2024 est maintenant disponible dans vos documents.",
+    "date": "2024-04-01T09:00:00Z",
+    "read": false,
+    "action_url": "/espace-employes/documents",
+    "action_label": "Voir le document"
+  },
+  {
+    "id": "notif_002",
+    "type": "warning",
+    "priority": "medium",
+    "category": "documents",
+    "title": "Échéance certificat médical",
+    "message": "Votre certificat médical expire dans 30 jours. Pensez à le renouveler.",
+    "date": "2024-03-25T14:30:00Z",
+    "read": false,
+    "action_url": "/espace-employes/documents/upload",
+    "action_label": "Ajouter nouveau certificat"
+  },
+  // {
+  //   "id": "notif_003",
+  //   "type": "success",
+  //   "priority": "low",
+  //   "category": "ipres",
+  //   "title": "Cotisation IPRES à jour",
+  //   "message": "Votre cotisation IPRES de mars 2024 a été traitée avec succès.",
+  //   "date": "2024-03-20T11:15:00Z",
+  //   "read": true,
+  //   "action_url": "/espace-employes/ipres",
+  //   "action_label": "Voir détails"
+  // },
+  {
+    "id": "notif_004",
+    "type": "info",
+    "priority": "medium",
+    "category": "formation",
+    "title": "Formation obligatoire disponible",
+    "message": "Nouvelle formation en cybersécurité disponible. Inscription avant le 30 avril.",
+    "date": "2024-03-18T16:45:00Z",
+    "read": true,
+    "action_url": "/espace-employes/formation",
+    "action_label": "S'inscrire"
+  },
+  {
+    "id": "notif_005",
+    "type": "urgent",
+    "priority": "high",
+    "category": "juridique",
+    "title": "Consultation juridique urgente",
+    "message": "Suite à votre demande, une consultation juridique urgente a été programmée pour demain à 14h.",
+    "date": "2024-04-02T08:30:00Z",
+    "read": false,
+    "action_url": "/espace-employes/juridique",
+    "action_label": "Voir détails"
+  },
+  // {
+  //   "id": "notif_006",
+  //   "type": "warning",
+  //   "priority": "high",
+  //   "category": "ipres",
+  //   "title": "Écart détecté dans vos cotisations",
+  //   "message": "Un écart de cotisation IPRES a été détecté pour février 2024. Contactez votre employeur.",
+  //   "date": "2024-03-28T10:20:00Z",
+  //   "read": false,
+  //   "action_url": "/espace-employes/ipres/cotisations",
+  //   "action_label": "Voir les cotisations"
+  // },
+  // {
+  //   "id": "notif_007",
+  //   "type": "info",
+  //   "priority": "medium",
+  //   "category": "carriere",
+  //   "title": "Offres d'emploi correspondant à votre profil",
+  //   "message": "3 nouvelles offres d'emploi correspondent à vos critères de recherche.",
+  //   "date": "2024-03-15T09:45:00Z",
+  //   "read": false,
+  //   "action_url": "/espace-employes/carriere/offres",
+  //   "action_label": "Voir les offres"
+  // },
+  {
+    "id": "notif_008",
+    "type": "success",
+    "priority": "low",
+    "category": "assistance",
+    "title": "Ticket résolu",
+    "message": "Votre demande d'assistance #AS-2024-001 a été résolue avec succès.",
+    "date": "2024-03-12T16:30:00Z",
+    "read": true,
+    "action_url": "/espace-employes/assistance",
+    "action_label": "Voir le ticket"
+  },
+  {
+    "id": "notif_009",
+    "type": "info",
+    "priority": "medium",
+    "category": "juridique",
+    "title": "Nouvelle réglementation",
+    "message": "Mise à jour du code du travail sénégalais. Consultez les nouvelles dispositions.",
+    "date": "2024-03-10T14:15:00Z",
+    "read": false,
+    "action_url": "/espace-employes/juridique/veille",
+    "action_label": "Lire la mise à jour"
+  },
+  {
+    "id": "notif_010",
+    "type": "warning",
+    "priority": "medium",
+    "category": "formation",
+    "title": "Formation droits des travailleurs",
+    "message": "Session d'information sur vos droits en tant que travailleur. Inscription ouverte.",
+    "date": "2024-03-08T11:00:00Z",
+    "read": false,
+    "action_url": "/espace-employes/formation/droits-travailleurs",
+    "action_label": "S'inscrire"
+  },
+  {
+    "id": "notif_011",
+    "type": "error",
+    "priority": "high",
+    "category": "system",
+    "title": "Maintenance programmée",
+    "message": "Maintenance système prévue le 15 avril de 2h à 4h du matin. Services temporairement indisponibles.",
+    "date": "2024-04-10T18:00:00Z",
+    "read": false,
+    "action_url": "/espace-employes/system/maintenance",
+    "action_label": "Plus d'infos"
+  },
+  // {
+  //   "id": "notif_012",
+  //   "type": "info",
+  //   "priority": "low",
+  //   "category": "carriere",
+  //   "title": "Évaluation de compétences disponible",
+  //   "message": "Un nouveau module d'évaluation de compétences est disponible pour votre profil.",
+  //   "date": "2024-03-05T13:20:00Z",
+  //   "read": true,
+  //   "action_url": "/espace-employes/carriere/evaluation",
+  //   "action_label": "Commencer l'évaluation"
+  // }
+]

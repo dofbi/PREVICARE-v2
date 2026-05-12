@@ -1,0 +1,111 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../components/DashboardShell.astro';
+import { createClient, createServiceRoleClient } from '../../../lib/supabase';
+import { getTransactionStatus } from '../../../lib/dexchangeService';
+
+const ref = Astro.url.searchParams.get('ref');
+
+if (ref) {
+  try {
+    const serviceSupabase = createServiceRoleClient();
+
+    const { data: sub } = await serviceSupabase
+      .from('subscriptions')
+      .select('id, status, payment_reference')
+      .eq('id', ref)
+      .single();
+
+    if (sub && sub.status === 'pending' && sub.payment_reference) {
+      const statusResponse = await getTransactionStatus(sub.payment_reference);
+      const dexStatus = statusResponse.transaction.Status;
+
+      if (['FAILED', 'CANCELLED', 'EXPIRED'].includes(dexStatus)) {
+        await serviceSupabase
+          .from('subscriptions')
+          .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+          .eq('id', ref);
+
+        await serviceSupabase
+          .from('payments')
+          .update({ status: 'failed' })
+          .eq('subscription_id', ref)
+          .eq('status', 'pending');
+      }
+    }
+  } catch (err) {
+    console.error('[Echec page] Dexchange verification error:', err);
+  }
+}
+
+const { user } = Astro.locals;
+
+if (!user) {
+  return Astro.redirect('/connexion');
+}
+
+const supabase = createClient({ request: Astro.request, cookies: Astro.cookies });
+
+let isCancelledOrFailed = false;
+let planName: string | null = null;
+
+if (ref) {
+  const { data: subscription, error } = await supabase
+    .from('subscriptions')
+    .select('status, plan:subscription_plans(display_name)')
+    .eq('id', ref)
+    .eq('user_id', user.id)
+    .single();
+
+  if (!error && subscription) {
+    isCancelledOrFailed = subscription.status === 'cancelled' || subscription.status === 'expired';
+    const planData = subscription.plan;
+    if (planData && typeof planData === 'object' && !Array.isArray(planData)) {
+      planName = (planData as { display_name: string }).display_name;
+    } else if (Array.isArray(planData) && planData.length > 0) {
+      planName = (planData[0] as { display_name: string }).display_name;
+    }
+  }
+}
+---
+
+<DashboardLayout title="Paiement échoué - PREVICARE EMPLOI">
+  <DashboardShell role="employer">
+    <div class="max-w-2xl mx-auto text-center py-12">
+      <div class="mx-auto w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-6">
+        <svg class="h-10 w-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-900 mb-3">Le paiement n'a pas abouti</h2>
+      {isCancelledOrFailed ? (
+        <p class="text-gray-600 mb-2">
+          Le paiement de votre abonnement{planName && <span> <strong>{planName}</strong></span>} a été annulé ou refusé.
+          Aucun montant n'a été débité de votre compte.
+        </p>
+      ) : (
+        <p class="text-gray-600 mb-2">Votre paiement n'a pas pu être traité. Aucun montant n'a été débité de votre compte.</p>
+      )}
+      <p class="text-sm text-gray-500 mb-8">Vérifiez que votre compte mobile money dispose de fonds suffisants et réessayez.</p>
+
+      <div class="bg-gray-50 rounded-lg p-6 mb-8 text-left">
+        <h3 class="font-semibold text-gray-900 mb-3">Causes possibles</h3>
+        <ul class="space-y-2 text-sm text-gray-600">
+          <li class="flex items-start"><span class="text-red-400 mr-2 mt-0.5">•</span>Solde insuffisant sur votre compte mobile money</li>
+          <li class="flex items-start"><span class="text-red-400 mr-2 mt-0.5">•</span>Délai de confirmation dépassé (OTP expiré)</li>
+          <li class="flex items-start"><span class="text-red-400 mr-2 mt-0.5">•</span>Transaction annulée ou refusée</li>
+          <li class="flex items-start"><span class="text-red-400 mr-2 mt-0.5">•</span>Problème de connexion lors du paiement</li>
+        </ul>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/tarifs" class="inline-flex items-center justify-center px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium">
+          Réessayer
+        </a>
+        <a href="/espace-employeurs/assistance" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+          Contacter le support
+        </a>
+      </div>
+    </div>
+  </DashboardShell>
+</DashboardLayout>

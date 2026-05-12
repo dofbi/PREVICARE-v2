@@ -1,0 +1,684 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { CONSULTATION_PRICES, CONSULTATION_CATEGORY_LABELS, type ConsultationCategory } from '../lib/consultationBookingService';
+
+const { user } = Astro.locals;
+const isLoggedIn = !!user;
+const meta = user?.user_metadata ?? {};
+
+let defaultCategory: ConsultationCategory = 'employee';
+if (meta.role === 'employer' || meta.role === 'delegate') {
+  defaultCategory = 'executive';
+} else if (meta.is_expatriate === true) {
+  defaultCategory = 'expatriate';
+} else if (meta.job_category === 'technician') {
+  defaultCategory = 'technician';
+}
+---
+<Layout title="Consultation RH — Rendez-vous avec un expert — Previcare Emploi" description="Réservez une consultation d'une heure avec un juriste ou expert RH spécialisé en droit du travail sénégalais. Disponible en formule Gold.">
+
+<style>
+  /* ── HERO ────────────────────────────────────────────────────── */
+  .rv-hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 130px 40px 100px;
+    position: relative;
+    overflow: hidden;
+  }
+  .rv-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 70% 40%, rgba(201,169,97,.1) 0%, transparent 55%);
+  }
+  .rv-hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .rv-kicker {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 7px;
+    text-transform: uppercase;
+    color: var(--gold-2);
+    margin-bottom: 32px;
+  }
+  .rv-h1 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(52px, 7vw, 88px);
+    line-height: .95;
+    margin: 0 0 28px;
+  }
+  .rv-h1 em { font-style: normal; color: var(--gold-2); }
+  .rv-sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 19px;
+    color: rgba(246,244,238,.72);
+    line-height: 1.65;
+    margin: 0 0 40px;
+  }
+  .rv-hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+
+  /* Visuel calendrier */
+  .rv-cal {
+    border: 1px solid rgba(201,169,97,.2);
+    background: rgba(20,40,73,.7);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .rv-cal-header {
+    background: rgba(11,29,58,.9);
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(201,169,97,.15);
+  }
+  .rv-cal-month {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 20px;
+    color: var(--paper);
+  }
+  .rv-cal-body { padding: 16px; }
+  .rv-cal-days {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .rv-cal-day-label {
+    font-family: var(--sans);
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(246,244,238,.4);
+    text-align: center;
+    padding-bottom: 6px;
+  }
+  .rv-cal-slot {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(201,169,97,.08);
+    border-radius: 3px;
+    padding: 8px 6px;
+    text-align: center;
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: rgba(246,244,238,.5);
+    cursor: default;
+    transition: .2s;
+  }
+  .rv-cal-slot.available {
+    background: rgba(201,169,97,.08);
+    border-color: rgba(201,169,97,.3);
+    color: var(--gold-2);
+  }
+  .rv-cal-slot.selected {
+    background: var(--gold);
+    border-color: var(--gold-2);
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .rv-cal-slot.booked { opacity: .25; }
+  .rv-cal-legend {
+    display: flex;
+    gap: 16px;
+    padding: 12px 0 4px;
+    border-top: 1px solid rgba(201,169,97,.1);
+  }
+  .rv-cal-legend span {
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: rgba(246,244,238,.45);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .rv-legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* ── COMMENT ÇA MARCHE ───────────────────────────────────────── */
+  .rv-how {
+    padding: 100px 40px;
+    background: var(--paper);
+  }
+  .rv-how-inner { max-width: 1200px; margin: 0 auto; }
+  .rv-how-head { text-align: center; margin-bottom: 64px; }
+  .rv-how-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(36px, 4.5vw, 52px);
+    margin: 16px 0 0;
+  }
+  .rv-how-h2 em { font-style: normal; color: var(--gold-3); }
+
+  .rv-how-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+  .rv-how-step {
+    background: var(--paper);
+    padding: 40px 28px;
+    position: relative;
+    transition: background .25s;
+  }
+  .rv-how-step:hover { background: #fff; }
+  .rv-how-num {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 64px;
+    color: var(--rule);
+    line-height: 1;
+    margin-bottom: 20px;
+    transition: color .25s;
+  }
+  .rv-how-step:hover .rv-how-num { color: var(--gold); opacity: .4; }
+  .rv-how-step-t {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 22px;
+    color: var(--ink);
+    margin: 0 0 12px;
+  }
+  .rv-how-step-d { font-size: 13px; color: var(--ink-3); line-height: 1.65; margin: 0; }
+
+  /* ── EXPERTS ─────────────────────────────────────────────────── */
+  .rv-experts {
+    padding: 100px 40px;
+    background: #fff;
+  }
+  .rv-experts-inner { max-width: 1200px; margin: 0 auto; }
+  .rv-experts-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 56px;
+  }
+  .rv-experts-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(36px, 4.5vw, 52px);
+    margin: 16px 0 0;
+  }
+  .rv-experts-h2 em { font-style: normal; color: var(--gold-3); }
+
+  .rv-experts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+  .rv-expert {
+    background: #fff;
+    padding: 40px 32px;
+    transition: background .25s;
+  }
+  .rv-expert:hover { background: var(--paper); }
+  .rv-expert-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 1px solid var(--gold);
+    background: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 24px;
+    color: var(--gold);
+  }
+  .rv-expert-specialty {
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    margin-bottom: 8px;
+  }
+  .rv-expert-name {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 24px;
+    color: var(--ink);
+    margin: 0 0 10px;
+  }
+  .rv-expert-desc { font-size: 13px; color: var(--ink-3); line-height: 1.65; margin: 0; }
+
+  /* ── CTA ─────────────────────────────────────────────────────── */
+  .rv-cta {
+    padding: 100px 40px;
+    background: var(--ink);
+    text-align: center;
+    color: var(--paper);
+  }
+  .rv-cta-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(36px, 5vw, 60px);
+    margin: 16px 0 20px;
+  }
+  .rv-cta-h2 em { font-style: normal; color: var(--gold-2); }
+  .rv-cta-p { font-size: 17px; color: rgba(246,244,238,.72); max-width: 520px; margin: 0 auto 40px; line-height: 1.7; }
+
+  /* ── BOOKING FORM ────────────────────────────────────────────── */
+  .rv-booking {
+    padding: 100px 40px;
+    background: var(--paper);
+  }
+  .rv-booking-inner {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .rv-booking-head {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .rv-booking-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(36px, 5vw, 60px);
+    margin: 12px 0 16px;
+    color: var(--ink);
+  }
+  .rv-booking-h2 em { font-style: normal; color: var(--gold-3); }
+  .rv-booking-sub {
+    font-size: 15px;
+    color: var(--ink-3);
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.65;
+  }
+  .rv-booking-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 48px;
+  }
+  .rv-booking-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .rv-booking-label {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--ink-4);
+  }
+  .rv-booking-input,
+  .rv-booking-select,
+  .rv-booking-textarea {
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .rv-booking-input:focus,
+  .rv-booking-select:focus,
+  .rv-booking-textarea:focus {
+    border-color: var(--gold);
+  }
+  .rv-booking-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .rv-booking-price {
+    text-align: center;
+    font-family: var(--sans);
+    font-size: 16px;
+    color: var(--ink);
+    padding: 16px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .rv-booking-price strong {
+    color: var(--gold-3);
+    font-size: 20px;
+    font-family: var(--display);
+    font-style: italic;
+  }
+  .rv-booking-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    text-align: center;
+  }
+  .rv-booking-submit {
+    width: 100%;
+    font-size: 16px;
+    padding: 16px;
+  }
+
+  @media (max-width: 900px) {
+    .rv-hero-inner { grid-template-columns: 1fr; }
+    .rv-how-grid { grid-template-columns: 1fr 1fr; }
+    .rv-experts-grid { grid-template-columns: 1fr; }
+    .rv-booking-form { padding: 28px 20px; }
+    .rv-booking-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .rv-how-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<!-- HERO -->
+<section class="rv-hero">
+  <div class="rv-hero-inner">
+    <div>
+      <p class="rv-kicker">— Outil V · Consultation avec expert</p>
+      <h1 class="rv-h1">Prenez<br/><em>rendez-vous</em></h1>
+      <p class="rv-sub">Une heure face à face avec un juriste ou expert RH spécialisé en droit du travail sénégalais. Séance visio sécurisée, compte-rendu archivé.</p>
+      <div class="rv-hero-btns">
+        {isLoggedIn ? (
+          <a href="#booking-form" class="btn btn-gold">Réserver un créneau</a>
+        ) : (
+          <a href="/connexion?redirect=/rdv-consultation" class="btn btn-gold">Réserver un créneau</a>
+        )}
+        <a href="/formules" class="btn btn-ghost" style="border-color:rgba(246,244,238,.3);color:var(--paper)">Voir les formules</a>
+      </div>
+    </div>
+    <div class="rv-cal">
+      <div class="rv-cal-header">
+        <button style="background:none;border:none;color:rgba(246,244,238,.5);cursor:pointer;font-size:16px">‹</button>
+        <span class="rv-cal-month">Juin 2026</span>
+        <button style="background:none;border:none;color:rgba(246,244,238,.5);cursor:pointer;font-size:16px">›</button>
+      </div>
+      <div class="rv-cal-body">
+        <div class="rv-cal-days">
+          <div class="rv-cal-day-label">LUN</div>
+          <div class="rv-cal-day-label">MAR</div>
+          <div class="rv-cal-day-label">MER</div>
+          <div class="rv-cal-day-label">JEU</div>
+          <div class="rv-cal-day-label">VEN</div>
+
+          <div class="rv-cal-slot booked">09:00</div>
+          <div class="rv-cal-slot available">10:00</div>
+          <div class="rv-cal-slot booked">09:00</div>
+          <div class="rv-cal-slot available">14:00</div>
+          <div class="rv-cal-slot booked">10:00</div>
+
+          <div class="rv-cal-slot available">11:00</div>
+          <div class="rv-cal-slot booked">11:00</div>
+          <div class="rv-cal-slot selected">14:00</div>
+          <div class="rv-cal-slot booked">15:00</div>
+          <div class="rv-cal-slot available">14:00</div>
+
+          <div class="rv-cal-slot booked">14:00</div>
+          <div class="rv-cal-slot available">15:00</div>
+          <div class="rv-cal-slot booked">16:00</div>
+          <div class="rv-cal-slot available">16:00</div>
+          <div class="rv-cal-slot booked">15:00</div>
+
+          <div class="rv-cal-slot available">16:00</div>
+          <div class="rv-cal-slot booked">16:00</div>
+          <div class="rv-cal-slot available">09:00</div>
+          <div class="rv-cal-slot booked">09:00</div>
+          <div class="rv-cal-slot available">16:00</div>
+        </div>
+        <div class="rv-cal-legend">
+          <span><span class="rv-legend-dot" style="background:rgba(201,169,97,.5)"></span>Disponible</span>
+          <span><span class="rv-legend-dot" style="background:var(--gold)"></span>Sélectionné</span>
+          <span><span class="rv-legend-dot" style="background:rgba(246,244,238,.15)"></span>Réservé</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMENT ÇA MARCHE -->
+<section class="rv-how">
+  <div class="rv-how-inner">
+    <div class="rv-how-head">
+      <p class="rv-kicker">— Réserver une consultation</p>
+      <h2 class="rv-how-h2">Quatre étapes vers votre <em>expert</em></h2>
+    </div>
+    <div class="rv-how-grid">
+      <div class="rv-how-step">
+        <p class="rv-how-num">1</p>
+        <h3 class="rv-how-step-t">Décrivez votre besoin</h3>
+        <p class="rv-how-step-d">Thème, contexte, urgence. Deux minutes de formulaire pour orienter vers le bon expert.</p>
+      </div>
+      <div class="rv-how-step">
+        <p class="rv-how-num">2</p>
+        <h3 class="rv-how-step-t">Choisissez un créneau</h3>
+        <p class="rv-how-step-d">Calendrier en temps réel. Créneaux disponibles du lundi au vendredi, 9 h – 18 h heure de Dakar.</p>
+      </div>
+      <div class="rv-how-step">
+        <p class="rv-how-num">3</p>
+        <h3 class="rv-how-step-t">Séance visio sécurisée</h3>
+        <p class="rv-how-step-d">Lien de connexion chiffré envoyé par e-mail. Durée : 60 minutes. Enregistrement optionnel avec votre accord.</p>
+      </div>
+      <div class="rv-how-step">
+        <p class="rv-how-num">4</p>
+        <h3 class="rv-how-step-t">Compte-rendu archivé</h3>
+        <p class="rv-how-step-d">Résumé structuré, points d'action et références juridiques archivés dans votre coffre-fort sous 24 heures.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERTS -->
+<section class="rv-experts">
+  <div class="rv-experts-inner">
+    <div class="rv-experts-head">
+      <div>
+        <p class="rv-kicker">— Le réseau Previcare</p>
+        <h2 class="rv-experts-h2">Des experts <em>certifiés</em></h2>
+      </div>
+    </div>
+    <div class="rv-experts-grid">
+      <div class="rv-expert">
+        <div class="rv-expert-avatar">M</div>
+        <p class="rv-expert-specialty">Droit du travail · Licenciement</p>
+        <h3 class="rv-expert-name">Me Diallo</h3>
+        <p class="rv-expert-desc">Avocat au Barreau du Sénégal. 15 ans d'expérience en contentieux social. Spécialiste des procédures de licenciement et de la représentation du personnel.</p>
+      </div>
+      <div class="rv-expert">
+        <div class="rv-expert-avatar">F</div>
+        <p class="rv-expert-specialty">RH · Gestion des carrières</p>
+        <h3 class="rv-expert-name">Mme Ndiaye</h3>
+        <p class="rv-expert-desc">DRH pendant 12 ans dans un groupe bancaire régional. Spécialiste des classifications conventionnelles, de la gestion des carrières et de la paie.</p>
+      </div>
+      <div class="rv-expert">
+        <div class="rv-expert-avatar">A</div>
+        <p class="rv-expert-specialty">Droit international · Expatriés</p>
+        <h3 class="rv-expert-name">Me Sow</h3>
+        <p class="rv-expert-desc">Juriste international formé à Paris et Dakar. Expert des conventions bilatérales de main-d'œuvre et des statuts des travailleurs expatriés au Sénégal.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING FORM -->
+{isLoggedIn && (
+<section id="booking-form" class="rv-booking">
+  <div class="rv-booking-inner">
+    <div class="rv-booking-head">
+      <p class="rv-kicker" style="color:var(--gold-3)">— Réservation</p>
+      <h2 class="rv-booking-h2">Réservez votre <em>consultation</em></h2>
+      <p class="rv-booking-sub">Complétez le formulaire ci-dessous. Paiement sécurisé via Orange Money, Wave ou carte bancaire.</p>
+    </div>
+    <form id="consultationForm" class="rv-booking-form">
+      <input type="hidden" name="userId" value={user.id} />
+
+      <div class="rv-booking-field">
+        <label class="rv-booking-label">Votre catégorie</label>
+        <select name="profileCategory" required class="rv-booking-select">
+          {Object.entries(CONSULTATION_CATEGORY_LABELS).map(([key, label]) => (
+            <option value={key} selected={key === defaultCategory}>{label} — {CONSULTATION_PRICES[key as keyof typeof CONSULTATION_PRICES].toLocaleString('fr-FR')} FCFA</option>
+          ))}
+        </select>
+      </div>
+
+      <div class="rv-booking-field">
+        <label class="rv-booking-label">Mode de consultation</label>
+        <select name="consultationType" required class="rv-booking-select">
+          <option value="electronic">Par visio / téléphone / e-mail</option>
+          <option value="in_person">En présentiel (Dakar)</option>
+        </select>
+      </div>
+
+      <div class="rv-booking-row">
+        <div class="rv-booking-field">
+          <label class="rv-booking-label">Date souhaitée</label>
+          <input type="date" name="preferredDate" required class="rv-booking-input" min={new Date().toISOString().split('T')[0]} />
+        </div>
+        <div class="rv-booking-field">
+          <label class="rv-booking-label">Créneau horaire</label>
+          <select name="preferredTime" required class="rv-booking-select">
+            <option value="09:00">09 h 00</option>
+            <option value="10:00">10 h 00</option>
+            <option value="11:00">11 h 00</option>
+            <option value="14:00">14 h 00</option>
+            <option value="15:00">15 h 00</option>
+            <option value="16:00">16 h 00</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="rv-booking-field">
+        <label class="rv-booking-label">Sujet de la consultation</label>
+        <input type="text" name="subject" required class="rv-booking-input" placeholder="Ex : Licenciement abusif, contrat de travail…" />
+      </div>
+
+      <div class="rv-booking-field">
+        <label class="rv-booking-label">Précisions (optionnel)</label>
+        <textarea name="message" rows={3} class="rv-booking-textarea" placeholder="Décrivez brièvement votre situation…"></textarea>
+      </div>
+
+      <div id="bookingPrice" class="rv-booking-price">
+        Montant : <strong id="bookingPriceAmount">{CONSULTATION_PRICES[defaultCategory].toLocaleString('fr-FR')} FCFA</strong>
+      </div>
+
+      <div id="bookingError" class="hidden rv-booking-error"></div>
+
+      <button type="submit" id="bookingSubmit" class="btn btn-gold rv-booking-submit">
+        <span id="bookingBtnText">Confirmer et payer</span>
+        <svg id="bookingSpinner" class="hidden animate-spin ml-3 h-5 w-5" fill="none" viewBox="0 0 24 24" style="display:inline;vertical-align:middle">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </button>
+    </form>
+  </div>
+</section>
+)}
+
+<!-- CTA -->
+<section class="rv-cta">
+  <p class="rv-kicker" style="color:var(--gold-2)">— Consultation à l'acte</p>
+  <h2 class="rv-cta-h2">Votre expert,<br/>à votre <em>service</em></h2>
+  <p class="rv-cta-p">Consultation ponctuelle ou incluse dans la formule Gold. Choisissez votre profil, réservez un créneau et payez en ligne.</p>
+  <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+    {isLoggedIn ? (
+      <a href="#booking-form" class="btn btn-gold">Réserver maintenant</a>
+    ) : (
+      <a href="/connexion?redirect=/rdv-consultation" class="btn btn-gold">Réserver maintenant</a>
+    )}
+    <a href="/formules" class="btn btn-ghost" style="border-color:rgba(246,244,238,.3);color:var(--paper)">Voir les formules</a>
+  </div>
+</section>
+
+</Layout>
+
+<script>
+  const PRICES: Record<string, number> = { employee: 15000, technician: 25000, expatriate: 40000, executive: 42900 };
+
+  const categorySelect = document.querySelector('select[name="profileCategory"]') as HTMLSelectElement | null;
+  const priceAmount = document.getElementById('bookingPriceAmount');
+  if (categorySelect && priceAmount) {
+    categorySelect.addEventListener('change', () => {
+      const cat = categorySelect.value;
+      const price = PRICES[cat] || 15000;
+      priceAmount.textContent = price.toLocaleString('fr-FR') + ' FCFA';
+    });
+  }
+
+  const form = document.getElementById('consultationForm') as HTMLFormElement | null;
+  const submitBtn = document.getElementById('bookingSubmit') as HTMLButtonElement | null;
+  const btnText = document.getElementById('bookingBtnText');
+  const spinner = document.getElementById('bookingSpinner');
+  const errorEl = document.getElementById('bookingError');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (submitBtn) submitBtn.disabled = true;
+    if (btnText) btnText.textContent = 'Traitement en cours…';
+    if (spinner) spinner.classList.remove('hidden');
+    if (errorEl) errorEl.classList.add('hidden');
+
+    const formData = new FormData(form);
+    const body = {
+      profileCategory: formData.get('profileCategory'),
+      consultationType: formData.get('consultationType'),
+      preferredDate: formData.get('preferredDate'),
+      preferredTime: formData.get('preferredTime'),
+      subject: formData.get('subject'),
+      message: formData.get('message'),
+    };
+
+    try {
+      const res = await fetch('/api/submit-consultation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const result = await res.json();
+      if (result.success) {
+        if (result.paymentUrl) {
+          if (btnText) btnText.textContent = 'Redirection vers le paiement…';
+          window.location.href = result.paymentUrl;
+        } else if (result.bookingId) {
+          if (btnText) btnText.textContent = 'Consultation réservée !';
+          window.location.href = '/rdv-consultation?success=1';
+        }
+      } else {
+        throw new Error(result.message || 'Une erreur est survenue');
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Une erreur est survenue. Veuillez réessayer.';
+      if (errorEl) { errorEl.textContent = msg; errorEl.classList.remove('hidden'); }
+      if (submitBtn) submitBtn.disabled = false;
+      if (btnText) btnText.textContent = 'Confirmer et payer';
+      if (spinner) spinner.classList.add('hidden');
+    }
+  });
+</script>

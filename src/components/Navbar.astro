@@ -1,0 +1,283 @@
+---
+import { createClient } from '../lib/supabase';
+
+const supabase = createClient({
+  request: Astro.request,
+  cookies: Astro.cookies,
+});
+
+const { data: { user } } = await supabase.auth.getUser();
+
+let profile = null;
+if (user) {
+  const { data } = await supabase
+    .from('profiles')
+    .select('avatar_url, first_name, last_name')
+    .eq('id', user.id)
+    .single();
+  profile = data;
+}
+
+const getInitials = () => {
+  if (profile?.first_name && profile?.last_name) {
+    return `${profile.first_name.charAt(0)}${profile.last_name.charAt(0)}`.toUpperCase();
+  }
+  if (user?.user_metadata?.first_name && user?.user_metadata?.last_name) {
+    return `${user.user_metadata.first_name.charAt(0)}${user.user_metadata.last_name.charAt(0)}`.toUpperCase();
+  }
+  if (user?.email) {
+    return user.email.substring(0, 2).toUpperCase();
+  }
+  return 'U';
+};
+
+const displayName = profile?.first_name || user?.user_metadata?.first_name || user?.email?.split('@')[0];
+
+const userSpace = user?.user_metadata?.role === 'employer' ? '/espace-employeurs'
+  : user?.user_metadata?.role === 'delegate' ? '/espace-delegues'
+  : user?.user_metadata?.is_expatriate ? '/espace-expatries'
+  : '/espace-employes';
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="px-nav" id="main-nav">
+  <div class="px-nav-inner">
+    <!-- Logo textuel avec point doré -->
+    <a href="/" class="px-logo">
+      <span class="dot"></span>
+      <span>Previcare <span class="sub">Emploi</span></span>
+    </a>
+
+    <!-- Navigation desktop -->
+    <nav aria-label="Navigation principale">
+      <ul>
+        <li><a href="/" class={currentPath === '/' ? 'nav-active' : ''}>Accueil</a></li>
+        <li><a href="/outils" class={currentPath.startsWith('/outils') ? 'nav-active' : ''}>Outils</a></li>
+        <li><a href="/souscripteurs" class={currentPath.startsWith('/souscripteurs') ? 'nav-active' : ''}>Souscripteurs</a></li>
+        <li><a href="/offres-emploi" class={currentPath.startsWith('/offres-emploi') ? 'nav-active' : ''}>Offres</a></li>
+        <li><a href="/formules" class={currentPath.startsWith('/formules') ? 'nav-active' : ''}>Formules</a></li>
+        <li><a href="/cga-cgu" class={currentPath.startsWith('/cga-cgu') ? 'nav-active' : ''}>CGA/CGU</a></li>
+
+        {user ? (
+          <li>
+            <a href={userSpace} class="cta nav-user-cta">
+              <span class="nav-user-avatar">
+                {profile?.avatar_url ? (
+                  <img
+                    src={`/api/get-avatar?path=${encodeURIComponent(profile.avatar_url)}`}
+                    alt={`Photo de ${displayName}`}
+                    class="nav-avatar-img"
+                  />
+                ) : (
+                  <span class="nav-avatar-initials">{getInitials()}</span>
+                )}
+              </span>
+              <span>{displayName}</span>
+            </a>
+          </li>
+        ) : (
+          <li><a href="/formules" class="cta">Souscrire</a></li>
+        )}
+      </ul>
+    </nav>
+
+    <!-- Hamburger mobile -->
+    <button
+      id="nav-mobile-btn"
+      class="nav-hamburger"
+      aria-label="Ouvrir le menu"
+      aria-expanded="false"
+    >
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <!-- Panneau mobile -->
+  <div id="nav-mobile-menu" class="nav-mobile-panel" hidden>
+    <a href="/" class="nav-mobile-link">Accueil</a>
+    <a href="/outils" class="nav-mobile-link">Outils</a>
+    <a href="/souscripteurs" class="nav-mobile-link">Souscripteurs</a>
+    <a href="/offres-emploi" class="nav-mobile-link">Offres</a>
+    <a href="/formules" class="nav-mobile-link">Formules</a>
+    <a href="/cga-cgu" class="nav-mobile-link">CGA / CGU</a>
+
+    {user ? (
+      <div class="nav-mobile-user">
+        <a href={userSpace} class="nav-mobile-link nav-mobile-espace">
+          {profile?.avatar_url ? (
+            <img
+              src={`/api/get-avatar?path=${encodeURIComponent(profile.avatar_url)}`}
+              alt={`Photo de ${displayName}`}
+              class="nav-avatar-img"
+            />
+          ) : (
+            <span class="nav-avatar-initials">{getInitials()}</span>
+          )}
+          <span>{displayName} · Mon espace</span>
+        </a>
+        <a href="/api/signout" class="btn btn-ghost nav-mobile-btn-action" style="text-align:center;justify-content:center">
+          Se déconnecter
+        </a>
+      </div>
+    ) : (
+      <div class="nav-mobile-auth">
+        <a href="/connexion" class="btn btn-ghost">Se connecter</a>
+        <a href="/inscription" class="btn btn-primary">S'inscrire</a>
+      </div>
+    )}
+  </div>
+</header>
+
+<style>
+  /* Lien actif */
+  .px-nav ul a.nav-active {
+    opacity: 1 !important;
+    color: var(--gold-3) !important;
+  }
+
+  /* CTA utilisateur connecté */
+  .nav-user-cta {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Hamburger */
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .nav-hamburger span {
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: var(--ink);
+    transition: .3s;
+    border-radius: 2px;
+  }
+  .nav-hamburger[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(6.5px) rotate(45deg);
+  }
+  .nav-hamburger[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  .nav-hamburger[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-6.5px) rotate(-45deg);
+  }
+
+  /* Panneau mobile */
+  .nav-mobile-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top: 1px solid var(--rule);
+    background: rgba(246,244,238,.98);
+    padding: 8px 20px 24px;
+  }
+  .nav-mobile-panel[hidden] { display: none !important; }
+
+  .nav-mobile-link {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: .75;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: opacity .2s, color .2s;
+  }
+  .nav-mobile-link:last-child { border-bottom: none; }
+  .nav-mobile-link:hover { opacity: 1; color: var(--gold-3); }
+
+  .nav-mobile-user {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 16px;
+  }
+  .nav-mobile-espace {
+    font-size: 12px;
+    letter-spacing: 1px;
+    border-bottom: none;
+    opacity: 1;
+    font-weight: 500;
+  }
+  .nav-mobile-auth {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 16px;
+  }
+  .nav-mobile-auth .btn,
+  .nav-mobile-btn-action {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Avatars */
+  .nav-user-avatar { display: inline-flex; align-items: center; }
+  .nav-avatar-img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--gold);
+  }
+  .nav-avatar-initials {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--gold);
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 920px) {
+    .nav-hamburger { display: flex; }
+    .px-nav nav { display: none; }
+  }
+</style>
+
+<script>
+  // Hamburger toggle
+  const btn = document.getElementById('nav-mobile-btn');
+  const menu = document.getElementById('nav-mobile-menu');
+
+  btn?.addEventListener('click', () => {
+    const isOpen = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!isOpen));
+    if (isOpen) {
+      menu?.setAttribute('hidden', '');
+    } else {
+      menu?.removeAttribute('hidden');
+    }
+  });
+
+  // Fermer le menu en cliquant en dehors
+  document.addEventListener('click', (e) => {
+    const nav = document.getElementById('main-nav');
+    if (nav && !nav.contains(e.target as Node)) {
+      menu?.setAttribute('hidden', '');
+      btn?.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+</script>

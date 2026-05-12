@@ -1,0 +1,50 @@
+---
+export interface StatItem {
+  label: string;
+  value: string | number | null;
+  sublabel: string;
+  icon: 'check' | 'document' | 'users' | 'building' | 'message' | 'globe' | 'shield' | 'briefcase' | 'tag';
+  color: 'primary' | 'secondary' | 'green' | 'orange' | 'red' | 'blue' | 'indigo' | 'teal';
+}
+
+export interface Props {
+  stats: StatItem[];
+}
+
+const { stats } = Astro.props;
+
+const iconPaths: Record<string, string> = {
+  check: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+  document: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+  users: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z',
+  building: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
+  message: 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z',
+  globe: 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064',
+  shield: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+  briefcase: 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2h8z',
+  tag: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z',
+};
+---
+
+<div class={`grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-${Math.min(stats.length, 5)} mb-6`}>
+  {stats.map((stat) => {
+    const iconPath = iconPaths[stat.icon] ?? iconPaths.check;
+    const displayValue = stat.value !== null && stat.value !== undefined ? stat.value : '—';
+    return (
+      <div class="bg-white rounded-xl p-4 border" style="border-color:var(--rule)">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider" style="color:var(--ink-4);font-family:var(--sans)">{stat.label}</p>
+          <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(201,169,97,.12)">
+            <svg class="h-4 w-4" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d={iconPath} />
+            </svg>
+          </div>
+        </div>
+        <div class="text-xl sm:text-2xl font-bold leading-none mb-1" style="font-family:var(--display);color:var(--ink)">
+          {displayValue}
+        </div>
+        <p class="text-[10px] sm:text-xs" style="color:var(--ink-4)">{stat.sublabel}</p>
+      </div>
+    );
+  })}
+</div>

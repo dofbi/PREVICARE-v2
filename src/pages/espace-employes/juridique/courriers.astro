@@ -1,0 +1,145 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../components/DashboardShell.astro';
+import { XalimaForm } from '../../../components/employee/XalimaForm.tsx';
+import { createClient } from '../../../lib/supabase';
+
+const { user } = Astro.locals;
+
+if (!user) {
+  return Astro.redirect('/connexion');
+}
+
+const supabase = createClient({ request: Astro.request, cookies: Astro.cookies });
+
+const { data: profile } = await supabase
+  .from('profiles')
+  .select('first_name, last_name, organization')
+  .eq('id', user.id)
+  .single();
+
+const { data: employeeDetails } = await supabase
+  .from('employee_details')
+  .select('current_position, employer_name, employer_hr_contact')
+  .eq('id', user.id)
+  .single();
+
+const userProfile = {
+  employee_name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || '',
+  employee_position: employeeDetails?.current_position || '',
+  company_name: profile?.organization || employeeDetails?.employer_name || '',
+  recipient: employeeDetails?.employer_hr_contact || '',
+};
+---
+
+<DashboardLayout title="Xalima — Rédaction de Courriers - PREVICARE EMPLOI">
+  <DashboardShell title="Xalima — Assistant de Rédaction">
+
+    <!-- Breadcrumbs -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+      <ol class="flex items-center gap-2 text-sm" style="color:var(--ink-4)">
+        <li><a href="/espace-employes" class="hover:opacity-80 transition-opacity" style="color:var(--ink-4)">Tableau de bord</a></li>
+        <li><span>/</span></li>
+        <li><a href="/espace-employes/juridique" class="hover:opacity-80 transition-opacity" style="color:var(--ink-4)">Juridique</a></li>
+        <li><span>/</span></li>
+        <li class="font-medium" style="color:var(--ink)">Courriers</li>
+      </ol>
+    </nav>
+
+    <!-- En-tête Xalima -->
+    <div class="mb-6 rounded-xl p-6 border" style="background:var(--ink);border-color:rgba(201,169,97,.25)">
+      <div class="flex flex-col md:flex-row md:items-center gap-4">
+        <div class="flex items-center gap-4">
+          <div class="flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center" style="background:rgba(201,169,97,.15)">
+            <svg class="w-8 h-8" style="color:var(--gold)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-white" style="font-family:var(--display)">Xalima</h1>
+            <p class="text-sm" style="color:rgba(255,255,255,.60)">Votre assistant IA de rédaction de courriers professionnels</p>
+          </div>
+        </div>
+        <div class="md:ml-auto">
+          <a href="/espace-employes/juridique/setlou" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.80)">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            Consulter SETLOU pour des conseils
+          </a>
+        </div>
+      </div>
+      <div class="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3">
+        {[
+          { label: 'Spécialité', value: 'Rédaction guidée de courriers' },
+          { label: 'Base légale', value: 'Droit du travail sénégalais' },
+          { label: 'Types disponibles', value: '10 types de courriers' },
+        ].map((item) => (
+          <div class="rounded-lg p-3" style="background:rgba(255,255,255,.07)">
+            <p class="text-[10px] uppercase tracking-wider mb-1" style="color:rgba(255,255,255,.45)">{item.label}</p>
+            <p class="text-white text-sm font-medium">{item.value}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Distinction rôles assistants -->
+    <div class="grid gap-3 mb-6 md:grid-cols-3">
+      <div class="rounded-xl p-4 border" style="background:var(--paper);border-color:rgba(201,169,97,.30)">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(201,169,97,.15)">
+            <svg class="w-4 h-4" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </div>
+          <p class="font-semibold text-sm" style="color:var(--ink)">Xalima — ici</p>
+        </div>
+        <p class="text-sm leading-relaxed" style="color:var(--ink-4)">Génération guidée de courriers professionnels (formulaire → courrier complet)</p>
+      </div>
+
+      <div class="rounded-xl p-4 border" style="border-color:var(--rule)">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(201,169,97,.10)">
+            <svg class="w-4 h-4" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <p class="font-semibold text-sm" style="color:var(--ink)">SETLOU — Assistance</p>
+        </div>
+        <p class="text-sm leading-relaxed" style="color:var(--ink-4)">Conseils juridiques, droits des employés, procédures RH</p>
+        <a href="/espace-employes/juridique/setlou" class="text-xs font-medium mt-2 block hover:opacity-80" style="color:var(--gold-3)">Consulter SETLOU →</a>
+      </div>
+
+      <div class="rounded-xl p-4 border" style="border-color:var(--rule)">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(11,29,58,.07)">
+            <svg class="w-4 h-4" style="color:var(--ink-4)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+          </div>
+          <p class="font-semibold text-sm" style="color:var(--ink)">Assistant PREVICARE</p>
+        </div>
+        <p class="text-sm leading-relaxed" style="color:var(--ink-4)">Guide de navigation de l'application (bulle flottante en bas à droite)</p>
+      </div>
+    </div>
+
+    <!-- Interface Xalima -->
+    <div class="bg-white rounded-xl border" style="border-color:var(--rule)">
+      <div class="px-6 py-4 border-b flex items-center gap-3" style="border-color:var(--rule)">
+        <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background:rgba(201,169,97,.12)">
+          <svg class="w-4 h-4" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-semibold text-base" style="color:var(--ink)">Rédigez votre courrier</h3>
+          <p class="text-sm leading-relaxed" style="color:var(--ink-4)">Sélectionnez un type, remplissez le formulaire et laissez Xalima rédiger pour vous</p>
+        </div>
+      </div>
+      <div class="p-6">
+        <XalimaForm userProfile={userProfile} client:load />
+      </div>
+    </div>
+
+  </DashboardShell>
+</DashboardLayout>

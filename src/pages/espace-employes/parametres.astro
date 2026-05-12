@@ -1,0 +1,343 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../components/DashboardShell.astro';
+import AvatarUpload from '../../components/AvatarUpload';
+import { createClient } from '../../lib/supabase';
+import { requireRole } from '../../lib/guards';
+
+const guard = await requireRole(Astro, 'employee');
+if (guard) return guard;
+
+const { user } = Astro.locals;
+const supabase = createClient({ request: Astro.request, cookies: Astro.cookies });
+
+const { data: profile } = await supabase
+  .from('profiles')
+  .select('*')
+  .eq('id', user.id)
+  .single();
+
+const { data: employeeDetails } = await supabase
+  .from('employee_details')
+  .select('*')
+  .eq('id', user.id)
+  .single();
+
+const isProfileComplete = profile &&
+  profile.first_name &&
+  profile.last_name &&
+  profile.email &&
+  profile.phone &&
+  profile.address &&
+  profile.country;
+
+const countries = [
+  "Sénégal", "France", "Côte d'Ivoire", "Mali", "Burkina Faso", "Niger",
+  "Guinée", "Mauritanie", "Bénin", "Togo", "Ghana", "Cameroun", "Gabon"
+];
+
+const contractTypes = ["CDI", "CDD", "Stagiaire", "Apprenti", "Consultant", "Freelance"];
+
+const sectors = [
+  "Agriculture", "Industrie", "Services", "Commerce", "Santé", "Éducation",
+  "Transport", "Télécommunications", "Banque", "Assurance", "BTP",
+  "Mines & Pétrole", "Tourisme", "Hôtellerie & Restauration", "Média & Communication",
+  "Énergie", "Autre"
+];
+---
+
+<DashboardLayout title="Paramètres - PREVICARE EMPLOI">
+  <DashboardShell role="employee">
+
+    <!-- Alerte profil incomplet -->
+    {!isProfileComplete && (
+      <div class="mb-6 p-4 rounded-xl border flex items-start gap-3" style="background:rgba(201,169,97,.08);border-color:rgba(201,169,97,.30)">
+        <svg class="h-5 w-5 flex-shrink-0 mt-0.5" style="color:var(--gold-3)" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        <div>
+          <h3 class="text-sm font-semibold" style="color:var(--ink)">Profil incomplet</h3>
+          <p class="text-sm mt-0.5" style="color:var(--ink-4)">Veuillez compléter vos informations personnelles pour accéder à tous les services.</p>
+        </div>
+      </div>
+    )}
+
+    <!-- Onglets -->
+    <div class="mb-6">
+      <div class="flex gap-1 p-1 rounded-xl w-full max-w-xs" style="background:rgba(11,29,58,.06)">
+        <button
+          class="tab-button flex-1 text-xs font-semibold py-2 px-3 rounded-lg transition-all focus:outline-none"
+          data-tab="personal"
+          style="background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(11,29,58,.12)"
+        >
+          Profil Personnel
+        </button>
+        <button
+          class="tab-button flex-1 text-xs font-semibold py-2 px-3 rounded-lg transition-all focus:outline-none"
+          data-tab="professional"
+          style="color:var(--ink-4)"
+        >
+          Carrière & Emploi
+        </button>
+      </div>
+    </div>
+
+    <div class="space-y-5">
+
+      <!-- Onglet personnel -->
+      <div id="personal-tab" class="tab-content">
+        <div class="bg-white rounded-xl border" style="border-color:var(--rule)">
+          <div class="p-6 border-b" style="border-color:var(--rule)">
+            <h3 class="font-semibold" style="color:var(--ink)">Profil Personnel</h3>
+            <p class="text-sm mt-0.5" style="color:var(--ink-4)">Mettez à jour vos informations personnelles et de contact.</p>
+          </div>
+          <div class="p-6 border-b" style="border-color:var(--rule)">
+            <AvatarUpload client:load currentAvatarUrl={profile?.avatar_url} userId={user.id} />
+          </div>
+          <form id="personal-form" class="p-6 space-y-5">
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <div>
+                <label for="first_name" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Prénom *</label>
+                <input type="text" id="first_name" name="first_name" value={profile?.first_name || ''} required
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+              <div>
+                <label for="last_name" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Nom *</label>
+                <input type="text" id="last_name" name="last_name" value={profile?.last_name || ''} required
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+              <div>
+                <label for="email" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Email *</label>
+                <input type="email" id="email" name="email" value={profile?.email || user.email || ''} required
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+              <div>
+                <label for="phone" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Téléphone</label>
+                <input type="tel" id="phone" name="phone" value={profile?.phone || ''}
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+              <div class="sm:col-span-2">
+                <label for="address" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Adresse</label>
+                <textarea id="address" name="address" rows="3"
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff">{profile?.address || ''}</textarea>
+              </div>
+              <div>
+                <label for="country" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Pays</label>
+                <select id="country" name="country"
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff">
+                  <option value="">-- Choisir un pays --</option>
+                  {countries.map(country => (
+                    <option value={country} selected={profile?.country === country}>{country}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label for="organization" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Organisation/Entreprise</label>
+                <input type="text" id="organization" name="organization" value={profile?.organization || ''}
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+              <div>
+                <label for="cni_number" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Numéro CNI</label>
+                <input type="text" id="cni_number" name="cni_number" value={profile?.cni_number || ''} placeholder="Numéro de Carte Nationale d'Identité"
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+              <div>
+                <label for="passport_number" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Numéro Passeport</label>
+                <input type="text" id="passport_number" name="passport_number" value={profile?.passport_number || ''} placeholder="Numéro de Passeport"
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+            </div>
+            <div class="flex justify-end pt-2">
+              <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg transition-opacity hover:opacity-90" style="background:var(--ink);color:var(--gold)">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Sauvegarder
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Onglet professionnel -->
+      <div id="professional-tab" class="tab-content hidden">
+        <div class="bg-white rounded-xl border" style="border-color:var(--rule)">
+          <div class="p-6 border-b" style="border-color:var(--rule)">
+            <h3 class="font-semibold" style="color:var(--ink)">Emploi</h3>
+            <p class="text-sm mt-0.5" style="color:var(--ink-4)">Gérez vos informations d'emploi et détails professionnels.</p>
+          </div>
+          <form id="professional-form" class="p-6 space-y-5">
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <div class="sm:col-span-2">
+                <label class="flex items-center gap-2.5 cursor-pointer">
+                  <input type="checkbox" name="is_expatriate" value="true" checked={employeeDetails?.is_expatriate || false}
+                    class="w-4 h-4 rounded border" style="border-color:var(--rule);accent-color:var(--ink)" />
+                  <span class="text-sm font-medium" style="color:var(--ink)">Je suis expatrié</span>
+                </label>
+              </div>
+              <div>
+                <label for="medical_insurer_name" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Assureur médical</label>
+                <input type="text" id="medical_insurer_name" name="medical_insurer_name" value={employeeDetails?.medical_insurer_name || ''}
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+              <div>
+                <label for="sector" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Secteur d'activité</label>
+                <select id="sector" name="sector"
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff">
+                  <option value="">-- Choisir un secteur --</option>
+                  {sectors.map(sector => (
+                    <option value={sector} selected={employeeDetails?.sector === sector}>{sector}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label for="hire_date" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Date d'embauche</label>
+                <input type="date" id="hire_date" name="hire_date" value={employeeDetails?.hire_date || ''}
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+              <div>
+                <label for="contract_type" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Type de contrat</label>
+                <select id="contract_type" name="contract_type"
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff">
+                  <option value="">-- Choisir un type --</option>
+                  {contractTypes.map(type => (
+                    <option value={type} selected={employeeDetails?.contract_type === type}>{type}</option>
+                  ))}
+                </select>
+              </div>
+              <div class="sm:col-span-2">
+                <label for="current_position" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Poste actuel</label>
+                <input type="text" id="current_position" name="current_position" value={employeeDetails?.current_position || ''}
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+              <div class="sm:col-span-2">
+                <label for="employer_name" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Nom de l'employeur</label>
+                <input type="text" id="employer_name" name="employer_name" value={employeeDetails?.employer_name || ''}
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+              <div>
+                <label for="employer_ceo_contact" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Contact PDG</label>
+                <input type="text" id="employer_ceo_contact" name="employer_ceo_contact" value={employeeDetails?.employer_ceo_contact || ''}
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+              <div>
+                <label for="employer_hr_contact" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Contact RH</label>
+                <input type="text" id="employer_hr_contact" name="employer_hr_contact" value={employeeDetails?.employer_hr_contact || ''}
+                  class="mt-1 block w-full px-3 py-2.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                  style="border-color:var(--rule);color:var(--ink);background:#fff" />
+              </div>
+            </div>
+            <div class="flex justify-end pt-2">
+              <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg transition-opacity hover:opacity-90" style="background:var(--ink);color:var(--gold)">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Sauvegarder
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message succès/erreur -->
+    <div id="message" class="hidden mt-5 p-4 rounded-xl border text-sm">
+      <p id="message-text"></p>
+    </div>
+
+    <script>
+      import { actions } from 'astro:actions';
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(tab => {
+          tab.addEventListener('click', function(this: HTMLElement) {
+            const targetTab = this.getAttribute('data-tab');
+
+            tabButtons.forEach(btn => {
+              (btn as HTMLElement).style.background = 'transparent';
+              (btn as HTMLElement).style.color = 'var(--ink-4)';
+              (btn as HTMLElement).style.boxShadow = '';
+            });
+
+            this.style.background = '#fff';
+            this.style.color = 'var(--ink)';
+            this.style.boxShadow = '0 1px 3px rgba(11,29,58,.12)';
+
+            tabContents.forEach(content => content.classList.add('hidden'));
+            const targetContent = document.getElementById(targetTab + '-tab');
+            if (targetContent) targetContent.classList.remove('hidden');
+          });
+        });
+
+        const personalForm = document.getElementById('personal-form') as HTMLFormElement;
+        personalForm?.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const formData = new FormData(personalForm);
+          try {
+            const result = await actions.profile.updateProfile(formData);
+            if (result.data?.success) {
+              showMessage('Profil mis à jour avec succès', 'success');
+              setTimeout(() => window.location.reload(), 1500);
+            } else {
+              showMessage(result.data?.message || 'Erreur lors de la mise à jour', 'error');
+            }
+          } catch (error: any) {
+            showMessage('Une erreur inattendue s\'est produite', 'error');
+          }
+        });
+
+        const professionalForm = document.getElementById('professional-form') as HTMLFormElement;
+        professionalForm?.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const formData = new FormData(professionalForm);
+          try {
+            const result = await actions.profile.updateEmployeeDetails(formData);
+            if (result.data?.success) {
+              showMessage('Informations professionnelles mises à jour avec succès', 'success');
+            } else {
+              showMessage(result.data?.message || result.error?.message || 'Erreur lors de la mise à jour', 'error');
+            }
+          } catch (error: any) {
+            showMessage('Une erreur inattendue s\'est produite', 'error');
+          }
+        });
+
+        function showMessage(text: string, type: 'success' | 'error') {
+          const messageDiv = document.getElementById('message') as HTMLElement;
+          const messageText = document.getElementById('message-text') as HTMLElement;
+          messageText.textContent = text;
+          messageDiv.classList.remove('hidden');
+          if (type === 'success') {
+            messageDiv.style.background = 'rgba(22,163,74,.08)';
+            messageDiv.style.borderColor = 'rgba(22,163,74,.25)';
+            messageDiv.style.color = '#15803d';
+          } else {
+            messageDiv.style.background = 'rgba(239,68,68,.08)';
+            messageDiv.style.borderColor = 'rgba(239,68,68,.25)';
+            messageDiv.style.color = '#dc2626';
+          }
+          setTimeout(() => messageDiv.classList.add('hidden'), 5000);
+        }
+      });
+    </script>
+  </DashboardShell>
+</DashboardLayout>

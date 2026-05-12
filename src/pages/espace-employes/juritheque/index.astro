@@ -1,0 +1,43 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../components/DashboardShell.astro';
+import JurithequeApp from '../../../components/employee/JurithequeApp';
+import type { JurithequeIndex, JurithequeArticleWithStats } from '../../../types/juritheque';
+import { JurithequeService } from '../../../lib/jurithequeService';
+import { createClient } from '../../../lib/supabase';
+
+const { user } = Astro.locals;
+
+const supabase = createClient({ request: Astro.request, cookies: Astro.cookies });
+const jurithequeService = new JurithequeService(supabase);
+
+const { index, favoriteKeys, viewCounts } = await jurithequeService.getIndexWithStats(user?.id);
+
+const enrichedArticles = index?.articles.map((a) => ({
+  ...a,
+  is_favorite: favoriteKeys.includes(a.key),
+  view_count: viewCounts[a.key] || 0,
+})) || [];
+
+const initialIndex = index ? { ...index, articles: enrichedArticles } : null;
+const currentUserId: string | undefined = user?.id;
+
+{
+  console.log('[Juritheque] InitialIndex articles count:', initialIndex?.articles?.length || 0);
+  console.log('[Juritheque] InitialIndex null:', initialIndex === null);
+  console.log('[Juritheque] Index null:', index === null);
+}
+
+---
+
+<DashboardLayout title="Jurithèque - PREVICARE EMPLOI">
+  <DashboardShell title="Jurithèque - Bibliothèque Juridique">
+    <div>
+      <JurithequeApp
+        client:load
+        initialIndex={initialIndex}
+        currentUserId={currentUserId}
+      />
+    </div>
+  </DashboardShell>
+</DashboardLayout>

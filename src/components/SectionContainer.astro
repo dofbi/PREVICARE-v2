@@ -1,0 +1,41 @@
+---
+import DecorativeShapes from "./DecorativeShapes.astro";
+import { cn } from "../lib/utils";
+
+interface Props {
+  background?: "white" | "accent" | "gradient-primary" | "pattern" | "gradient-secondary" | "gradient-tertiary" | "gradient" | "gradient-to-r from-highlight to-highlight-dark";
+  decorative?: boolean;
+  decorativeVariant?: "primary" | "secondary" | "mixed";
+  className?: string;
+  id?: string;
+}
+
+const {
+  background = "white",
+  decorative = false,
+  decorativeVariant = "primary",
+  className,
+  id,
+} = Astro.props;
+
+const backgroundClasses = {
+  white: "bg-white",
+  accent: "bg-accent",
+  pattern: "bg-gradient-to-br from-accent to-white",
+  "gradient-primary": "bg-gradient-primary",
+  "gradient-secondary": "bg-gradient-secondary",
+  "gradient-tertiary": "bg-gradient-tertiary",
+  gradient: "bg-gradient-primary",
+  "gradient-to-r from-highlight to-highlight-dark": "bg-gradient-to-r from-highlight to-highlight-dark",
+};
+---
+
+<section
+  id={id}
+  class={cn("relative w-full py-16 md:py-24 overflow-visible", backgroundClasses[background], className)}
+>
+  {decorative && <DecorativeShapes variant={decorativeVariant} />}
+  <div class="container mx-auto px-4 md:px-6 relative z-10">
+    <slot />
+  </div>
+</section>

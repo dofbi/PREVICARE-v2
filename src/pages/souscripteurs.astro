@@ -1,0 +1,335 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Souscripteurs — Previcare Emploi" description="Previcare Emploi s'adresse aux salariés locaux, expatriés, employeurs et délégués du personnel. Découvrez la formule faite pour vous.">
+
+<style>
+  /* ── HERO ────────────────────────────────────────────────────── */
+  .so-hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 130px 40px 90px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .so-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(201,169,97,.12) 0%, transparent 60%);
+  }
+  .so-hero-inner { position: relative; z-index: 2; max-width: 800px; margin: 0 auto; }
+  .so-kicker {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 7px;
+    text-transform: uppercase;
+    color: var(--gold-2);
+    margin-bottom: 32px;
+  }
+  .so-h1 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(56px, 9vw, 110px);
+    line-height: .95;
+    margin: 0;
+  }
+  .so-h1 em { font-style: normal; color: var(--gold-2); }
+  .so-sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 20px;
+    color: rgba(246,244,238,.65);
+    margin: 32px auto 0;
+    max-width: 580px;
+    line-height: 1.6;
+  }
+
+  /* ── PROFILS ALTERNÉS ────────────────────────────────────────── */
+  .so-profile {
+    padding: 100px 40px;
+    position: relative;
+  }
+  .so-profile:nth-child(odd)  { background: var(--paper); }
+  .so-profile:nth-child(even) { background: #fff; }
+
+  .so-profile-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .so-profile:nth-child(even) .so-profile-inner { direction: rtl; }
+  .so-profile:nth-child(even) .so-profile-text { direction: ltr; }
+  .so-profile:nth-child(even) .so-profile-vis  { direction: ltr; }
+
+  .so-profile-num {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 140px;
+    color: var(--rule);
+    line-height: 1;
+    margin: 0 0 -20px;
+    user-select: none;
+  }
+  .so-profile-label {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    margin-bottom: 16px;
+  }
+  .so-profile-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(36px, 4vw, 52px);
+    margin: 0 0 24px;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .so-profile-p {
+    font-size: 16px;
+    color: var(--ink-3);
+    line-height: 1.75;
+    margin: 0 0 32px;
+  }
+  .so-profile-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 40px;
+  }
+  .so-profile-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-3);
+    line-height: 1.45;
+  }
+  .so-profile-list li:last-child { border-bottom: none; }
+  .so-profile-list .pcheck { color: var(--gold-3); flex-shrink: 0; font-weight: 700; }
+  .so-profile-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  /* Visuel illustration */
+  .so-profile-vis {
+    aspect-ratio: 1 / 1.1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--paper-2, #EDE9DA);
+    border: 1px solid var(--rule);
+    position: relative;
+    overflow: hidden;
+  }
+  .so-vis-icon {
+    width: 120px;
+    height: 120px;
+    color: var(--gold-3);
+    opacity: .45;
+  }
+  .so-vis-num {
+    position: absolute;
+    bottom: 20px;
+    right: 28px;
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 200px;
+    color: var(--gold);
+    opacity: .08;
+    line-height: 1;
+    user-select: none;
+  }
+
+  /* ── CTA FINAL ────────────────────────────────────────────────── */
+  .so-cta {
+    padding: 120px 40px;
+    background: var(--ink);
+    color: var(--paper);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .so-cta::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, rgba(201,169,97,.1) 0%, transparent 65%);
+  }
+  .so-cta-inner { position: relative; z-index: 2; max-width: 680px; margin: 0 auto; }
+  .so-cta-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(40px, 6vw, 72px);
+    margin: 16px 0 24px;
+    line-height: 1.1;
+  }
+  .so-cta-h2 em { font-style: normal; color: var(--gold-2); }
+  .so-cta-p { font-size: 17px; color: rgba(246,244,238,.72); max-width: 520px; margin: 0 auto 48px; line-height: 1.7; }
+
+  @media (max-width: 900px) {
+    .so-profile-inner { grid-template-columns: 1fr; gap: 48px; direction: ltr !important; }
+    .so-profile-vis { aspect-ratio: 2 / 1; max-height: 260px; }
+    .so-profile-num { font-size: 80px; }
+  }
+</style>
+
+<!-- HERO -->
+<section class="so-hero">
+  <div class="so-hero-inner">
+    <p class="so-kicker">— Pour chaque acteur du travail</p>
+    <h1 class="so-h1">Votre <em>profil</em>,<br/>vos besoins</h1>
+    <p class="so-sub">Que vous soyez travailleur local, expatrié, employeur ou délégué du personnel, Previcare Emploi dispose d'une formule conçue pour vous.</p>
+  </div>
+</section>
+
+<!-- ── PROFIL 1 : SALARIÉS LOCAUX ── -->
+<section class="so-profile" id="travailleurs">
+  <div class="so-profile-inner">
+    <div class="so-profile-text">
+      <p class="so-profile-num">1</p>
+      <p class="so-profile-label">Profil · Salarié du secteur privé local</p>
+      <h2 class="so-profile-h2">Le salarié<br/>sénégalais</h2>
+      <p class="so-profile-p">
+        Vous travaillez dans le secteur privé, en CDI, CDD ou contrat saisonnier. Vous avez besoin de comprendre vos droits, de sécuriser vos documents et d'accéder à des conseils juridiques sans passer par un avocat à chaque question.
+      </p>
+      <ul class="so-profile-list">
+        <li><span class="pcheck">→</span><span>Coffre-fort documentaire : bulletins de paie, contrats, attestations IPRES</span></li>
+        <li><span class="pcheck">→</span><span>Setlou répond à vos questions de droit du travail 24 h/24</span></li>
+        <li><span class="pcheck">→</span><span>Xalima rédige vos courriers : congé, contestation, démission</span></li>
+        <li><span class="pcheck">→</span><span>Offres d'emploi vérifiées pour une mobilité professionnelle sereine</span></li>
+        <li><span class="pcheck">→</span><span>Consultation mensuelle avec un juriste (formule Gold)</span></li>
+      </ul>
+      <div class="so-profile-btns">
+        <a href="/formules" class="btn btn-primary">Choisir ma formule</a>
+        <a href="/setlou" class="btn btn-ghost">Essayer Setlou</a>
+      </div>
+    </div>
+    <div class="so-profile-vis">
+      <svg class="so-vis-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".8" stroke-linecap="round">
+        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      <span class="so-vis-num">1</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROFIL 2 : EXPATRIÉS ── -->
+<section class="so-profile" id="expatries">
+  <div class="so-profile-inner">
+    <div class="so-profile-text">
+      <p class="so-profile-num">2</p>
+      <p class="so-profile-label">Profil · Travailleur expatrié au Sénégal</p>
+      <h2 class="so-profile-h2">L'expatrié<br/>au Sénégal</h2>
+      <p class="so-profile-p">
+        Vous exercez au Sénégal avec un contrat d'expatriation, un permis de travail ou un contrat de mission. La complexité des règles applicables — droit local vs. conventions bilatérales — exige un accompagnement spécialisé.
+      </p>
+      <ul class="so-profile-list">
+        <li><span class="pcheck">→</span><span>Veille sur les obligations spécifiques aux travailleurs étrangers</span></li>
+        <li><span class="pcheck">→</span><span>Archivage sécurisé de vos documents d'immigration et contrats</span></li>
+        <li><span class="pcheck">→</span><span>Setlou informé des conventions bilatérales Sénégal/pays d'origine</span></li>
+        <li><span class="pcheck">→</span><span>Consultation avec expert en droit international du travail</span></li>
+        <li><span class="pcheck">→</span><span>Interface disponible en français et en anglais</span></li>
+      </ul>
+      <div class="so-profile-btns">
+        <a href="/formules" class="btn btn-primary">Choisir ma formule</a>
+        <a href="/rdv-consultation" class="btn btn-ghost">Prendre rendez-vous</a>
+      </div>
+    </div>
+    <div class="so-profile-vis">
+      <svg class="so-vis-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".8" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="2" y1="12" x2="22" y2="12"/>
+        <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+      </svg>
+      <span class="so-vis-num">2</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROFIL 3 : EMPLOYEURS ── -->
+<section class="so-profile" id="employeurs">
+  <div class="so-profile-inner">
+    <div class="so-profile-text">
+      <p class="so-profile-num">3</p>
+      <p class="so-profile-label">Profil · Employeur & direction RH</p>
+      <h2 class="so-profile-h2">L'employeur<br/>& les RH</h2>
+      <p class="so-profile-p">
+        Vous gérez une équipe, une PME ou un service RH. Vous devez assurer la conformité réglementaire, sécuriser vos actes juridiques et archiver les documents d'une organisation entière.
+      </p>
+      <ul class="so-profile-list">
+        <li><span class="pcheck">→</span><span>Coffre-fort multi-utilisateurs : archivage des dossiers de tous les employés</span></li>
+        <li><span class="pcheck">→</span><span>Setlou adapté aux questions patronales : licenciement, sanction, convention</span></li>
+        <li><span class="pcheck">→</span><span>Xalima rédige les courriers employeur : convocation, mise en demeure</span></li>
+        <li><span class="pcheck">→</span><span>Consultation mensuelle avec expert RH ou juriste droit social</span></li>
+        <li><span class="pcheck">→</span><span>Tableau de bord de conformité : suivi des contrats, alertes d'échéance</span></li>
+      </ul>
+      <div class="so-profile-btns">
+        <a href="/formules" class="btn btn-primary">Choisir ma formule</a>
+        <a href="/coffre-fort" class="btn btn-ghost">Voir le coffre-fort</a>
+      </div>
+    </div>
+    <div class="so-profile-vis">
+      <svg class="so-vis-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".8" stroke-linecap="round">
+        <rect x="3" y="7" width="18" height="13" rx="2"/>
+        <path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2M16 11a4 4 0 01-8 0"/>
+      </svg>
+      <span class="so-vis-num">3</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROFIL 4 : DÉLÉGUÉS ── -->
+<section class="so-profile" id="delegues">
+  <div class="so-profile-inner">
+    <div class="so-profile-text">
+      <p class="so-profile-num">4</p>
+      <p class="so-profile-label">Profil · Délégué du personnel</p>
+      <h2 class="so-profile-h2">Le délégué<br/>du personnel</h2>
+      <p class="so-profile-p">
+        Vous représentez les salariés. Votre rôle exige une maîtrise précise du droit du travail, un suivi rigoureux des réclamations et une traçabilité de toutes les démarches.
+      </p>
+      <ul class="so-profile-list">
+        <li><span class="pcheck">→</span><span>Setlou informé des spécificités de la représentation du personnel</span></li>
+        <li><span class="pcheck">→</span><span>Suivi et archivage des réclamations des salariés représentés</span></li>
+        <li><span class="pcheck">→</span><span>Xalima rédige les procès-verbaux, comptes-rendus et courriers syndicaux</span></li>
+        <li><span class="pcheck">→</span><span>Accès à la jurisprudence sur les droits des délégués</span></li>
+        <li><span class="pcheck">→</span><span>Consultation dédiée avec avocat spécialisé droit syndical</span></li>
+      </ul>
+      <div class="so-profile-btns">
+        <a href="/formules" class="btn btn-primary">Choisir ma formule</a>
+        <a href="/setlou" class="btn btn-ghost">Consulter Setlou</a>
+      </div>
+    </div>
+    <div class="so-profile-vis">
+      <svg class="so-vis-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".8" stroke-linecap="round">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+      </svg>
+      <span class="so-vis-num">4</span>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="so-cta">
+  <div class="so-cta-inner">
+    <p class="so-kicker" style="color:var(--gold-2)">— Rejoindre Previcare Emploi</p>
+    <h2 class="so-cta-h2">Quel que soit<br/>votre <em>profil</em></h2>
+    <p class="so-cta-p">Ouvrez un compte en moins de deux minutes. Choisissez la formule qui correspond à votre situation. Changez à tout moment.</p>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <a href="/formules"   class="btn btn-gold">Voir les formules</a>
+      <a href="/inscription" class="btn btn-ghost" style="border-color:rgba(246,244,238,.3);color:var(--paper)">Créer un compte</a>
+    </div>
+  </div>
+</section>
+
+</Layout>

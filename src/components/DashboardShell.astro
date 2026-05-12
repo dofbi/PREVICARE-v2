@@ -1,0 +1,369 @@
+
+---
+import { FloatingAssistant } from './employee/FloatingAssistant.tsx';
+import { getNavItems, BASE_PATHS } from '../config/navConfig';
+import type { UserRole } from '../config/roleConfig';
+
+const { user } = Astro.locals;
+
+if (!user) {
+  return Astro.redirect('/connexion');
+}
+
+const { role = 'employee' } = Astro.props as { role?: UserRole };
+
+const currentPath = Astro.url.pathname;
+const navigationItems = getNavItems(role, currentPath);
+const homeHref = BASE_PATHS[role] ?? BASE_PATHS.employee;
+const settingsHref = `${BASE_PATHS[role] ?? BASE_PATHS.employee}/parametres`;
+
+const firstName = (user.user_metadata?.first_name as string | undefined) ?? '';
+const lastName = (user.user_metadata?.last_name as string | undefined) ?? '';
+const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || 'U';
+
+const iconPaths: Record<string, string> = {
+  home: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
+  document: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+  shield: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+  support: 'M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z',
+  bell: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9',
+  card: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z',
+};
+---
+
+<!-- Anti-flash: apply collapsed class before first paint -->
+<script is:inline>
+  (function () {
+    if (localStorage.getItem('sidebar-collapsed') === 'true') {
+      document.documentElement.classList.add('sb-collapsed');
+    }
+  })();
+</script>
+
+<style is:global>
+  /* Sidebar width tokens */
+  :root {
+    --sb-w: 16rem;   /* 256px expanded */
+    --sb-w-sm: 4rem; /* 64px collapsed */
+  }
+
+  /* Desktop sidebar transitions — md breakpoint only */
+  @media (min-width: 768px) {
+    #desktop-sidebar {
+      width: var(--sb-w);
+      transition: width 200ms ease;
+    }
+    #main-content {
+      margin-left: var(--sb-w);
+      transition: margin-left 200ms ease;
+    }
+
+    /* Collapsed state */
+    .sb-collapsed #desktop-sidebar {
+      width: var(--sb-w-sm);
+    }
+    .sb-collapsed #main-content {
+      margin-left: var(--sb-w-sm);
+    }
+  }
+
+  /* Logo: hide text label when collapsed */
+  .sb-collapsed .sb-logo-text { display: none; }
+  .sb-collapsed .sb-logo-full { display: none; }
+  .sb-collapsed .sb-logo-mini { display: flex; }
+  .sb-logo-mini { display: none; }
+
+  /* Nav items: hide label when collapsed, center icon */
+  .sb-collapsed .sb-nav-label { display: none; }
+  .sb-collapsed .sb-nav-link {
+    justify-content: center;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border-left: none !important;
+  }
+  .sb-collapsed .sb-nav-link.sb-active {
+    border-left: none !important;
+    padding-left: 0 !important;
+  }
+
+  /* Profile: hide text when collapsed */
+  .sb-collapsed .sb-profile-text { display: none; }
+  .sb-collapsed .sb-profile-link {
+    justify-content: center;
+    padding: 0.5rem;
+  }
+  .sb-collapsed .sb-profile-arrow { display: none; }
+
+  /* Toggle button icon swap */
+  .sb-collapsed .sb-chevron-left { display: none; }
+  .sb-collapsed .sb-chevron-right { display: flex; }
+  .sb-chevron-right { display: none; }
+
+  /* Prevent label overflow during transition */
+  #desktop-sidebar { overflow: hidden; }
+  #desktop-sidebar nav { overflow-y: auto; overflow-x: hidden; }
+</style>
+
+<div class="min-h-screen flex flex-col md:flex-row" style="background:var(--paper)">
+
+  <!-- ─── Desktop sidebar ─────────────────────────────────────── -->
+  <aside
+    id="desktop-sidebar"
+    class="hidden md:flex md:flex-col md:fixed md:inset-y-0 md:z-20"
+    style="background:var(--ink)"
+  >
+    <!-- Logo -->
+    <div class="flex items-center h-16 px-4 border-b flex-shrink-0" style="border-color:rgba(255,255,255,.10)">
+      <!-- Expanded logo -->
+      <a href={homeHref} class="sb-logo-full flex items-center gap-2 no-underline min-w-0">
+        <span class="text-lg font-bold tracking-tight whitespace-nowrap" style="font-family:var(--display);color:var(--gold)">PREVICARE</span>
+        <span class="sb-logo-text text-xs font-medium uppercase tracking-widest whitespace-nowrap" style="color:rgba(255,255,255,.55)">Emploi</span>
+      </a>
+      <!-- Collapsed logo: gold dot / initial -->
+      <a href={homeHref} class="sb-logo-mini items-center justify-center w-full no-underline">
+        <span class="text-lg font-bold" style="font-family:var(--display);color:var(--gold)">P</span>
+      </a>
+    </div>
+
+    <!-- Navigation (scrollable) -->
+    <nav class="flex-1 py-4 px-2 space-y-0.5">
+      {navigationItems.map((item) => {
+        const path = iconPaths[item.icon] ?? iconPaths.document;
+        return (
+          <a
+            href={item.href}
+            title={item.name}
+            class={`sb-nav-link group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+              item.current
+                ? 'sb-active text-white'
+                : 'text-white/60 hover:text-white hover:bg-white/8'
+            }`}
+            style={item.current ? 'background:rgba(201,169,97,.18);border-left:3px solid var(--gold);padding-left:calc(0.75rem - 3px)' : ''}
+          >
+            <svg
+              class={`w-5 h-5 flex-shrink-0 ${item.current ? '' : 'opacity-60 group-hover:opacity-100'}`}
+              style={item.current ? 'color:var(--gold)' : ''}
+              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d={path} />
+            </svg>
+            <span class="sb-nav-label whitespace-nowrap">{item.name}</span>
+          </a>
+        );
+      })}
+    </nav>
+
+    <!-- Toggle button -->
+    <div class="px-2 pb-1 flex-shrink-0">
+      <button
+        id="sidebar-toggle"
+        type="button"
+        class="w-full flex items-center justify-end px-3 py-2 rounded-lg text-sm transition-colors hover:bg-white/8"
+        style="color:rgba(255,255,255,.40)"
+        onmouseover="this.style.color='var(--gold)'"
+        onmouseout="this.style.color='rgba(255,255,255,.40)'"
+        aria-label="Replier / déployer la barre latérale"
+      >
+        <!-- Chevron left (expanded → collapse) -->
+        <svg class="sb-chevron-left w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        <!-- Chevron right (collapsed → expand) -->
+        <svg class="sb-chevron-right w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- User profile — always anchored at bottom -->
+    <div class="px-2 pb-3 pt-1 border-t flex-shrink-0" style="border-color:rgba(255,255,255,.10)">
+      <a
+        href={settingsHref}
+        class="sb-profile-link flex items-center gap-3 p-2 rounded-lg hover:bg-white/8 transition-colors group no-underline"
+        title={`${firstName} ${lastName}`}
+      >
+        <div class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold" style="background:var(--gold);color:var(--ink)">
+          {initials}
+        </div>
+        <div class="sb-profile-text min-w-0">
+          <p class="text-sm font-medium text-white truncate">{firstName} {lastName}</p>
+          <p class="text-xs" style="color:rgba(255,255,255,.45)">Voir le profil</p>
+        </div>
+        <svg class="sb-profile-arrow w-4 h-4 ml-auto flex-shrink-0 opacity-0 group-hover:opacity-60 transition-opacity" style="color:var(--gold)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
+      <!-- Logout button — desktop -->
+      <a
+        href="/api/signout"
+        class="sb-logout-link flex items-center gap-3 px-3 py-2 rounded-lg transition-colors group no-underline mt-0.5"
+        title="Se déconnecter"
+        style="color:rgba(255,255,255,.40)"
+        onmouseover="this.style.color='rgba(239,68,68,.80)';this.style.background='rgba(239,68,68,.08)'"
+        onmouseout="this.style.color='rgba(255,255,255,.40)';this.style.background=''"
+      >
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+        <span class="sb-nav-label text-xs font-medium">Se déconnecter</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ─── Main content ────────────────────────────────────────── -->
+  <div id="main-content" class="flex flex-col flex-1 min-w-0">
+
+    <!-- Mobile topbar -->
+    <header class="md:hidden flex items-center justify-between h-14 px-4 border-b bg-white flex-shrink-0" style="border-color:var(--rule)">
+      <span class="text-base font-bold" style="font-family:var(--display);color:var(--ink)">PREVICARE</span>
+      <button
+        id="mobile-menu-btn"
+        type="button"
+        class="w-11 h-11 flex items-center justify-center rounded-lg transition-colors"
+        style="color:var(--ink);background:rgba(201,169,97,.12)"
+        aria-label="Ouvrir le menu"
+      >
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </header>
+
+    <!-- Mobile drawer overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden" aria-hidden="true"></div>
+
+    <!-- Mobile sidebar drawer -->
+    <aside
+      id="mobile-sidebar"
+      class="fixed inset-y-0 left-0 z-50 w-64 flex flex-col transform -translate-x-full transition-transform duration-200 md:hidden"
+      style="background:var(--ink)"
+    >
+      <div class="flex items-center justify-between h-14 px-4 border-b flex-shrink-0" style="border-color:rgba(255,255,255,.10)">
+        <span class="text-base font-bold" style="font-family:var(--display);color:var(--gold)">PREVICARE</span>
+        <button id="close-mobile-menu" class="w-9 h-9 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/8 transition-colors" aria-label="Fermer le menu">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mobile nav (scrollable, never covers profile) -->
+      <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-0.5">
+        {navigationItems.map((item) => {
+          const path = iconPaths[item.icon] ?? iconPaths.document;
+          return (
+            <a
+              href={item.href}
+              class={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                item.current ? 'text-white' : 'text-white/60 hover:text-white hover:bg-white/8'
+              }`}
+              style={item.current ? 'background:rgba(201,169,97,.18);border-left:3px solid var(--gold);padding-left:calc(0.75rem - 3px)' : ''}
+            >
+              <svg class="w-5 h-5 flex-shrink-0" style={item.current ? 'color:var(--gold)' : 'opacity:.6'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d={path} />
+              </svg>
+              <span>{item.name}</span>
+            </a>
+          );
+        })}
+      </nav>
+
+      <!-- Mobile profile — always anchored -->
+      <div class="p-4 border-t flex-shrink-0" style="border-color:rgba(255,255,255,.10)">
+        <a href={settingsHref} class="flex items-center gap-3 p-1 rounded-lg hover:bg-white/8 transition-colors no-underline mb-2">
+          <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold" style="background:var(--gold);color:var(--ink)">{initials}</div>
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-white truncate">{firstName} {lastName}</p>
+            <p class="text-xs" style="color:rgba(255,255,255,.45)">Voir le profil</p>
+          </div>
+        </a>
+        <!-- Logout button — mobile drawer -->
+        <a
+          href="/api/signout"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg no-underline transition-colors"
+          style="color:rgba(255,255,255,.50);background:rgba(239,68,68,.06)"
+        >
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span class="text-sm font-medium">Se déconnecter</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="flex-1 py-6 pb-20 md:pb-6 min-w-0">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <slot />
+      </div>
+    </main>
+
+    <!-- ─── Bottom nav mobile ──────────────────────────────────── -->
+    <nav class="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t" style="border-color:var(--rule)">
+      <div class="grid gap-0 px-1 py-2" style={`grid-template-columns: repeat(${Math.min(navigationItems.length, 5)}, 1fr)`}>
+        {navigationItems.slice(0, 5).map((item) => {
+          const path = iconPaths[item.icon] ?? iconPaths.document;
+          return (
+            <a
+              href={item.href}
+              class={`flex flex-col items-center justify-center py-1.5 text-xs font-medium rounded-md transition-colors ${
+                item.current ? 'text-[var(--ink)]' : 'text-[var(--ink-4)] hover:text-[var(--ink)]'
+              }`}
+            >
+              <svg class="h-5 w-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width={item.current ? "2" : "1.5"} d={path} />
+              </svg>
+              <span>{item.name}</span>
+              {item.current && <span class="block w-5 h-0.5 rounded-full mt-0.5" style="background:var(--gold)"></span>}
+            </a>
+          );
+        })}
+      </div>
+    </nav>
+  </div>
+
+  <!-- Assistant virtuel flottant -->
+  <FloatingAssistant client:load />
+</div>
+
+<script>
+  // ── Mobile menu ──────────────────────────────────────────────
+  const mobileBtn = document.getElementById('mobile-menu-btn');
+  const overlay = document.getElementById('mobile-overlay');
+  const mobileSidebar = document.getElementById('mobile-sidebar');
+  const closeBtn = document.getElementById('close-mobile-menu');
+
+  function openMenu() {
+    mobileSidebar?.classList.remove('-translate-x-full');
+    overlay?.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeMenu() {
+    mobileSidebar?.classList.add('-translate-x-full');
+    overlay?.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  mobileBtn?.addEventListener('click', openMenu);
+  overlay?.addEventListener('click', closeMenu);
+  closeBtn?.addEventListener('click', closeMenu);
+
+  // ── Desktop sidebar toggle ───────────────────────────────────
+  const toggleBtn = document.getElementById('sidebar-toggle');
+
+  function applyCollapsed(collapsed: boolean) {
+    if (collapsed) {
+      document.documentElement.classList.add('sb-collapsed');
+    } else {
+      document.documentElement.classList.remove('sb-collapsed');
+    }
+  }
+
+  // Init from localStorage (already applied by inline script, but keep in sync)
+  let isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+
+  toggleBtn?.addEventListener('click', () => {
+    isCollapsed = !isCollapsed;
+    localStorage.setItem('sidebar-collapsed', String(isCollapsed));
+    applyCollapsed(isCollapsed);
+  });
+</script>

@@ -1,0 +1,293 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Visionneuse juridique — Previcare Emploi" description="Bibliothèque numérique du droit du travail sénégalais : Code du Travail, conventions collectives, jurisprudence. Recherche plein texte, navigation par article.">
+
+<style>
+  /* ── HERO ────────────────────────────────────────────────────── */
+  .vi-hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 130px 40px 100px;
+    position: relative;
+    overflow: hidden;
+  }
+  .vi-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 65% 50%, rgba(201,169,97,.08) 0%, transparent 55%);
+  }
+  .vi-hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .vi-kicker {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 7px;
+    text-transform: uppercase;
+    color: var(--gold-2);
+    margin-bottom: 32px;
+  }
+  .vi-h1 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(52px, 7vw, 88px);
+    line-height: .95;
+    margin: 0 0 28px;
+  }
+  .vi-h1 em { font-style: normal; color: var(--gold-2); }
+  .vi-sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 19px;
+    color: rgba(246,244,238,.72);
+    line-height: 1.65;
+    margin: 0 0 40px;
+  }
+  .vi-hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+
+  /* Aperçu interface */
+  .vi-preview {
+    border: 1px solid rgba(201,169,97,.2);
+    background: rgba(20,40,73,.8);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .vi-preview-bar {
+    background: rgba(11,29,58,.9);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid rgba(201,169,97,.15);
+  }
+  .vi-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .vi-preview-search {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(201,169,97,.2);
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: rgba(246,244,238,.5);
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 1px;
+    flex: 1;
+    margin-left: 12px;
+  }
+  .vi-preview-content { padding: 20px; }
+  .vi-preview-line {
+    height: 8px;
+    background: rgba(246,244,238,.08);
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  .vi-preview-line.hi { background: rgba(201,169,97,.3); width: 70%; }
+  .vi-preview-article {
+    margin-top: 16px;
+    padding: 12px;
+    background: rgba(11,29,58,.5);
+    border-left: 2px solid var(--gold);
+    border-radius: 2px;
+  }
+  .vi-preview-article-n {
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--gold-2);
+    margin-bottom: 8px;
+  }
+  .vi-preview-article-t {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 16px;
+    color: var(--paper);
+    margin-bottom: 8px;
+  }
+  .vi-preview-article p {
+    font-size: 11px;
+    color: rgba(246,244,238,.6);
+    line-height: 1.6;
+  }
+
+  /* ── CORPUS SECTION ──────────────────────────────────────────── */
+  .vi-corpus {
+    padding: 100px 40px;
+    background: var(--paper);
+  }
+  .vi-corpus-inner { max-width: 1200px; margin: 0 auto; }
+  .vi-corpus-head { text-align: center; margin-bottom: 64px; }
+  .vi-corpus-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(36px, 4.5vw, 52px);
+    margin: 16px 0 0;
+  }
+  .vi-corpus-h2 em { font-style: normal; color: var(--gold-3); }
+
+  .vi-corpus-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+  .vi-corpus-item {
+    background: var(--paper);
+    padding: 40px 32px;
+    transition: background .25s;
+  }
+  .vi-corpus-item:hover { background: #fff; }
+  .vi-corpus-icon { color: var(--gold-3); margin-bottom: 20px; }
+  .vi-corpus-icon svg { width: 44px; height: 44px; }
+  .vi-corpus-label {
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    margin-bottom: 8px;
+  }
+  .vi-corpus-t {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 24px;
+    color: var(--ink);
+    margin: 0 0 12px;
+  }
+  .vi-corpus-d { font-size: 13px; color: var(--ink-3); line-height: 1.65; margin: 0; }
+  .vi-corpus-count {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 36px;
+    color: var(--gold-3);
+    display: block;
+    margin-top: 20px;
+  }
+
+  /* ── CTA ─────────────────────────────────────────────────────── */
+  .vi-cta {
+    padding: 100px 40px;
+    background: var(--ink);
+    text-align: center;
+    color: var(--paper);
+  }
+  .vi-cta-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(36px, 5vw, 60px);
+    margin: 16px 0 20px;
+  }
+  .vi-cta-h2 em { font-style: normal; color: var(--gold-2); }
+  .vi-cta-p { font-size: 17px; color: rgba(246,244,238,.72); max-width: 520px; margin: 0 auto 40px; line-height: 1.7; }
+
+  @media (max-width: 900px) {
+    .vi-hero-inner { grid-template-columns: 1fr; }
+    .vi-corpus-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<!-- HERO -->
+<section class="vi-hero">
+  <div class="vi-hero-inner">
+    <div>
+      <p class="vi-kicker">— Outil II · Bibliothèque juridique</p>
+      <h1 class="vi-h1">La <em>visionneuse</em><br/>juridique</h1>
+      <p class="vi-sub">Consultez le Code du Travail sénégalais, les conventions collectives et la jurisprudence. Recherche plein texte, navigation par article, annotations personnelles.</p>
+      <div class="vi-hero-btns">
+        <a href="/connexion" class="btn btn-gold">Accéder à la visionneuse</a>
+        <a href="/coffre-fort" class="btn btn-ghost" style="border-color:rgba(246,244,238,.3);color:var(--paper)">Mon coffre-fort</a>
+      </div>
+    </div>
+    <div class="vi-preview">
+      <div class="vi-preview-bar">
+        <span class="vi-dot" style="background:#ef4444"></span>
+        <span class="vi-dot" style="background:#f59e0b"></span>
+        <span class="vi-dot" style="background:#22c55e"></span>
+        <div class="vi-preview-search">Rechercher dans le Code du Travail…</div>
+      </div>
+      <div class="vi-preview-content">
+        <div class="vi-preview-line" style="width:55%"></div>
+        <div class="vi-preview-line" style="width:80%"></div>
+        <div class="vi-preview-line hi"></div>
+        <div class="vi-preview-line" style="width:65%"></div>
+        <div class="vi-preview-article">
+          <p class="vi-preview-article-n">Art. 49 · Loi n° 97-17</p>
+          <p class="vi-preview-article-t">Délai-congé et préavis</p>
+          <p>La durée du préavis est fixée par la convention collective interprofessionnelle ou, à défaut, par décret…</p>
+        </div>
+        <div style="margin-top:16px">
+          <div class="vi-preview-line" style="width:90%"></div>
+          <div class="vi-preview-line" style="width:72%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CORPUS -->
+<section class="vi-corpus">
+  <div class="vi-corpus-inner">
+    <div class="vi-corpus-head">
+      <p class="vi-kicker">— Le corpus juridique</p>
+      <h2 class="vi-corpus-h2">2 400+ articles <em>indexés</em></h2>
+    </div>
+    <div class="vi-corpus-grid">
+      <div class="vi-corpus-item">
+        <div class="vi-corpus-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+            <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+          </svg>
+        </div>
+        <p class="vi-corpus-label">Texte fondateur</p>
+        <h3 class="vi-corpus-t">Code du Travail</h3>
+        <p class="vi-corpus-d">Loi n° 97-17 du 1er décembre 1997, tous décrets d'application, circulaires ministérielles. Navigation par livre, titre et article.</p>
+        <span class="vi-corpus-count">600+ articles</span>
+      </div>
+      <div class="vi-corpus-item">
+        <div class="vi-corpus-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+        </div>
+        <p class="vi-corpus-label">Droit conventionnel</p>
+        <h3 class="vi-corpus-t">Conventions collectives</h3>
+        <p class="vi-corpus-d">11 conventions collectives nationales sectorielles intégrées : Commerce, Banque, Bâtiment, Industrie, Agriculture, Transports et plus.</p>
+        <span class="vi-corpus-count">11 CCN</span>
+      </div>
+      <div class="vi-corpus-item">
+        <div class="vi-corpus-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+          </svg>
+        </div>
+        <p class="vi-corpus-label">Droit appliqué</p>
+        <h3 class="vi-corpus-t">Jurisprudence</h3>
+        <p class="vi-corpus-d">Arrêts et jugements de la Cour suprême, Cour d'appel de Dakar, tribunaux du travail. Résumés clairs et texte intégral.</p>
+        <span class="vi-corpus-count">1 800+ décisions</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="vi-cta">
+  <p class="vi-kicker" style="color:var(--gold-2)">— Accès immédiat</p>
+  <h2 class="vi-cta-h2">Le droit du travail<br/>à <em>portée de main</em></h2>
+  <p class="vi-cta-p">La visionneuse est accessible dès la formule Basique. Annotations et export PDF disponibles avec les formules Silver et Gold.</p>
+  <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+    <a href="/connexion" class="btn btn-gold">Ouvrir la visionneuse</a>
+    <a href="/formules" class="btn btn-ghost" style="border-color:rgba(246,244,238,.3);color:var(--paper)">Voir les formules</a>
+  </div>
+</section>
+
+</Layout>

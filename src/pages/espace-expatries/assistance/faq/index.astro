@@ -1,0 +1,138 @@
+---
+import DashboardLayout from '../../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../../components/DashboardShell.astro';
+import { getCollection, render } from 'astro:content';
+import { requireRole } from '../../../../lib/guards';
+
+const guard = await requireRole(Astro, 'expatriate');
+if (guard) return guard;
+
+const faqs = await getCollection('faq');
+const sortedFaqs = faqs.sort((a, b) => a.data.order - b.data.order);
+
+const renderedFaqs = await Promise.all(
+  sortedFaqs.map(async (faq) => ({
+    ...faq,
+    rendered: await render(faq),
+  }))
+);
+
+const categories = {
+  general: { label: 'Général', color: 'blue', icon: '❓' },
+  documents: { label: 'Documents', color: 'green', icon: '📄' },
+  juridique: { label: 'Juridique', color: 'red', icon: '⚖️' },
+  technique: { label: 'Technique', color: 'slate', icon: '⚙️' },
+};
+
+const groupedFaqs = Object.entries(categories).reduce((acc, [key, category]) => {
+  acc[key] = {
+    ...category,
+    items: renderedFaqs.filter(faq => faq.data.category === key),
+  };
+  return acc;
+}, {} as Record<string, any>);
+---
+
+<DashboardLayout title="FAQ - PREVICARE EMPLOI">
+  <DashboardShell role="expatriate">
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+      <ol class="flex items-center space-x-4">
+        <li><a href="/espace-expatries" class="text-gray-400 hover:text-gray-500">Tableau de bord</a></li>
+        <li><span class="text-gray-300">/</span></li>
+        <li><a href="/espace-expatries/assistance" class="text-gray-400 hover:text-gray-500">Assistance</a></li>
+        <li><span class="text-gray-300">/</span></li>
+        <li><span class="text-gray-500">FAQ</span></li>
+      </ol>
+    </nav>
+
+    <div class="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-6 mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Questions Fréquemment Posées</h1>
+      <p class="text-gray-700">Trouvez les réponses aux questions les plus courantes sur PREVICARE EMPLOI</p>
+    </div>
+
+    <div class="mb-8">
+      <div class="flex flex-wrap gap-2">
+        {Object.entries(categories).map(([key, category]) => (
+          <a
+            href={`#category-${key}`}
+            class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all bg-white border-2 hover:border-blue-500 hover:bg-blue-50 text-gray-700 hover:text-blue-700"
+          >
+            <span class="mr-2">{category.icon}</span>
+            {category.label} ({groupedFaqs[key].items.length})
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <div class="space-y-8">
+      {Object.entries(groupedFaqs).map(([key, category]) => {
+        if (category.items.length === 0) return null;
+
+        const colorClasses = {
+          blue: 'border-blue-200 bg-blue-50',
+          green: 'border-green-200 bg-green-50',
+          purple: 'border-purple-200 bg-purple-50',
+          red: 'border-red-200 bg-red-50',
+          orange: 'border-orange-200 bg-orange-50',
+          slate: 'border-slate-200 bg-slate-50',
+        };
+
+        return (
+          <section data-key={key} id={`category-${key}`} class="scroll-mt-20">
+            <div class={`border-l-4 border-l-${category.color}-500 pl-4 mb-4`}>
+              <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <span text-xl>{category.icon}</span>
+                {category.label}
+              </h2>
+              <p class="text-sm text-gray-600 mt-1">{category.items.length} question{category.items.length > 1 ? 's' : ''}</p>
+            </div>
+
+            <div class="space-y-3 mb-8">
+              {category.items.map((faq: any) => (
+                <details
+                  class={`group border-2 rounded-lg overflow-hidden transition-all hover:shadow-md ${colorClasses[category.color as keyof typeof colorClasses]}`}
+                >
+                  <summary class="flex items-center justify-between p-4 cursor-pointer select-none">
+                    <div class="flex items-center gap-3 flex-1">
+                      <span class="flex-shrink-0 w-6 h-6 rounded-full bg-white border-2 flex items-center justify-center text-xs font-bold text-gray-600 group-open:hidden">+</span>
+                      <span class="flex-shrink-0 w-6 h-6 rounded-full bg-white border-2 flex items-center justify-center text-xs font-bold text-gray-600 hidden group-open:flex">−</span>
+                      <h3 class="font-semibold text-gray-900 text-sm md:text-base group-open:text-blue-700">{faq.data.question}</h3>
+                    </div>
+                  </summary>
+                  <div class="px-4 pb-4 border-t-2 bg-white">
+                    <div class="prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-ul:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-900 prose-a:text-blue-600">
+                      <faq.rendered.Content />
+                    </div>
+                  </div>
+                </details>
+              ))}
+            </div>
+          </section>
+        );
+      })}
+    </div>
+
+    <div class="mt-12 bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 rounded-lg p-8">
+      <div class="flex items-start gap-4">
+        <div class="flex-shrink-0 text-3xl">💬</div>
+        <div class="flex-1">
+          <h3 class="text-lg font-bold text-gray-900 mb-2">Vous n'avez pas trouvé votre réponse ?</h3>
+          <p class="text-gray-700 mb-4">Notre assistant virtuel est disponible 24/7 pour vous aider avec toutes vos questions.</p>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a href="/espace-expatries/assistance#chat" class="inline-flex items-center justify-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
+              Ouvrir le chat assistant →
+            </a>
+            <a href="/espace-expatries/tickets/nouveau" class="inline-flex items-center justify-center px-6 py-2 bg-white border-2 border-blue-600 hover:bg-blue-50 text-blue-600 font-medium rounded-lg transition-colors">
+              Créer un ticket
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </DashboardShell>
+</DashboardLayout>
+
+<style>
+  details summary::-webkit-details-marker { display: none; }
+  html { scroll-behavior: smooth; }
+</style>

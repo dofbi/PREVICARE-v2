@@ -1,0 +1,642 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { actions } from 'astro:actions';
+
+const { user } = Astro.locals;
+
+// Récupérer le paramètre redirect pour après inscription
+const redirectParam = Astro.url.searchParams.get('redirect');
+
+// Si l'utilisateur est déjà connecté, le rediriger vers sa page (ou le redirect demandé)
+if (user) {
+  if (redirectParam) {
+    return Astro.redirect(redirectParam);
+  }
+  
+  const userRole = user.user_metadata?.role;
+
+  if (userRole === 'employee') {
+    return Astro.redirect(user.user_metadata?.is_expatriate ? '/espace-expatries' : '/espace-employes');
+  } else if (userRole === 'employer') {
+    return Astro.redirect('/espace-employeurs');
+  } else if (userRole === 'delegate') {
+    return Astro.redirect('/espace-delegues');
+  }
+
+  return Astro.redirect('/dashboard');
+}
+
+// Gestion du résultat de l'action d'inscription
+const result = Astro.getActionResult(actions.auth.signUp);
+
+// Construire l'URL de connexion avec le redirect
+const connexionUrl = redirectParam ? `/connexion?redirect=${encodeURIComponent(redirectParam)}` : '/connexion';
+---
+
+<Layout title="Inscription — Previcare Emploi" description="Créez votre compte Previcare Emploi en quelques étapes.">
+
+<style>
+  .in-page {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--paper);
+  }
+
+  /* ── Panneau gauche ─────────────────────────────────────────── */
+  .in-left {
+    background: var(--ink);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 60px 64px;
+    position: relative;
+    overflow: hidden;
+  }
+  .in-left::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 70% 60%, rgba(201,169,97,.09) 0%, transparent 55%);
+  }
+  .in-left-inner { position: relative; z-index: 2; }
+  .in-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--paper);
+    text-decoration: none;
+    margin-bottom: 80px;
+  }
+  .in-logo-dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; flex-shrink: 0; }
+  .in-left-quote {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(26px, 2.8vw, 40px);
+    color: var(--paper);
+    line-height: 1.25;
+    margin: 0 0 20px;
+  }
+  .in-left-quote em { font-style: normal; color: var(--gold-2); }
+  .in-left-source {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(246,244,238,.4);
+  }
+  .in-tiers {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .in-tier {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
+    border: 1px solid rgba(201,169,97,.15);
+    background: rgba(20,40,73,.4);
+  }
+  .in-tier-name {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--paper);
+    flex: 1;
+  }
+  .in-tier-price {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--gold-2);
+  }
+
+  /* ── Panneau droit ──────────────────────────────────────────── */
+  .in-right {
+    overflow-y: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 60px 48px;
+  }
+  .in-form-wrap { width: 100%; max-width: 440px; }
+
+  .in-kicker {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    margin-bottom: 20px;
+  }
+  .in-h1 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 44px;
+    color: var(--ink);
+    margin: 0 0 8px;
+    line-height: 1.05;
+  }
+  .in-sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink-3);
+    margin: 0 0 36px;
+    line-height: 1.5;
+  }
+
+  /* Tabs */
+  .in-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 99px;
+    padding: 3px;
+    margin-bottom: 28px;
+    gap: 3px;
+  }
+  .in-tab {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 10px;
+    border-radius: 99px;
+    text-align: center;
+    color: var(--ink-3);
+    text-decoration: none;
+    transition: .2s;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  .in-tab.active { background: var(--ink); color: var(--paper); }
+  .in-tab:not(.active):hover { color: var(--ink); }
+
+  /* Messages */
+  .in-msg-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-left: 3px solid #ef4444;
+    padding: 14px 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: #991b1b;
+  }
+  .in-msg-success {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-left: 3px solid #16a34a;
+    padding: 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: #166534;
+  }
+  .in-msg-success h3 { margin: 0 0 8px; font-size: 14px; }
+  .in-msg-success p { margin: 0 0 8px; font-size: 12px; line-height: 1.6; }
+  .in-msg-success a {
+    display: inline-block;
+    margin-top: 12px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  /* Champs */
+  .in-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .in-field { margin-bottom: 16px; }
+  .in-label {
+    display: block;
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 7px;
+  }
+  .in-input {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--rule);
+    background: #fff;
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color .2s;
+    border-radius: 4px;
+    box-sizing: border-box;
+    appearance: none;
+  }
+  .in-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,169,97,.08); }
+  .in-input-wrap { position: relative; }
+  .in-input-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ink-4);
+    display: flex;
+    align-items: center;
+  }
+  .in-input-btn svg { width: 16px; height: 16px; }
+
+  /* Cases à cocher */
+  .in-check-group { margin-bottom: 16px; }
+  .in-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .in-check:last-child { border-bottom: none; }
+  .in-check input { margin-top: 2px; flex-shrink: 0; accent-color: var(--ink); }
+  .in-check-label {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--ink-3);
+    line-height: 1.55;
+  }
+  .in-check-label a { color: var(--gold-3); }
+  .in-check-label a:hover { color: var(--gold); }
+
+  /* Bouton */
+  .in-submit {
+    width: 100%;
+    height: 48px;
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid var(--ink);
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background .25s, border-color .25s;
+    margin-top: 8px;
+    margin-bottom: 24px;
+  }
+  .in-submit:hover { background: var(--gold-3); border-color: var(--gold-3); }
+  .in-submit:disabled { opacity: .55; cursor: not-allowed; }
+
+  /* Pied de formulaire */
+  .in-footer {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--ink-4);
+    text-align: center;
+    line-height: 1.7;
+  }
+  .in-footer a { color: var(--gold-3); }
+  .in-footer a:hover { color: var(--gold); }
+  .in-divider { height: 1px; background: var(--rule); margin: 20px 0; }
+
+  /* Indicateur de force mot de passe */
+  .in-pwd-bar-wrap { margin-top: 6px; }
+  .in-pwd-bar-track { height: 3px; background: var(--rule); border-radius: 99px; overflow: hidden; }
+  .in-pwd-bar { height: 100%; width: 0; border-radius: 99px; transition: width .3s, background .3s; }
+  .in-pwd-hint { font-family: var(--sans); font-size: 10px; color: var(--ink-4); margin-top: 4px; }
+
+  @media (max-width: 800px) {
+    .in-page { grid-template-columns: 1fr; }
+    .in-left { display: none; }
+    .in-right { padding: 48px 24px; }
+    .in-row { grid-template-columns: 1fr; gap: 0; }
+  }
+</style>
+
+<div class="in-page">
+
+  <!-- Panneau gauche -->
+  <div class="in-left">
+    <div class="in-left-inner">
+      <a href="/" class="in-logo">
+        <span class="in-logo-dot"></span>
+        Previcare Emploi
+      </a>
+      <blockquote>
+        <p class="in-left-quote">Rejoignez la plateforme RH<br/>qui <em>protège</em> votre carrière.</p>
+        <footer class="in-left-source">— Previcare Emploi · Sénégal</footer>
+      </blockquote>
+    </div>
+    <div class="in-left-inner">
+      <div class="in-tiers">
+        <div class="in-tier">
+<span class="in-tier-name">Basique</span>
+           <span class="in-tier-price">4 990 FCFA / mois</span>
+         </div>
+         <div class="in-tier">
+           <span class="in-tier-name">Silver</span>
+           <span class="in-tier-price">9 900 FCFA / mois</span>
+         </div>
+         <div class="in-tier" style="border-color:rgba(201,169,97,.4);background:rgba(201,169,97,.08)">
+           <span class="in-tier-name" style="color:var(--gold-2)">Gold</span>
+           <span class="in-tier-price">19 900 FCFA / mois</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panneau droit -->
+  <div class="in-right">
+    <div class="in-form-wrap">
+      <p class="in-kicker">— Créer un compte</p>
+      <h1 class="in-h1">Inscription</h1>
+      <p class="in-sub">Rejoignez Previcare Emploi en moins de deux minutes.</p>
+
+      <!-- Tabs -->
+      <div class="in-tabs">
+        <a href={connexionUrl} class="in-tab">Connexion</a>
+        <button class="in-tab active" aria-current="page">Inscription</button>
+      </div>
+
+      <!-- Messages -->
+      {(result?.error || (result?.data && !result.data.success)) && (
+        <div class="in-msg-error">
+          {result?.error?.message || result?.data?.message || "Une erreur s'est produite lors de l'inscription."}
+        </div>
+      )}
+
+      {(result?.data && result.data.success) && (
+        <div class="in-msg-success">
+          <h3>Inscription réussie !</h3>
+          <p>{result.data.message}</p>
+          <p>Un e-mail de confirmation a été envoyé. Cliquez sur le lien pour activer votre compte. Pensez à vérifier vos spams.</p>
+          <a href="/connexion">Se connecter →</a>
+        </div>
+      )}
+
+      <form method="POST" action={actions.auth.signUp}>
+        <div class="in-row">
+          <div class="in-field">
+            <label for="firstName" class="in-label">Prénom *</label>
+            <input type="text" id="firstName" name="firstName" placeholder="Prénom" class="in-input" required />
+          </div>
+          <div class="in-field">
+            <label for="lastName" class="in-label">Nom *</label>
+            <input type="text" id="lastName" name="lastName" placeholder="Nom" class="in-input" required />
+          </div>
+        </div>
+
+        <div class="in-field">
+          <label for="email" class="in-label">Adresse e-mail *</label>
+          <input type="email" id="email" name="email" placeholder="nom@exemple.com" class="in-input" required />
+        </div>
+
+        <div class="in-field">
+          <label for="phone" class="in-label">Téléphone</label>
+          <input type="tel" id="phone" name="phone" placeholder="+221 XX XXX XX XX" class="in-input" />
+        </div>
+
+        <div class="in-field">
+          <label for="userType" class="in-label">Profil *</label>
+          <select id="userType" name="userType" class="in-input" required>
+            <option value="" disabled selected>Sélectionnez votre profil</option>
+            <option value="employee">Employé du secteur privé</option>
+            <option value="employer">Employeur / RH</option>
+            <option value="delegate">Délégué du personnel</option>
+          </select>
+        </div>
+
+        <div class="in-field" id="expatriate-field" style="display:none">
+          <div class="in-check">
+            <input type="checkbox" id="isExpatriate" name="isExpatriate" value="true" />
+            <label for="isExpatriate" class="in-check-label">
+              Je suis expatrié(e) au Sénégal — activer les services spécialisés expatriés.
+            </label>
+          </div>
+        </div>
+
+        <div id="delegate-fields" style="display:none">
+          <p class="in-kicker" style="margin-bottom:8px">— Informations de mandat</p>
+          <div class="in-field">
+            <label for="delegateCompanyName" class="in-label">Nom de l'entreprise d'exercice *</label>
+            <input type="text" id="delegateCompanyName" name="delegateCompanyName" placeholder="Nom de l'entreprise" class="in-input delegate-required" />
+          </div>
+          <div class="in-field">
+            <label for="delegateSector" class="in-label">Secteur d'activité *</label>
+            <select id="delegateSector" name="delegateSector" class="in-input delegate-required">
+              <option value="" disabled selected>Sélectionnez le secteur</option>
+              <option value="agriculture">Agriculture, sylviculture, pêche</option>
+              <option value="mines">Industries extractives</option>
+              <option value="agroalimentaire">Industrie agroalimentaire</option>
+              <option value="textile">Industrie textile et habillement</option>
+              <option value="chimie">Industrie chimique et pharmaceutique</option>
+              <option value="metallurgie">Métallurgie et travail des métaux</option>
+              <option value="btp">BTP et travaux publics</option>
+              <option value="commerce">Commerce et distribution</option>
+              <option value="transport">Transport et logistique</option>
+              <option value="banque">Banque et assurances</option>
+              <option value="telecoms">Télécommunications et IT</option>
+              <option value="education">Éducation et formation</option>
+              <option value="sante">Santé et action sociale</option>
+              <option value="tourisme">Tourisme et hôtellerie</option>
+              <option value="administration">Administration publique</option>
+              <option value="energie">Énergie et eau</option>
+              <option value="media">Médias et communication</option>
+              <option value="autre">Autre secteur</option>
+            </select>
+          </div>
+          <div class="in-field">
+            <label for="delegateHeadcount" class="in-label">Effectif de l'entreprise *</label>
+            <select id="delegateHeadcount" name="delegateHeadcount" class="in-input delegate-required">
+              <option value="" disabled selected>Nombre de salariés</option>
+              <option value="1-10">1 à 10 salariés</option>
+              <option value="11-50">11 à 50 salariés</option>
+              <option value="51-200">51 à 200 salariés</option>
+              <option value="201-500">201 à 500 salariés</option>
+              <option value="500+">Plus de 500 salariés</option>
+            </select>
+          </div>
+          <div class="in-field">
+            <label for="delegateMandateType" class="in-label">Type de mandat *</label>
+            <select id="delegateMandateType" name="delegateMandateType" class="in-input delegate-required">
+              <option value="" disabled selected>Sélectionnez le type de mandat</option>
+              <option value="titulaire">Délégué titulaire</option>
+              <option value="suppleant">Délégué suppléant</option>
+              <option value="delegue_syndical">Délégué syndical</option>
+              <option value="representant_syndicat">Représentant du personnel</option>
+            </select>
+          </div>
+          <div class="in-field">
+            <label for="delegateMandateStart" class="in-label">Date de début du mandat *</label>
+            <input type="date" id="delegateMandateStart" name="delegateMandateStart" class="in-input delegate-required" />
+          </div>
+        </div>
+
+        <div class="in-field">
+          <label for="company" class="in-label">Entreprise</label>
+          <input type="text" id="company" name="company" placeholder="Nom de l'entreprise (optionnel)" class="in-input" />
+        </div>
+
+        <div class="in-field">
+          <label for="password" class="in-label">Mot de passe *</label>
+          <div class="in-input-wrap">
+            <input type="password" id="password" name="password" placeholder="••••••••" class="in-input" required minlength="8" style="padding-right:40px" />
+            <button type="button" class="in-input-btn toggle-password" data-target="password">
+              <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg class="eye-closed hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+          <div class="in-pwd-bar-wrap">
+            <div class="in-pwd-bar-track"><div class="in-pwd-bar" id="pwdBar"></div></div>
+            <p class="in-pwd-hint" id="pwdHint">8 caractères minimum, majuscule, chiffre, caractère spécial</p>
+          </div>
+        </div>
+
+        <div class="in-field">
+          <label for="confirmPassword" class="in-label">Confirmer le mot de passe *</label>
+          <div class="in-input-wrap">
+            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••" class="in-input" required style="padding-right:40px" />
+            <button type="button" class="in-input-btn toggle-password" data-target="confirmPassword">
+              <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg class="eye-closed hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="in-check-group">
+          <div class="in-check">
+            <input type="checkbox" id="terms" name="terms" required />
+            <label for="terms" class="in-check-label">
+              J'accepte les <a href="/cga-cgu">conditions générales d'utilisation</a>
+              et la <a href="/cga-cgu#donnees">politique de confidentialité</a>.
+            </label>
+          </div>
+          <div class="in-check">
+            <input type="checkbox" id="newsletter" name="newsletter" />
+            <label for="newsletter" class="in-check-label">
+              J'accepte de recevoir des informations sur les services Previcare Emploi.
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="in-submit" id="submitBtn">Créer mon compte →</button>
+      </form>
+
+      <div class="in-divider"></div>
+      <div class="in-footer">
+        Déjà un compte ?&nbsp;<a href={connexionUrl}>Se connecter</a>
+        &ensp;·&ensp;
+        <a href="/formules">Voir les formules</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Toggle password visibility
+    const toggleButtons = document.querySelectorAll('.toggle-password');
+    toggleButtons.forEach(button => {
+      button.addEventListener('click', function(this: HTMLElement) {
+        const targetId = this.getAttribute('data-target');
+        const eyeOpen = this.querySelector('.eye-open');
+        const eyeClosed = this.querySelector('.eye-closed');
+        const targetInput = document.getElementById(targetId!) as HTMLInputElement;
+        if (targetInput?.type === 'password') {
+          targetInput.type = 'text';
+          eyeOpen?.classList.add('hidden');
+          eyeClosed?.classList.remove('hidden');
+        } else {
+          targetInput.type = 'password';
+          eyeOpen?.classList.remove('hidden');
+          eyeClosed?.classList.add('hidden');
+        }
+      });
+    });
+
+    // Afficher champ expatrié si employé sélectionné, et champ délégué
+    const userTypeSelect = document.getElementById('userType') as HTMLSelectElement | null;
+    const expatField = document.getElementById('expatriate-field');
+    const delegateFields = document.getElementById('delegate-fields');
+    const delegateRequiredFields = document.querySelectorAll('.delegate-required');
+    userTypeSelect?.addEventListener('change', function() {
+      const val = this.value;
+      if (expatField) {
+        expatField.style.display = (val === 'employee' || val === 'employer') ? 'block' : 'none';
+      }
+      if (delegateFields) {
+        const isDelegate = val === 'delegate';
+        delegateFields.style.display = isDelegate ? 'block' : 'none';
+        delegateRequiredFields.forEach((el) => {
+          const input = el as HTMLInputElement | HTMLSelectElement;
+          if (isDelegate) {
+            input.setAttribute('required', '');
+          } else {
+            input.removeAttribute('required');
+            if (input instanceof HTMLSelectElement) {
+              input.selectedIndex = 0;
+            } else {
+              input.value = '';
+            }
+          }
+        });
+      }
+    });
+
+    // Indicateur de force mot de passe
+    const passwordInput = document.getElementById('password') as HTMLInputElement | null;
+    const pwdBar = document.getElementById('pwdBar');
+    const pwdHint = document.getElementById('pwdHint');
+
+    passwordInput?.addEventListener('input', function() {
+      const val = this.value;
+      let strength = 0;
+      if (val.length >= 8) strength++;
+      if (/[A-Z]/.test(val)) strength++;
+      if (/[a-z]/.test(val)) strength++;
+      if (/\d/.test(val)) strength++;
+      if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(val)) strength++;
+      const pct = (strength / 5) * 100;
+      const colors = ['#ef4444','#f97316','#eab308','#22c55e','#16a34a'];
+      const labels = ['Très faible','Faible','Moyen','Fort','Très fort'];
+      if (pwdBar) { pwdBar.style.width = pct + '%'; pwdBar.style.background = colors[strength - 1] || '#e5e7eb'; }
+      if (pwdHint && val.length > 0) { pwdHint.textContent = labels[strength - 1] || ''; }
+    });
+
+    // Validation confirmation mot de passe
+    const confirmInput = document.getElementById('confirmPassword') as HTMLInputElement | null;
+    confirmInput?.addEventListener('blur', function() {
+      if (passwordInput && this.value && this.value !== passwordInput.value) {
+        this.style.borderColor = '#ef4444';
+      } else {
+        this.style.borderColor = '';
+      }
+    });
+  });
+</script>
+
+</Layout>

@@ -1,0 +1,1124 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const { user } = Astro.locals;
+const isLoggedIn = !!user;
+
+const meta = user?.user_metadata ?? {};
+let defaultTab = 'pan-travailleurs';
+if (meta.role === 'employer') {
+  defaultTab = 'pan-employeurs';
+} else if (meta.role === 'delegate') {
+  defaultTab = 'pan-delegues';
+} else if (meta.is_expatriate === true) {
+  defaultTab = 'pan-expatries';
+}
+
+const basiquUrl = isLoggedIn
+  ? '/espace-employes/abonnement/souscrire?plan=essentiel'
+  : '/inscription?redirect=' + encodeURIComponent('/espace-employes/abonnement/souscrire?plan=essentiel');
+
+const silverUrl = isLoggedIn
+  ? '/espace-employes/abonnement/souscrire?plan=serenite'
+  : '/inscription?redirect=' + encodeURIComponent('/espace-employes/abonnement/souscrire?plan=serenite');
+
+const goldUrl = isLoggedIn
+  ? '/espace-employes/abonnement/souscrire?plan=integral'
+  : '/inscription?redirect=' + encodeURIComponent('/espace-employes/abonnement/souscrire?plan=integral');
+
+const employerDevisUrl = isLoggedIn
+  ? '/espace-employeurs/abonnement/demander-devis'
+  : '/inscription?redirect=' + encodeURIComponent('/espace-employeurs/abonnement/demander-devis');
+
+const delegateSouscrireUrl = isLoggedIn
+  ? '/espace-delegues/abonnement/souscrire?plan=delegate'
+  : '/inscription?redirect=' + encodeURIComponent('/espace-delegues/abonnement/souscrire?plan=delegate');
+
+const expatDevisUrl = isLoggedIn
+  ? '/espace-expatries/abonnement/demander-devis'
+  : '/inscription?redirect=' + encodeURIComponent('/espace-expatries/abonnement/demander-devis');
+---
+
+<Layout title="Formules & Tarifs — Previcare Emploi" description="Travailleurs, Employeurs, Délégués, Expatriés : choisissez la formule Previcare Emploi adaptée à votre profil.">
+
+<style>
+  /* ── HERO ────────────────────────────────────────────────────── */
+  .fo-hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 130px 40px 90px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .fo-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(201,169,97,.12) 0%, transparent 65%);
+  }
+  .fo-hero-inner { position: relative; z-index: 2; max-width: 800px; margin: 0 auto; }
+  .fo-kicker {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 7px;
+    text-transform: uppercase;
+    color: var(--gold-2);
+    margin-bottom: 32px;
+  }
+  .fo-h1 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(52px, 8vw, 100px);
+    line-height: .95;
+    margin: 0;
+  }
+  .fo-h1 em { font-style: normal; color: var(--gold-2); }
+  .fo-sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 20px;
+    color: rgba(246,244,238,.65);
+    margin: 32px auto 0;
+    max-width: 560px;
+    line-height: 1.6;
+  }
+
+  /* ── ONGLETS PROFIL ─────────────────────────────────────────── */
+  .fo-tabs-wrap {
+    background: var(--paper);
+    padding: 56px 40px 0;
+  }
+  .fo-tabs-inner { max-width: 1320px; margin: 0 auto; }
+  .fo-tabs-label {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .fo-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding-bottom: 0;
+  }
+  .fo-tab {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 24px;
+    border-radius: 99px;
+    border: 1px solid var(--rule);
+    background: rgba(11,29,58,.05);
+    color: var(--ink-3);
+    cursor: pointer;
+    transition: background 150ms, color 150ms, border-color 150ms;
+  }
+  .fo-tab:hover { background: rgba(11,29,58,.09); border-color: var(--gold-3); color: var(--ink); }
+  .fo-tab[aria-selected="true"] {
+    background: var(--ink);
+    color: var(--gold-2);
+    border-color: var(--ink);
+  }
+
+  /* ── PANNEAUX GÉNÉRAUX ──────────────────────────────────────── */
+  .fo-panel { display: none; }
+  .fo-panel.fo-active { display: block; }
+
+  /* ── TIERS (Travailleurs) ───────────────────────────────────── */
+  .fo-tiers {
+    padding: 72px 40px 100px;
+    background: var(--paper);
+  }
+  .fo-tiers-inner { max-width: 1320px; margin: 0 auto; }
+  .fo-intro { text-align: center; margin-bottom: 64px; }
+  .fo-intro-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(34px, 4vw, 50px);
+    margin: 12px 0 18px;
+  }
+  .fo-intro-h2 em { font-style: normal; color: var(--gold-3); }
+  .fo-intro-p { font-size: 16px; color: var(--ink-3); max-width: 560px; margin: 0 auto; line-height: 1.7; }
+
+  .fo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+
+  /* Tier commun */
+  .fo-tier {
+    background: var(--paper);
+    padding: 56px 40px 48px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .fo-tier-badge {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    padding: 4px 18px;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+  .fo-tier-label {
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .fo-tier-name {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 52px;
+    line-height: 1;
+    margin: 0 0 28px;
+  }
+  .fo-tier-price {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 32px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .fo-tier-amount {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 52px;
+    line-height: 1;
+  }
+  .fo-tier-currency { font-family: var(--sans); font-size: 14px; color: var(--ink-3); align-self: center; }
+  .fo-tier-section-label {
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    margin: 20px 0 8px;
+  }
+  .fo-tier-section-label:first-of-type { margin-top: 0; }
+  .fo-tier-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 40px;
+    flex: 1;
+  }
+  .fo-tier-features li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-3);
+    line-height: 1.45;
+  }
+  .fo-tier-features li:last-child { border-bottom: none; }
+  .fo-tier-features li .fo-check { flex-shrink: 0; margin-top: 1px; }
+  .fo-tier-features li.fo-off { opacity: .4; }
+  .fo-tier-btn { display: block; text-align: center; }
+
+  /* Basique */
+  .fo-tier-basique .fo-tier-label { color: var(--ink-3); }
+  .fo-tier-basique .fo-tier-name { color: var(--ink); }
+  .fo-tier-basique .fo-tier-amount { color: var(--ink); }
+
+  /* Silver — mis en avant */
+  .fo-tier-silver {
+    background: #fff;
+    border-top: 3px solid var(--gold);
+    box-shadow: 0 4px 40px rgba(11,29,58,.08);
+    margin-top: -8px;
+    padding-top: 72px;
+  }
+  .fo-tier-silver .fo-tier-label { color: var(--gold-3); }
+  .fo-tier-silver .fo-tier-name { color: var(--ink); }
+  .fo-tier-silver .fo-tier-amount { color: var(--ink); }
+
+  /* Gold */
+  .fo-tier-gold {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .fo-tier-gold .fo-tier-label { color: var(--gold-2); }
+  .fo-tier-gold .fo-tier-name { color: var(--paper); }
+  .fo-tier-gold .fo-tier-amount { color: var(--paper); }
+  .fo-tier-gold .fo-tier-price { border-color: rgba(246,244,238,.12); }
+  .fo-tier-gold .fo-tier-currency { color: rgba(246,244,238,.55); }
+  .fo-tier-gold .fo-tier-features li {
+    border-color: rgba(246,244,238,.1);
+    color: rgba(246,244,238,.75);
+  }
+  .fo-tier-gold .fo-tier-features li.fo-off { opacity: .25; }
+  .fo-tier-gold .fo-tier-section-label { color: var(--gold-2); }
+
+  /* ── CARTE PROFIL (Employeurs / Délégués / Expatriés) ────────── */
+  .fo-profile {
+    padding: 72px 40px 100px;
+    background: var(--paper);
+  }
+  .fo-profile-inner { max-width: 880px; margin: 0 auto; }
+  .fo-profile-card {
+    background: #fff;
+    border: 1px solid var(--rule);
+  }
+  .fo-profile-head {
+    padding: 48px 48px 40px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--ink);
+    color: var(--paper);
+    position: relative;
+  }
+  .fo-profile-head::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--gold);
+  }
+  .fo-profile-eyebrow {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold-2);
+    margin-bottom: 16px;
+  }
+  .fo-profile-title {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(36px, 4vw, 52px);
+    line-height: 1;
+    margin: 0 0 16px;
+    color: var(--paper);
+  }
+  .fo-profile-price {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(44px, 6vw, 72px);
+    line-height: 1;
+    color: var(--gold-2);
+  }
+  .fo-profile-price-sub {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: rgba(246,244,238,.55);
+    margin-top: 6px;
+  }
+  .fo-profile-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border: 1px solid rgba(201,169,97,.4);
+    border-radius: 99px;
+    font-family: var(--sans);
+    font-size: 11px;
+    color: var(--gold-2);
+    margin-top: 16px;
+  }
+  .fo-profile-body { padding: 48px; }
+  .fo-profile-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+  }
+  .fo-profile-col-title {
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    margin-bottom: 20px;
+  }
+  .fo-profile-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .fo-profile-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-3);
+    line-height: 1.45;
+  }
+  .fo-profile-list li:last-child { border-bottom: none; }
+  .fo-profile-list-icon { flex-shrink: 0; color: var(--gold-3); margin-top: 2px; }
+  .fo-profile-foot {
+    padding: 0 48px 48px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* ── PANNEAU À L'ACTE ───────────────────────────────────────── */
+  .fo-acte {
+    padding: 72px 40px 100px;
+    background: var(--paper);
+  }
+  .fo-acte-inner { max-width: 640px; margin: 0 auto; }
+  .fo-acte-card {
+    background: #fff;
+    border: 1px solid var(--rule);
+  }
+  .fo-acte-head {
+    padding: 48px 48px 40px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--ink);
+    color: var(--paper);
+    position: relative;
+    text-align: center;
+  }
+  .fo-acte-head::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--gold);
+  }
+  .fo-acte-eyebrow {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold-2);
+    margin-bottom: 16px;
+  }
+  .fo-acte-title {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(36px, 4vw, 52px);
+    line-height: 1;
+    margin: 0 0 10px;
+  }
+  .fo-acte-sub {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: rgba(246,244,238,.55);
+  }
+  .fo-acte-body { padding: 48px; }
+  .fo-acte-mode {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-3);
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+  .fo-acte-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--sans);
+    font-size: 13px;
+  }
+  .fo-acte-table thead th {
+    padding: 10px 16px;
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    border-bottom: 1px solid var(--rule);
+    text-align: left;
+  }
+  .fo-acte-table thead th:last-child { text-align: right; }
+  .fo-acte-table tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-3);
+  }
+  .fo-acte-table tbody td:last-child {
+    text-align: right;
+    font-weight: 600;
+    color: var(--ink);
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 18px;
+  }
+  .fo-acte-table tbody tr:last-child td { border-bottom: none; }
+  .fo-acte-table tbody tr:hover td { background: var(--paper); }
+  .fo-acte-foot { padding: 0 48px 48px; }
+
+  /* ── TABLEAU COMPARATIF ──────────────────────────────────────── */
+  .fo-compare {
+    padding: 80px 40px 120px;
+    background: #fff;
+  }
+  .fo-compare-inner { max-width: 1000px; margin: 0 auto; }
+  .fo-compare-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(32px, 4vw, 48px);
+    text-align: center;
+    margin: 0 0 16px;
+  }
+  .fo-compare-sub {
+    font-size: 15px;
+    color: var(--ink-3);
+    text-align: center;
+    margin: 0 0 56px;
+  }
+  .fo-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--sans);
+    font-size: 13px;
+  }
+  .fo-table thead th {
+    padding: 16px 20px;
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 22px;
+    font-weight: 400;
+    text-align: center;
+    border-bottom: 1px solid var(--rule);
+  }
+  .fo-table thead th:first-child {
+    text-align: left;
+    font-family: var(--sans);
+    font-style: normal;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink-4);
+  }
+  .fo-table tbody td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--rule);
+    text-align: center;
+    color: var(--ink-3);
+  }
+  .fo-table tbody td:first-child {
+    text-align: left;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .fo-table tbody tr:last-child td { border-bottom: none; }
+  .fo-table tbody tr:hover td { background: var(--paper); }
+  .fo-check-y { color: #16a34a; font-size: 16px; }
+  .fo-check-n { color: var(--rule); font-size: 16px; }
+
+  /* ── MENTIONS ────────────────────────────────────────────────── */
+  .fo-note {
+    text-align: center;
+    padding: 0 40px 60px;
+    background: #fff;
+  }
+  .fo-note p {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--ink-4);
+    max-width: 640px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* ── RESPONSIVE ──────────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .fo-tabs-wrap { padding: 40px 20px 0; }
+    .fo-tiers { padding: 48px 20px 72px; }
+    .fo-profile { padding: 48px 20px 72px; }
+    .fo-acte { padding: 48px 20px 72px; }
+    .fo-grid { grid-template-columns: 1fr; gap: 20px; background: none; border: none; }
+    .fo-tier { border: 1px solid var(--rule); border-radius: 4px; }
+    .fo-tier-silver { margin-top: 0; border: 2px solid var(--gold); }
+    .fo-tier-gold { border: 1px solid var(--ink); }
+    .fo-profile-head { padding: 32px 24px 28px; }
+    .fo-profile-body { padding: 32px 24px; }
+    .fo-profile-cols { grid-template-columns: 1fr; gap: 32px; }
+    .fo-profile-foot { padding: 0 24px 32px; }
+    .fo-acte-head { padding: 32px 24px 28px; }
+    .fo-acte-body { padding: 32px 24px; }
+    .fo-acte-foot { padding: 0 24px 32px; }
+    .fo-table { font-size: 12px; }
+  }
+  @media (max-width: 600px) {
+    .fo-tab { font-size: 11px; padding: 8px 14px; }
+  }
+</style>
+
+<!-- HERO -->
+<section class="fo-hero">
+  <div class="fo-hero-inner">
+    <p class="fo-kicker">— Formules & Tarifs · 2026</p>
+    <h1 class="fo-h1">Votre <em>formule</em>,<br/>votre profil</h1>
+    <p class="fo-sub">Travailleurs, employeurs, délégués ou expatriés — choisissez l'offre faite pour vous.</p>
+  </div>
+</section>
+
+<!-- SÉLECTEUR D'ONGLETS -->
+<div class="fo-tabs-wrap">
+  <div class="fo-tabs-inner">
+    <p class="fo-tabs-label">— Sélectionnez votre profil</p>
+    <div class="fo-tabs" role="tablist" data-default-tab={defaultTab}>
+      <button class="fo-tab" role="tab" aria-selected={defaultTab === 'pan-travailleurs' ? 'true' : 'false'} data-target="pan-travailleurs">Travailleurs</button>
+      <button class="fo-tab" role="tab" aria-selected={defaultTab === 'pan-employeurs'   ? 'true' : 'false'} data-target="pan-employeurs">Employeurs</button>
+      <button class="fo-tab" role="tab" aria-selected={defaultTab === 'pan-delegues'     ? 'true' : 'false'} data-target="pan-delegues">Délégués</button>
+      <button class="fo-tab" role="tab" aria-selected={defaultTab === 'pan-expatries'    ? 'true' : 'false'} data-target="pan-expatries">Expatriés</button>
+      <button class="fo-tab" role="tab" aria-selected={defaultTab === 'pan-acte'         ? 'true' : 'false'} data-target="pan-acte">À l'acte</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PANNEAU : TRAVAILLEURS
+═══════════════════════════════════════════════════════ -->
+<div id="pan-travailleurs" class={`fo-panel${defaultTab === 'pan-travailleurs' ? ' fo-active' : ''}`}>
+
+  <section class="fo-tiers">
+    <div class="fo-tiers-inner">
+      <div class="fo-intro">
+        <p class="fo-kicker">— Trois niveaux d'accès</p>
+        <h2 class="fo-intro-h2">Choisissez votre <em>niveau</em></h2>
+        <p class="fo-intro-p">De l'essentiel au suivi RH complet, chaque formule s'adapte à votre situation. Sans engagement sur les formules mensuelles.</p>
+      </div>
+
+      <div class="fo-grid">
+
+        <!-- BASIQUE -->
+        <div class="fo-tier fo-tier-basique">
+          <p class="fo-tier-label">Formule</p>
+          <h2 class="fo-tier-name">Basique</h2>
+          <div class="fo-tier-price">
+            <span class="fo-tier-amount">4 990</span>
+            <span class="fo-tier-currency">FCFA / mois</span>
+          </div>
+          <p class="fo-tier-section-label">Outils</p>
+          <ul class="fo-tier-features">
+            <li>
+              <span class="fo-check fo-check-y">✓</span>
+              <span>Archivage sécurisé des documents RH</span>
+            </li>
+            <li>
+              <span class="fo-check fo-check-y">✓</span>
+              <span>Visionneuse Jurithèque — textes de loi</span>
+            </li>
+            <li class="fo-off">
+              <span class="fo-check fo-check-n">✗</span>
+              <span>Setlou — conseiller juridique IA</span>
+            </li>
+            <li class="fo-off">
+              <span class="fo-check fo-check-n">✗</span>
+              <span>Xalima — rédaction de courriers</span>
+            </li>
+            <li class="fo-off">
+              <span class="fo-check fo-check-n">✗</span>
+              <span>Offres d'emploi premium</span>
+            </li>
+          </ul>
+          <a href={basiquUrl} class="btn btn-ghost fo-tier-btn">Choisir Basique</a>
+        </div>
+
+        <!-- SILVER -->
+        <div class="fo-tier fo-tier-silver">
+          <span class="fo-tier-badge">Recommandé</span>
+          <p class="fo-tier-label">Formule</p>
+          <h2 class="fo-tier-name">Silver</h2>
+          <div class="fo-tier-price">
+            <span class="fo-tier-amount">9 900</span>
+            <span class="fo-tier-currency">FCFA / mois</span>
+          </div>
+          <p class="fo-tier-section-label">Outils</p>
+          <ul class="fo-tier-features">
+            <li>
+              <span class="fo-check fo-check-y">✓</span>
+              <span>Archivage sécurisé des documents RH</span>
+            </li>
+            <li>
+              <span class="fo-check fo-check-y">✓</span>
+              <span>Visionneuse Jurithèque</span>
+            </li>
+            <li>
+              <span class="fo-check fo-check-y">✓</span>
+              <span>Setlou — 50 000 tokens/mois</span>
+            </li>
+            <li>
+              <span class="fo-check fo-check-y">✓</span>
+              <span>Xalima — 50 000 tokens/mois</span>
+            </li>
+            <li>
+              <span class="fo-check fo-check-y">✓</span>
+              <span>Accès offres d'emploi</span>
+            </li>
+          </ul>
+          <p class="fo-tier-section-label">Services</p>
+          <ul class="fo-tier-features">
+            <li>
+              <span class="fo-check fo-check-y">✓</span>
+              <span>Conseil RH/juridique — gestion des conflits</span>
+            </li>
+            <li class="fo-off">
+              <span class="fo-check fo-check-n">✗</span>
+              <span>Défense juridique complète</span>
+            </li>
+          </ul>
+          <a href={silverUrl} class="btn btn-gold fo-tier-btn">Choisir Silver</a>
+        </div>
+
+        <!-- GOLD -->
+        <div class="fo-tier fo-tier-gold">
+          <p class="fo-tier-label">Formule</p>
+          <h2 class="fo-tier-name">Gold</h2>
+          <div class="fo-tier-price">
+            <span class="fo-tier-amount">19 900</span>
+            <span class="fo-tier-currency">FCFA / mois</span>
+          </div>
+          <p class="fo-tier-section-label">Outils</p>
+          <ul class="fo-tier-features">
+            <li>
+              <span class="fo-check fo-check-y">✓</span>
+              <span>Archivage sécurisé des documents RH</span>
+            </li>
+            <li>
+              <span class="fo-check fo-check-y">✓</span>
+              <span>Visionneuse Jurithèque</span>
+            </li>
+            <li>
+              <span class="fo-check fo-check-y">✓</span>
+              <span>Setlou — 100 000 tokens/mois</span>
+            </li>
+            <li>
+              <span class="fo-check fo-check-y">✓</span>
+              <span>Xalima — 100 000 tokens/mois</span>
+            </li>
+            <li>
+              <span class="fo-check fo-check-y">✓</span>
+              <span>Veille juridique mensuelle</span>
+            </li>
+            <li>
+              <span class="fo-check fo-check-y">✓</span>
+              <span>Accès offres d'emploi</span>
+            </li>
+          </ul>
+          <p class="fo-tier-section-label">Services</p>
+          <ul class="fo-tier-features">
+            <li>
+              <span class="fo-check fo-check-y">✓</span>
+              <span>Défense juridique complète</span>
+            </li>
+            <li>
+              <span class="fo-check fo-check-y">✓</span>
+              <span>Assistance préventive — contrat de travail</span>
+            </li>
+          </ul>
+          <a href={goldUrl} class="btn fo-tier-btn" style="background:var(--gold);color:var(--ink);border-color:var(--gold)">Choisir Gold</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- TABLEAU COMPARATIF -->
+  <section class="fo-compare">
+    <div class="fo-compare-inner">
+      <h2 class="fo-compare-h2">Comparaison détaillée</h2>
+      <p class="fo-compare-sub">Tous les accès et limites, fonctionnalité par fonctionnalité.</p>
+      <table class="fo-table">
+        <thead>
+          <tr>
+            <th>Fonctionnalité</th>
+            <th>Basique</th>
+            <th>Silver</th>
+            <th>Gold</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Archivage documents RH</td>
+            <td><span class="fo-check-y">✓</span></td>
+            <td><span class="fo-check-y">✓</span></td>
+            <td><span class="fo-check-y">✓</span></td>
+          </tr>
+          <tr>
+            <td>Visionneuse Jurithèque</td>
+            <td><span class="fo-check-y">✓</span></td>
+            <td><span class="fo-check-y">✓</span></td>
+            <td><span class="fo-check-y">✓</span></td>
+          </tr>
+          <tr>
+            <td>Setlou — tokens/mois</td>
+            <td><span class="fo-check-n">✗</span></td>
+            <td>50 000</td>
+            <td>100 000</td>
+          </tr>
+          <tr>
+            <td>Xalima — tokens/mois</td>
+            <td><span class="fo-check-n">✗</span></td>
+            <td>50 000</td>
+            <td>100 000</td>
+          </tr>
+          <tr>
+            <td>Offres d'emploi</td>
+            <td><span class="fo-check-n">✗</span></td>
+            <td><span class="fo-check-y">✓</span></td>
+            <td><span class="fo-check-y">✓</span></td>
+          </tr>
+          <tr>
+            <td>Conseil RH/juridique (conflits)</td>
+            <td><span class="fo-check-n">✗</span></td>
+            <td><span class="fo-check-y">✓</span></td>
+            <td><span class="fo-check-y">✓</span></td>
+          </tr>
+          <tr>
+            <td>Veille juridique mensuelle</td>
+            <td><span class="fo-check-n">✗</span></td>
+            <td><span class="fo-check-n">✗</span></td>
+            <td><span class="fo-check-y">✓</span></td>
+          </tr>
+          <tr>
+            <td>Défense juridique complète</td>
+            <td><span class="fo-check-n">✗</span></td>
+            <td><span class="fo-check-n">✗</span></td>
+            <td><span class="fo-check-y">✓</span></td>
+          </tr>
+          <tr>
+            <td>Assistance préventive contrat</td>
+            <td><span class="fo-check-n">✗</span></td>
+            <td><span class="fo-check-n">✗</span></td>
+            <td><span class="fo-check-y">✓</span></td>
+          </tr>
+          <tr>
+            <td>Tarif mensuel</td>
+            <td><strong>4 990 FCFA</strong></td>
+            <td><strong>9 900 FCFA</strong></td>
+            <td><strong>19 900 FCFA</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- MENTIONS -->
+  <section class="fo-note">
+    <p>Tarifs exprimés en Francs CFA (FCFA) — TVA incluse le cas échéant. Paiement sécurisé par Orange Money, Wave ou carte bancaire internationale. Sans engagement pour les formules mensuelles : résiliation à tout moment depuis votre espace personnel, avec prise d'effet à la fin de la période en cours. <a href="/cga-cgu" style="color:var(--gold-3)">CGA / CGU →</a></p>
+  </section>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     PANNEAU : EMPLOYEURS
+═══════════════════════════════════════════════════════ -->
+<div id="pan-employeurs" class={`fo-panel${defaultTab === 'pan-employeurs' ? ' fo-active' : ''}`}>
+  <section class="fo-profile">
+    <div class="fo-profile-inner">
+      <div class="fo-profile-card">
+        <div class="fo-profile-head">
+          <p class="fo-profile-eyebrow">— Offre Employeurs</p>
+          <h2 class="fo-profile-title">Entreprises &amp; organisations</h2>
+          <div class="fo-profile-price">Sur demande</div>
+          <p class="fo-profile-price-sub">Tarification selon les outils et services souscrits</p>
+        </div>
+        <div class="fo-profile-body">
+          <div class="fo-profile-cols">
+            <div>
+              <p class="fo-profile-col-title">— Outils</p>
+              <ul class="fo-profile-list">
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Archivage numérique sécurisé des documents RH employés</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Consultant RH « SETLOU » — 3 000 000 tokens</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Visionneuse Jurithèque</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Assistant « Xalima » — 3 000 000 tokens/mois</span>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <p class="fo-profile-col-title">— Services</p>
+              <ul class="fo-profile-list">
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Canal Whistleblower</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Investigations RH internes indépendantes</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Médiation sociale</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Gestion des permis de travail expatriés</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Audit facturation sociétés intérimaires</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Gestion proactive des risques RH/juridiques</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="fo-profile-foot">
+          <a href={employerDevisUrl} class="btn btn-gold">Demander un devis</a>
+          <a href="/inscription?role=employer" class="btn btn-ghost">Créer un compte Employeur</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     PANNEAU : DÉLÉGUÉS
+═══════════════════════════════════════════════════════ -->
+<div id="pan-delegues" class={`fo-panel${defaultTab === 'pan-delegues' ? ' fo-active' : ''}`}>
+  <section class="fo-profile">
+    <div class="fo-profile-inner">
+      <div class="fo-profile-card">
+        <div class="fo-profile-head">
+          <p class="fo-profile-eyebrow">— Offre Délégués du Personnel</p>
+          <h2 class="fo-profile-title">Représentation &amp; dialogue social</h2>
+          <div class="fo-profile-price">600 000 FCFA</div>
+          <p class="fo-profile-price-sub">par trimestre — à l'exclusion des prestations listées ci-dessous</p>
+        </div>
+        <div class="fo-profile-body">
+          <div class="fo-profile-cols">
+            <div>
+              <p class="fo-profile-col-title">— Outils</p>
+              <ul class="fo-profile-list">
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Consultant RH « SETLOU » — 5 000 000 tokens</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Archivage numérique (PV, accords, conventions)</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Visionneuse Jurithèque</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Assistant « Xalima » — 3 000 000 tokens/mois</span>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <p class="fo-profile-col-title">— Services</p>
+              <ul class="fo-profile-list">
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Négociation sociale et accords collectifs</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Gestion des conflits sociaux</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Audit social et benchmark sectoriel</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Rédaction / validation d'accords sociaux</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Formation à la gestion des conflits</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Veille juridique mensuelle</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="fo-profile-foot">
+          <a href={delegateSouscrireUrl} class="btn btn-gold">Souscrire</a>
+          <a href="/contact" class="btn btn-ghost">Nous contacter</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     PANNEAU : EXPATRIÉS
+═══════════════════════════════════════════════════════ -->
+<div id="pan-expatries" class={`fo-panel${defaultTab === 'pan-expatries' ? ' fo-active' : ''}`}>
+  <section class="fo-profile">
+    <div class="fo-profile-inner">
+      <div class="fo-profile-card">
+        <div class="fo-profile-head">
+          <p class="fo-profile-eyebrow">— Offre Expatriés</p>
+          <h2 class="fo-profile-title">Travailleurs expatriés</h2>
+          <div class="fo-profile-price">Sur demande</div>
+          <p class="fo-profile-price-sub">Travailleurs expatriés d'entreprises privées</p>
+          <div class="fo-profile-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            English version available
+          </div>
+        </div>
+        <div class="fo-profile-body">
+          <div class="fo-profile-cols">
+            <div>
+              <p class="fo-profile-col-title">— Outils</p>
+              <ul class="fo-profile-list">
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Archivage numérique sécurisé des documents RH</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Consultant RH « SETLOU » — 1 000 000 tokens</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Visionneuse Jurithèque</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Assistant « Xalima » — 1 000 000 tokens/mois</span>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <p class="fo-profile-col-title">— Services</p>
+              <ul class="fo-profile-list">
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Conseils juridiques spécialisés expatriés</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Défense juridique complète</span>
+                </li>
+                <li>
+                  <svg class="fo-profile-list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Veille juridique mensuelle</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="fo-profile-foot">
+          <a href={expatDevisUrl} class="btn btn-gold">Demander un devis</a>
+          <a href="/inscription?role=expatriate" class="btn btn-ghost">Créer un compte Expatrié</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     PANNEAU : À L'ACTE
+═══════════════════════════════════════════════════════ -->
+<div id="pan-acte" class={`fo-panel${defaultTab === 'pan-acte' ? ' fo-active' : ''}`}>
+  <section class="fo-acte">
+    <div class="fo-acte-inner">
+      <div class="fo-acte-card">
+        <div class="fo-acte-head">
+          <p class="fo-acte-eyebrow">— Consultations ponctuelles</p>
+          <h2 class="fo-acte-title">À l'acte</h2>
+          <p class="fo-acte-sub">Sans abonnement — à la demande</p>
+        </div>
+        <div class="fo-acte-body">
+          <p class="fo-acte-mode">
+            Par voie électronique (e-mail, WhatsApp, téléphone, visioconférence) ou en présentiel.<br/>
+            Règlement sécurisé par Orange Money, Wave ou carte bancaire.
+          </p>
+          <table class="fo-acte-table">
+            <thead>
+              <tr>
+                <th>Profil</th>
+                <th>Prix / consultation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Employé</td>
+                <td>15 000 FCFA</td>
+              </tr>
+              <tr>
+                <td>Agent de maîtrise / Technicien assimilé</td>
+                <td>25 000 FCFA</td>
+              </tr>
+              <tr>
+                <td>Expatrié</td>
+                <td>40 000 FCFA</td>
+              </tr>
+              <tr>
+                <td>Cadre</td>
+                <td>42 900 FCFA</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="fo-acte-foot">
+          <a href="/rdv-consultation" class="btn btn-gold">Prendre rendez-vous</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<script>
+  const tabs = document.querySelectorAll<HTMLButtonElement>('.fo-tab');
+  const panels = document.querySelectorAll<HTMLElement>('.fo-panel');
+  const tablist = document.querySelector<HTMLElement>('.fo-tabs');
+
+  function activateTab(targetId: string) {
+    tabs.forEach(t => t.setAttribute('aria-selected', 'false'));
+    panels.forEach(p => p.classList.remove('fo-active'));
+
+    const activeTab = document.querySelector<HTMLButtonElement>(`.fo-tab[data-target="${targetId}"]`);
+    const activePanel = document.getElementById(targetId);
+    if (activeTab) activeTab.setAttribute('aria-selected', 'true');
+    if (activePanel) activePanel.classList.add('fo-active');
+  }
+
+  const defaultTab = tablist?.dataset.defaultTab ?? 'pan-travailleurs';
+  activateTab(defaultTab);
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      activateTab(tab.dataset.target as string);
+    });
+  });
+</script>
+
+</Layout>

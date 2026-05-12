@@ -1,0 +1,24 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../components/DashboardShell.astro';
+import { JurithequeByRole } from '../../../components/shared/JurithequeByRole';
+import { requireRole } from '../../../lib/guards';
+
+const guard = await requireRole(Astro, 'expatriate');
+if (guard) return guard;
+
+const { user } = Astro.locals;
+---
+
+<DashboardLayout title="Jurithèque - PREVICARE EMPLOI">
+  <DashboardShell role="expatriate">
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+      <ol class="flex items-center space-x-4">
+        <li><a href="/espace-expatries" class="text-gray-400 hover:text-gray-500">Tableau de bord</a></li>
+        <li><span class="text-gray-300">/</span></li>
+        <li><span class="text-gray-500">Jurithèque</span></li>
+      </ol>
+    </nav>
+    <JurithequeByRole client:load userRole="expatriate" initialIndex={null} currentUserId={user.id} />
+  </DashboardShell>
+</DashboardLayout>

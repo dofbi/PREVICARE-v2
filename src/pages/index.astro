@@ -1,0 +1,716 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Previcare Emploi — HR Platform 360° · Sénégal" description="Plateforme RH 360° pour le Sénégal : droit du travail, coffre-fort numérique, signature électronique, offres d'emploi vérifiées, consultations juridiques.">
+
+<style is:global>
+  .px-nav {
+    background: rgba(11,29,58,.85) !important;
+    border-color: rgba(201,169,97,.18) !important;
+    backdrop-filter: blur(12px);
+  }
+  .px-nav .px-logo,
+  .px-nav .px-logo .sub,
+  .px-nav ul a {
+    color: rgba(246,244,238,.85) !important;
+  }
+  .px-nav ul a:hover { color: var(--gold-2) !important; opacity: 1 !important; }
+  .px-nav ul a.nav-active { color: var(--gold-2) !important; }
+  .px-nav ul a.cta {
+    border-color: var(--gold) !important;
+    color: var(--gold-2) !important;
+    background: transparent !important;
+  }
+  .px-nav ul a.cta:hover { background: rgba(201,169,97,.12) !important; }
+  .nav-hamburger span { background: var(--paper) !important; }
+</style>
+
+<style>
+  /* ── HERO ─────────────────────────────────────────────────────── */
+  .hm-hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(170deg, #0B1D3A 0%, #142849 55%, #0D2144 100%);
+    color: var(--paper);
+    overflow: hidden;
+  }
+  .hm-bg-stars {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .hm-seal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(900px, 110vw);
+    height: min(900px, 110vw);
+    opacity: .07;
+    animation: hmSpin 120s linear infinite;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .hm-hero-inner {
+    position: relative;
+    z-index: 4;
+    text-align: center;
+    max-width: 1100px;
+    padding: 0 40px;
+    padding-top: 80px;
+  }
+  .hm-over {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    color: var(--gold-2);
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: hmFade 1s .3s forwards;
+  }
+  .hm-h1 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(72px, 12vw, 160px);
+    line-height: .92;
+    letter-spacing: -2px;
+    margin: 0;
+  }
+  .hm-h1 .w1 {
+    display: inline-block;
+    opacity: 0;
+    animation: hmRise 1.2s .6s cubic-bezier(.16,1,.3,1) forwards;
+    color: var(--paper);
+  }
+  .hm-h1 .w2 {
+    display: inline-block;
+    opacity: 0;
+    animation: hmRise 1.2s 1.1s cubic-bezier(.16,1,.3,1) forwards;
+    color: var(--gold-2);
+  }
+  .hm-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin: 40px auto 32px;
+    opacity: 0;
+    animation: hmFade 1s 1.8s forwards;
+  }
+  .hm-divider::before,
+  .hm-divider::after {
+    content: "";
+    flex: 1;
+    max-width: 120px;
+    height: 1px;
+    background: var(--gold);
+    opacity: .6;
+  }
+  .hm-divider-diamond {
+    width: 8px;
+    height: 8px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    opacity: .8;
+    flex-shrink: 0;
+  }
+  .hm-sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(18px, 2vw, 23px);
+    color: rgba(246,244,238,.72);
+    max-width: 640px;
+    margin: 0 auto;
+    line-height: 1.55;
+    opacity: 0;
+    animation: hmFade 1.2s 2.1s forwards;
+  }
+  .hm-cta {
+    margin-top: 48px;
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: hmFade 1s 2.5s forwards;
+  }
+  .hm-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    padding: 14px 32px;
+    border-radius: 99px;
+    transition: .25s;
+    cursor: pointer;
+  }
+  .hm-btn-gold {
+    background: var(--gold);
+    color: var(--ink);
+    border: 1px solid var(--gold-2);
+  }
+  .hm-btn-gold:hover { background: var(--gold-2); transform: translateY(-1px); }
+  .hm-btn-outline {
+    background: transparent;
+    color: var(--paper);
+    border: 1px solid rgba(246,244,238,.35);
+  }
+  .hm-btn-outline:hover {
+    background: rgba(246,244,238,.07);
+    border-color: var(--gold-2);
+    color: var(--gold-2);
+  }
+  .hm-scroll-hint {
+    position: absolute;
+    bottom: 44px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    animation: hmFade 1s 3s forwards;
+  }
+  .hm-scroll-hint span {
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold-2);
+  }
+  .hm-scroll-line {
+    width: 1px;
+    height: 50px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: hmDrop 2s 3s ease-in-out infinite;
+  }
+
+  /* ── MANIFESTE ─────────────────────────────────────────────────── */
+  .hm-manif {
+    padding: 140px 40px;
+    background: var(--paper);
+  }
+  .hm-manif-inner {
+    max-width: 1020px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .hm-kicker {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    margin-bottom: 28px;
+  }
+  .hm-manif-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(36px, 5vw, 60px);
+    line-height: 1.1;
+    margin: 0;
+  }
+  .hm-manif-h2 em { font-style: normal; color: var(--gold-3); }
+  .hm-manif-p {
+    font-size: 19px;
+    color: var(--ink-3);
+    margin: 40px auto 0;
+    max-width: 720px;
+    line-height: 1.75;
+  }
+  .hm-three {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    margin-top: 80px;
+    padding-top: 80px;
+    border-top: 1px solid var(--rule);
+  }
+  .hm-three-item { text-align: center; }
+  .hm-three-num {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 64px;
+    color: var(--gold-3);
+    display: block;
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+  .hm-three-t {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 24px;
+    margin: 0 0 12px;
+    color: var(--ink);
+  }
+  .hm-three-d {
+    font-size: 14px;
+    color: var(--ink-3);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* ── OUTILS ────────────────────────────────────────────────────── */
+  .hm-tools {
+    padding: 120px 40px;
+    background: #fff;
+  }
+  .hm-tools-head {
+    max-width: 1320px;
+    margin: 0 auto 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .hm-tools-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(32px, 4vw, 52px);
+    margin: 0;
+  }
+  .hm-tools-h2 em { font-style: normal; color: var(--gold-3); }
+  .hm-tools-link {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink);
+    border-bottom: 1px solid var(--gold);
+    padding-bottom: 4px;
+    transition: color .2s;
+  }
+  .hm-tools-link:hover { color: var(--gold-3); }
+  .hm-tools-grid {
+    max-width: 1320px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .hm-tool {
+    background: #fff;
+    padding: 44px 20px 36px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    transition: background .25s;
+  }
+  .hm-tool:hover { background: var(--paper); }
+  .hm-tool svg {
+    width: 52px;
+    height: 52px;
+    color: var(--gold-3);
+    margin-bottom: 20px;
+    flex-shrink: 0;
+  }
+  .hm-tool-name {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 22px;
+    margin: 0 0 6px;
+    color: var(--ink);
+  }
+  .hm-tool-sub {
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    margin: 0 0 12px;
+  }
+  .hm-tool-desc {
+    font-size: 12px;
+    color: var(--ink-3);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* ── SÉNÉGAL ──────────────────────────────────────────────────── */
+  .hm-senegal {
+    padding: 140px 40px;
+    background: linear-gradient(165deg, #EDE9DA 0%, var(--paper) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .hm-sn-inner {
+    max-width: 1320px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .hm-sn-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(40px, 5vw, 60px);
+    margin: 0;
+    line-height: 1.1;
+  }
+  .hm-sn-h2 em { font-style: normal; color: var(--gold-3); }
+  .hm-sn-p {
+    font-size: 17px;
+    color: var(--ink-3);
+    line-height: 1.75;
+    margin: 28px 0 40px;
+  }
+  .hm-sn-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .hm-sn-list li {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .hm-sn-list li span:first-child {
+    font-family: var(--sans);
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .hm-sn-list li span:last-child {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 24px;
+    color: var(--gold-3);
+  }
+
+  /* ── CITATION ─────────────────────────────────────────────────── */
+  .hm-quote {
+    padding: 120px 40px;
+    background: var(--ink);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hm-quote-inner { max-width: 860px; margin: 0 auto; position: relative; z-index: 2; }
+  .hm-quote-mark {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 200px;
+    color: var(--gold);
+    opacity: .12;
+    line-height: 1;
+    position: absolute;
+    top: -60px;
+    left: -20px;
+    pointer-events: none;
+    user-select: none;
+  }
+  .hm-quote-text {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(26px, 3.5vw, 42px);
+    line-height: 1.4;
+    margin: 0;
+    color: var(--paper);
+  }
+  .hm-quote-source {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold-2);
+    margin-top: 44px;
+  }
+
+  /* ── CTA FINAL ────────────────────────────────────────────────── */
+  .hm-final {
+    padding: 140px 40px;
+    background: var(--paper);
+    text-align: center;
+  }
+  .hm-final-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 1.1;
+    margin: 16px 0 24px;
+  }
+  .hm-final-h2 em { font-style: normal; color: var(--gold-3); }
+  .hm-final-p {
+    font-size: 18px;
+    color: var(--ink-3);
+    max-width: 560px;
+    margin: 0 auto 48px;
+    line-height: 1.7;
+  }
+  .hm-final-btns {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  @keyframes hmRise {
+    from { opacity: 0; transform: translateY(50px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes hmFade { to { opacity: 1; } }
+  @keyframes hmSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+  @keyframes hmDrop {
+    0%, 100% { transform: scaleY(.5); transform-origin: top; opacity: .5; }
+    50%       { transform: scaleY(1);  transform-origin: top; opacity: 1; }
+  }
+
+  @media (max-width: 960px) {
+    .hm-three { grid-template-columns: 1fr; gap: 40px; }
+    .hm-sn-inner { grid-template-columns: 1fr; }
+    .hm-tools-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .hm-tools-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+
+<!-- ═══════════════════════════ HERO ═══════════════════════════ -->
+<section class="hm-hero">
+  <!-- Étoiles SVG -->
+  <svg class="hm-bg-stars" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g fill="#C9A961" opacity=".9">
+      <circle cx="80"  cy="120" r="1.2"/><circle cx="200" cy="280" r=".8"/>
+      <circle cx="350" cy="160" r="1.5"/><circle cx="480" cy="320" r="1"/>
+      <circle cx="640" cy="200" r=".8"/><circle cx="760" cy="80"  r="1.3"/>
+      <circle cx="920" cy="240" r="1"/><circle cx="1050" cy="180" r=".8"/>
+      <circle cx="1200" cy="300" r="1.2"/><circle cx="1380" cy="140" r="1"/>
+      <circle cx="140" cy="600" r="1"/><circle cx="320" cy="720" r=".8"/>
+      <circle cx="540" cy="680" r="1.3"/><circle cx="720" cy="800" r="1"/>
+      <circle cx="900" cy="640" r=".8"/><circle cx="1100" cy="760" r="1.2"/>
+      <circle cx="1300" cy="680" r="1"/><circle cx="1420" cy="820" r=".8"/>
+    </g>
+    <path d="M 0 480 Q 360 380 720 480 T 1440 480" fill="none" stroke="#C9A961" stroke-width=".4" opacity=".35"/>
+    <path d="M 0 540 Q 360 640 720 540 T 1440 540" fill="none" stroke="#C9A961" stroke-width=".4" opacity=".25"/>
+  </svg>
+
+  <!-- Sceau tournant -->
+  <svg class="hm-seal" viewBox="0 0 820 820" aria-hidden="true">
+    <defs>
+      <path id="hmRingPath" d="M410,410 m-340,0 a340,340 0 1,1 680,0 a340,340 0 1,1,-680,0"/>
+    </defs>
+    <circle cx="410" cy="410" r="400" fill="none" stroke="#C9A961" stroke-width=".8"/>
+    <circle cx="410" cy="410" r="360" fill="none" stroke="#C9A961" stroke-width=".4"/>
+    <circle cx="410" cy="410" r="320" fill="none" stroke="#C9A961" stroke-width=".8"/>
+    <text font-family="Inter" font-size="13" fill="#C9A961" letter-spacing="5">
+      <textPath href="#hmRingPath">· PREVICARE EMPLOI · HR PLATFORM 360° · RÉPUBLIQUE DU SÉNÉGAL · DEPUIS 2026 ·&nbsp;&nbsp;&nbsp;&nbsp;· PREVICARE EMPLOI · HR PLATFORM 360° · RÉPUBLIQUE DU SÉNÉGAL · DEPUIS 2026 ·</textPath>
+    </text>
+  </svg>
+
+  <div class="hm-hero-inner">
+    <p class="hm-over">— HR Platform 360° · République du Sénégal</p>
+    <h1 class="hm-h1">
+      <span class="w1">Previcare</span>&nbsp;<span class="w2">Emploi</span>
+    </h1>
+    <div class="hm-divider"><span class="hm-divider-diamond"></span></div>
+    <p class="hm-sub">Justice sociale, conformité réglementaire et outils numériques pour le monde du travail sénégalais.</p>
+    <div class="hm-cta">
+      <a href="/formules" class="hm-btn hm-btn-gold">Commencer maintenant →</a>
+      <a href="/outils"   class="hm-btn hm-btn-outline">Voir les outils</a>
+    </div>
+  </div>
+
+  <div class="hm-scroll-hint">
+    <span>Découvrir</span>
+    <div class="hm-scroll-line"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ MANIFESTE ═══════════════════════════ -->
+<section class="hm-manif" id="manifeste">
+  <div class="hm-manif-inner">
+    <p class="hm-kicker">— Manifeste</p>
+    <h2 class="hm-manif-h2">
+      Une plateforme où le <em>droit du travail</em><br/>
+      sénégalais devient <em>accessible</em>.
+    </h2>
+    <p class="hm-manif-p">
+      Previcare Emploi rassemble en un lieu unique les textes officiels, les outils contractuels,
+      un coffre-fort numérique conforme eIDAS, et un réseau de juristes et d'avocats ancrés dans
+      les réalités sénégalaises. Chaque fonctionnalité sert une intention : rendre l'emploi
+      équitable, traçable et durable.
+    </p>
+    <div class="hm-three">
+      <div class="hm-three-item">
+        <span class="hm-three-num">I</span>
+        <h3 class="hm-three-t">Accessibilité</h3>
+        <p class="hm-three-d">Textes, contrats, jurisprudences — disponibles 24 h/24 à toute personne connectée, du cadre supérieur au travailleur journalier.</p>
+      </div>
+      <div class="hm-three-item">
+        <span class="hm-three-num">II</span>
+        <h3 class="hm-three-t">Conformité</h3>
+        <p class="hm-three-d">Chaque acte validé contre le Code du Travail (Loi n° 97-17), les conventions collectives et les lois 2008-08 et 2008-12 sur la donnée.</p>
+      </div>
+      <div class="hm-three-item">
+        <span class="hm-three-num">III</span>
+        <h3 class="hm-three-t">Continuité</h3>
+        <p class="hm-three-d">Archivage décennal, signatures opposables, preuve permanente. Votre dossier vous survit à chaque changement d'employeur.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ OUTILS ═══════════════════════════ -->
+<section class="hm-tools">
+  <div class="hm-tools-head">
+    <div>
+      <p class="hm-kicker" style="margin-bottom:12px">— Six outils complémentaires</p>
+      <h2 class="hm-tools-h2">Une boîte à outils <em>intégrée</em></h2>
+    </div>
+    <a href="/outils" class="hm-tools-link">Tous les outils →</a>
+  </div>
+  <div class="hm-tools-grid">
+    <a href="/setlou" class="hm-tool">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35M8 11h6M11 8v6"/>
+      </svg>
+      <h3 class="hm-tool-name">Setlou</h3>
+      <p class="hm-tool-sub">I · Juridique IA</p>
+      <p class="hm-tool-desc">Conseiller droit du travail sénégalais</p>
+    </a>
+    <a href="/visionneuse" class="hm-tool">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h6"/>
+      </svg>
+      <h3 class="hm-tool-name">Visionneuse</h3>
+      <p class="hm-tool-sub">II · Lecture</p>
+      <p class="hm-tool-desc">Textes de loi et jurisprudence</p>
+    </a>
+    <a href="/coffre-fort" class="hm-tool">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>
+        <path d="M12 5v2M12 17v2M5 12h2M17 12h2"/>
+      </svg>
+      <h3 class="hm-tool-name">Coffre-fort</h3>
+      <p class="hm-tool-sub">III · Archives</p>
+      <p class="hm-tool-desc">Stockage chiffré AES-256</p>
+    </a>
+    <a href="/xalima" class="hm-tool">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.24 4.24a2.83 2.83 0 00-4 0L4 16.48V20h3.52L19.76 7.76a2.83 2.83 0 000-4z"/>
+        <line x1="16" y1="8" x2="19" y2="5"/>
+      </svg>
+      <h3 class="hm-tool-name">Xalima</h3>
+      <p class="hm-tool-sub">IV · Rédaction</p>
+      <p class="hm-tool-desc">Courriers professionnels guidés</p>
+    </a>
+    <a href="/rdv-consultation" class="hm-tool">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/>
+        <circle cx="12" cy="16" r="1.5" fill="currentColor" stroke="none"/>
+      </svg>
+      <h3 class="hm-tool-name">Consultation</h3>
+      <p class="hm-tool-sub">V · Rendez-vous</p>
+      <p class="hm-tool-desc">Expert RH et juriste à l'acte</p>
+    </a>
+    <a href="/offres-emploi" class="hm-tool">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="7" width="18" height="13" rx="2"/>
+        <path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2M12 12v2M10 14h4"/>
+      </svg>
+      <h3 class="hm-tool-name">Offres</h3>
+      <p class="hm-tool-sub">VI · Marché</p>
+      <p class="hm-tool-desc">Emplois vérifiés au Sénégal</p>
+    </a>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ SÉNÉGAL ═══════════════════════════ -->
+<section class="hm-senegal">
+  <div class="hm-sn-inner">
+    <div>
+      <p class="hm-kicker">— Ancrage national</p>
+      <h2 class="hm-sn-h2">Conçu au <em>Sénégal</em>,<br/>pour le <em>Sénégal</em></h2>
+      <p class="hm-sn-p">
+        De Dakar à Ziguinchor, de Saint-Louis à Kédougou, Previcare Emploi s'appuie sur un réseau
+        de juristes, d'avocats et d'inspecteurs du travail ancrés dans les réalités régionales.
+      </p>
+      <ul class="hm-sn-list">
+        <li><span>Régions couvertes</span><span>14</span></li>
+        <li><span>Conventions collectives intégrées</span><span>11</span></li>
+        <li><span>Juristes et avocats partenaires</span><span>+80</span></li>
+        <li><span>Articles de loi indexés</span><span>2 400+</span></li>
+      </ul>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center">
+      <svg viewBox="0 0 500 500" width="100%" style="max-width:460px" aria-hidden="true">
+        <defs>
+          <radialGradient id="hmGlow" cx=".5" cy=".5" r=".5">
+            <stop offset="0" stop-color="#C9A961" stop-opacity=".18"/>
+            <stop offset="1" stop-color="#C9A961" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <circle cx="250" cy="250" r="240" fill="url(#hmGlow)"/>
+        <circle cx="250" cy="250" r="238" fill="none" stroke="#C9A961" stroke-width=".6" opacity=".35"/>
+        <circle cx="250" cy="250" r="180" fill="none" stroke="#C9A961" stroke-width=".4" stroke-dasharray="3,6" opacity=".3"/>
+        <circle cx="250" cy="250" r="120" fill="none" stroke="#C9A961" stroke-width=".4" stroke-dasharray="3,6" opacity=".3"/>
+        <path d="M108 215 L170 175 L250 170 L335 185 L405 218 L415 278 L395 340 L355 378 L305 388 L252 378 L215 358 L170 348 L128 316 L112 265 Z"
+              fill="#0B1D3A" opacity=".75"/>
+        <g stroke="#C9A961" stroke-width=".7" fill="none" opacity=".4" stroke-dasharray="2,5">
+          <line x1="148" y1="235" x2="194" y2="222"/>
+          <line x1="148" y1="235" x2="242" y2="192"/>
+          <line x1="148" y1="235" x2="324" y2="248"/>
+          <line x1="148" y1="235" x2="352" y2="338"/>
+          <line x1="148" y1="235" x2="244" y2="368"/>
+        </g>
+        <circle cx="148" cy="235" r="7" fill="#C9A961"/>
+        <text x="115" y="228" font-family="Inter" font-size="9" fill="#0B1D3A" letter-spacing="2" font-weight="600">DAKAR</text>
+        <circle cx="194" cy="222" r="4.5" fill="#C9A961" opacity=".8"/>
+        <text x="200" y="218" font-family="Inter" font-size="8" fill="#0B1D3A" letter-spacing="1.5">THIÈS</text>
+        <circle cx="242" cy="192" r="4.5" fill="#C9A961" opacity=".8"/>
+        <text x="248" y="188" font-family="Inter" font-size="8" fill="#0B1D3A" letter-spacing="1.5">SAINT-LOUIS</text>
+        <circle cx="324" cy="248" r="4.5" fill="#C9A961" opacity=".8"/>
+        <text x="332" y="252" font-family="Inter" font-size="8" fill="#0B1D3A" letter-spacing="1.5">KAOLACK</text>
+        <circle cx="352" cy="338" r="4.5" fill="#C9A961" opacity=".8"/>
+        <text x="360" y="342" font-family="Inter" font-size="8" fill="#0B1D3A" letter-spacing="1.5">TAMBACOUNDA</text>
+        <circle cx="244" cy="368" r="4.5" fill="#C9A961" opacity=".8"/>
+        <text x="212" y="388" font-family="Inter" font-size="8" fill="#0B1D3A" letter-spacing="1.5">ZIGUINCHOR</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ CITATION ═══════════════════════════ -->
+<section class="hm-quote">
+  <div class="hm-quote-inner">
+    <span class="hm-quote-mark" aria-hidden="true">«</span>
+    <p class="hm-quote-text">Le travailleur a droit à la protection juridique de ses intérêts professionnels ; l'employeur, à la sécurité juridique de ses actes.</p>
+    <p class="hm-quote-source">— Article premier · Code du Travail du Sénégal</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ CTA FINAL ═══════════════════════════ -->
+<section class="hm-final">
+  <p class="hm-kicker">— Rejoindre Previcare Emploi</p>
+  <h2 class="hm-final-h2">Votre <em>carrière</em>,<br/>en <em>bonne tenue</em>.</h2>
+  <p class="hm-final-p">Ouvrez un compte gratuit Basique. Accédez en trente secondes aux textes de loi et à votre coffre-fort personnel.</p>
+  <div class="hm-final-btns">
+    <a href="/formules" class="btn btn-primary">Choisir ma formule</a>
+    <a href="/souscripteurs" class="btn btn-ghost">Pour qui c'est fait</a>
+  </div>
+</section>
+
+</Layout>

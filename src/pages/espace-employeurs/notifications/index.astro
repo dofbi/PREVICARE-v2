@@ -1,0 +1,43 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../components/DashboardShell.astro';
+import { NotificationCenter } from '../../../components/employee/NotificationCenter.tsx';
+import { requireRole } from '../../../lib/guards';
+
+const guard = await requireRole(Astro, 'employer');
+if (guard) return guard;
+---
+
+<DashboardLayout title="Centre de Notifications - PREVICARE EMPLOI">
+  <DashboardShell role="employer">
+
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+      <ol class="flex items-center gap-2 text-sm" style="color:var(--ink-4)">
+        <li><a href="/espace-employeurs" class="hover:opacity-80 transition-opacity" style="color:var(--ink-4)">Tableau de bord</a></li>
+        <li><span>/</span></li>
+        <li class="font-medium" style="color:var(--ink)">Notifications</li>
+      </ol>
+    </nav>
+
+    <div class="bg-white rounded-xl border mb-6" style="border-color:var(--rule)">
+      <div class="px-6 py-4 border-b" style="border-color:var(--rule)">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-semibold" style="color:var(--ink)">Centre de notifications</h3>
+            <p class="text-sm mt-0.5" style="color:var(--ink-4)">Restez informé des mises à jour importantes</p>
+          </div>
+          <div class="flex gap-3">
+            <button class="px-4 py-2 text-xs font-semibold rounded-lg border transition-colors hover:opacity-90" style="border-color:var(--rule);color:var(--ink-4)">
+              Marquer tout comme lu
+            </button>
+            <button class="px-4 py-2 text-xs font-semibold rounded-lg transition-opacity hover:opacity-90" style="background:var(--ink);color:var(--gold)">
+              Paramètres notifications
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <NotificationCenter client:load />
+  </DashboardShell>
+</DashboardLayout>

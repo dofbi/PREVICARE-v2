@@ -1,0 +1,566 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Offres d'emploi — Previcare Emploi" description="Tableau de bord emploi premium : offres vérifiées au Sénégal par secteur. Accès Silver et Gold.">
+
+<style>
+  /* ── HERO SKYLINE ────────────────────────────────────────────── */
+  .oe-hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 130px 40px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .oe-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(201,169,97,.1) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 80%, rgba(201,169,97,.05) 0%, transparent 40%);
+  }
+  .oe-hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .oe-kicker {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 7px;
+    text-transform: uppercase;
+    color: var(--gold-2);
+    margin-bottom: 32px;
+  }
+  .oe-h1 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(56px, 9vw, 110px);
+    line-height: .95;
+    margin: 0 0 28px;
+  }
+  .oe-h1 em { font-style: normal; color: var(--gold-2); }
+  .oe-sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 19px;
+    color: rgba(246,244,238,.65);
+    margin: 0 auto 56px;
+    max-width: 560px;
+    line-height: 1.65;
+  }
+
+  /* Skyline SVG */
+  .oe-skyline {
+    position: relative;
+    z-index: 2;
+    margin-top: 20px;
+  }
+  .oe-skyline svg {
+    width: 100%;
+    max-width: 1320px;
+    display: block;
+    margin: 0 auto;
+    opacity: .18;
+  }
+
+  /* ── BARRE DE FILTRE ─────────────────────────────────────────── */
+  .oe-filter {
+    background: #fff;
+    border-bottom: 1px solid var(--rule);
+    padding: 0 40px;
+    position: sticky;
+    top: 64px;
+    z-index: 20;
+  }
+  .oe-filter-inner {
+    max-width: 1320px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .oe-filter-inner::-webkit-scrollbar { display: none; }
+  .oe-filter-btn {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 18px 20px;
+    border-bottom: 2px solid transparent;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: .2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .oe-filter-btn:hover,
+  .oe-filter-btn.active { color: var(--ink); border-bottom-color: var(--gold); }
+
+  /* ── GRILLE OFFRES ───────────────────────────────────────────── */
+  .oe-main {
+    padding: 80px 40px;
+    background: var(--paper);
+  }
+  .oe-main-inner { max-width: 1320px; margin: 0 auto; }
+  .oe-section-title {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .oe-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin-bottom: 80px;
+  }
+
+  /* Carte offre */
+  .oe-card {
+    background: var(--paper);
+    padding: 36px 32px;
+    display: flex;
+    flex-direction: column;
+    transition: background .2s;
+    position: relative;
+  }
+  .oe-card:hover { background: #fff; }
+  .oe-card-premium {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-family: var(--sans);
+    font-size: 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    background: var(--gold);
+    color: var(--ink);
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-weight: 700;
+  }
+  .oe-card-logo {
+    width: 44px;
+    height: 44px;
+    background: var(--ink);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+  }
+  .oe-card-logo span {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--gold);
+  }
+  .oe-card-company {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    margin-bottom: 8px;
+  }
+  .oe-card-title {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 24px;
+    color: var(--ink);
+    margin: 0 0 16px;
+    line-height: 1.15;
+  }
+  .oe-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .oe-tag {
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid var(--rule);
+    border-radius: 99px;
+    color: var(--ink-3);
+  }
+  .oe-tag-sector { border-color: var(--gold); color: var(--gold-3); }
+  .oe-card-desc {
+    font-size: 13px;
+    color: var(--ink-3);
+    line-height: 1.65;
+    margin: 0 0 24px;
+    flex: 1;
+  }
+  .oe-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+  }
+  .oe-card-loc {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--ink-4);
+  }
+  .oe-card-cta {
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink);
+    border-bottom: 1px solid var(--gold);
+    padding-bottom: 2px;
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .oe-card-cta:hover { color: var(--gold-3); }
+
+  /* Carte floue (accès restreint) */
+  .oe-card-blur {
+    filter: blur(4px);
+    pointer-events: none;
+    user-select: none;
+    opacity: .6;
+  }
+
+  /* ── BLOC ACCÈS RESTREINT ────────────────────────────────────── */
+  .oe-gate {
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid rgba(201,169,97,.2);
+    padding: 72px 48px;
+    text-align: center;
+    margin-bottom: 80px;
+  }
+  .oe-gate-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(32px, 4vw, 48px);
+    margin: 16px 0 20px;
+  }
+  .oe-gate-h2 em { font-style: normal; color: var(--gold-2); }
+  .oe-gate-p { font-size: 16px; color: rgba(246,244,238,.72); max-width: 480px; margin: 0 auto 40px; line-height: 1.7; }
+
+  /* ── SECTEURS ────────────────────────────────────────────────── */
+  .oe-sectors {
+    margin-top: 40px;
+  }
+  .oe-sectors-title {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(28px, 3.5vw, 40px);
+    margin: 0 0 40px;
+  }
+  .oe-sectors-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+  .oe-sector {
+    background: var(--paper);
+    padding: 28px 20px;
+    text-align: center;
+    transition: background .2s;
+  }
+  .oe-sector:hover { background: #fff; }
+  .oe-sector-name {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink);
+    margin: 0 0 6px;
+  }
+  .oe-sector-count {
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+  }
+
+  @media (max-width: 960px) {
+    .oe-grid { grid-template-columns: 1fr; }
+    .oe-sectors-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .oe-sectors-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+
+<!-- HERO SKYLINE -->
+<section class="oe-hero">
+  <div class="oe-hero-inner">
+    <p class="oe-kicker">— Tableau de bord emploi premium</p>
+    <h1 class="oe-h1">Offres <em>vérifiées</em><br/>au Sénégal</h1>
+    <p class="oe-sub">Chaque poste publié sur Previcare Emploi est vérifié par notre équipe. Employeurs conformes, contrats conformes au Code du Travail.</p>
+  </div>
+  <div class="oe-skyline">
+    <svg viewBox="0 0 1320 180" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg" fill="#C9A961">
+      <!-- Skyline de Dakar stylisée -->
+      <rect x="0"   y="100" width="18" height="80"/>
+      <rect x="22"  y="70"  width="25" height="110"/>
+      <rect x="52"  y="90"  width="14" height="90"/>
+      <rect x="72"  y="50"  width="30" height="130"/>
+      <rect x="76"  y="42"  width="22" height="8"/>
+      <rect x="108" y="80"  width="20" height="100"/>
+      <rect x="132" y="60"  width="35" height="120"/>
+      <rect x="134" y="52"  width="31" height="8"/>
+      <rect x="172" y="90"  width="16" height="90"/>
+      <rect x="194" y="40"  width="40" height="140"/>
+      <rect x="200" y="30"  width="28" height="12"/>
+      <rect x="240" y="70"  width="22" height="110"/>
+      <rect x="268" y="55"  width="30" height="125"/>
+      <rect x="304" y="85"  width="18" height="95"/>
+      <rect x="328" y="45"  width="45" height="135"/>
+      <rect x="340" y="35"  width="21" height="12"/>
+      <rect x="380" y="75"  width="20" height="105"/>
+      <rect x="406" y="90"  width="16" height="90"/>
+      <rect x="428" y="55"  width="32" height="125"/>
+      <rect x="466" y="40"  width="38" height="140"/>
+      <rect x="472" y="28"  width="26" height="14"/>
+      <rect x="510" y="70"  width="22" height="110"/>
+      <rect x="538" y="85"  width="17" height="95"/>
+      <rect x="560" y="50"  width="35" height="130"/>
+      <rect x="600" y="65"  width="25" height="115"/>
+      <rect x="630" y="90"  width="18" height="90"/>
+      <rect x="654" y="45"  width="40" height="135"/>
+      <rect x="660" y="33"  width="28" height="14"/>
+      <rect x="700" y="75"  width="22" height="105"/>
+      <rect x="728" y="55"  width="30" height="125"/>
+      <rect x="764" y="85"  width="18" height="95"/>
+      <rect x="788" y="40"  width="42" height="140"/>
+      <rect x="794" y="28"  width="30" height="14"/>
+      <rect x="836" y="70"  width="20" height="110"/>
+      <rect x="862" y="90"  width="16" height="90"/>
+      <rect x="884" y="55"  width="34" height="125"/>
+      <rect x="924" y="65"  width="26" height="115"/>
+      <rect x="956" y="45"  width="38" height="135"/>
+      <rect x="962" y="33"  width="26" height="14"/>
+      <rect x="1000" y="80" width="20" height="100"/>
+      <rect x="1026" y="55" width="32" height="125"/>
+      <rect x="1064" y="40" width="44" height="140"/>
+      <rect x="1070" y="28" width="32" height="14"/>
+      <rect x="1114" y="70" width="22" height="110"/>
+      <rect x="1142" y="85" width="18" height="95"/>
+      <rect x="1166" y="50" width="36" height="130"/>
+      <rect x="1208" y="60" width="28" height="120"/>
+      <rect x="1242" y="40" width="40" height="140"/>
+      <rect x="1248" y="28" width="28" height="14"/>
+      <rect x="1288" y="75" width="20" height="105"/>
+      <rect x="1314" y="90" width="6"  height="90"/>
+    </svg>
+  </div>
+</section>
+
+<!-- FILTRE -->
+<nav class="oe-filter" aria-label="Filtres secteur">
+  <div class="oe-filter-inner">
+    <span class="oe-filter-btn active">Tous les secteurs</span>
+    <span class="oe-filter-btn">Finance & Banque</span>
+    <span class="oe-filter-btn">Télécoms & IT</span>
+    <span class="oe-filter-btn">Agro-alimentaire</span>
+    <span class="oe-filter-btn">Énergie & Mines</span>
+    <span class="oe-filter-btn">Santé</span>
+    <span class="oe-filter-btn">Commerce</span>
+    <span class="oe-filter-btn">Industrie</span>
+    <span class="oe-filter-btn">Transport</span>
+    <span class="oe-filter-btn">Éducation</span>
+  </div>
+</nav>
+
+<!-- GRILLE OFFRES -->
+<section class="oe-main">
+  <div class="oe-main-inner">
+    <p class="oe-section-title">— Offres récentes · aperçu</p>
+    <div class="oe-grid">
+
+      <!-- Carte 1 — visible -->
+      <div class="oe-card">
+        <span class="oe-card-premium">Premium</span>
+        <div class="oe-card-logo"><span>E</span></div>
+        <p class="oe-card-company">Ecobank Sénégal</p>
+        <h3 class="oe-card-title">Chargé d'affaires Entreprises</h3>
+        <div class="oe-card-tags">
+          <span class="oe-tag oe-tag-sector">Finance</span>
+          <span class="oe-tag">CDI</span>
+          <span class="oe-tag">Bac+4/5</span>
+        </div>
+        <p class="oe-card-desc">Développer et gérer un portefeuille de clients Entreprises. Assurer le suivi des engagements et proposer des solutions de financement adaptées.</p>
+        <div class="oe-card-footer">
+          <span class="oe-card-loc">Dakar · Plateau</span>
+          <a href="/connexion" class="oe-card-cta">Postuler →</a>
+        </div>
+      </div>
+
+      <!-- Carte 2 — visible -->
+      <div class="oe-card">
+        <div class="oe-card-logo"><span>O</span></div>
+        <p class="oe-card-company">Orange Sénégal</p>
+        <h3 class="oe-card-title">Ingénieur Réseau 5G</h3>
+        <div class="oe-card-tags">
+          <span class="oe-tag oe-tag-sector">Télécoms</span>
+          <span class="oe-tag">CDI</span>
+          <span class="oe-tag">Bac+5</span>
+        </div>
+        <p class="oe-card-desc">Déploiement et optimisation du réseau 5G national. Configuration des équipements, supervision des KPIs et coordination avec les équipes terrain.</p>
+        <div class="oe-card-footer">
+          <span class="oe-card-loc">Dakar · Almadies</span>
+          <a href="/connexion" class="oe-card-cta">Postuler →</a>
+        </div>
+      </div>
+
+      <!-- Carte 3 — flou -->
+      <div class="oe-card oe-card-blur">
+        <span class="oe-card-premium">Premium</span>
+        <div class="oe-card-logo"><span>S</span></div>
+        <p class="oe-card-company">Sonatel Group</p>
+        <h3 class="oe-card-title">Responsable RH Régional</h3>
+        <div class="oe-card-tags">
+          <span class="oe-tag oe-tag-sector">Télécoms</span>
+          <span class="oe-tag">CDI</span>
+        </div>
+        <p class="oe-card-desc">Piloter la politique RH sur la région Nord. Recrutement, gestion des carrières, relations sociales et conformité droit du travail.</p>
+        <div class="oe-card-footer">
+          <span class="oe-card-loc">Saint-Louis</span>
+          <span class="oe-card-cta">Postuler →</span>
+        </div>
+      </div>
+
+      <!-- Carte 4 — flou -->
+      <div class="oe-card oe-card-blur">
+        <div class="oe-card-logo"><span>C</span></div>
+        <p class="oe-card-company">CBAO Groupe Attijariwafa</p>
+        <h3 class="oe-card-title">Directeur Agence</h3>
+        <div class="oe-card-tags">
+          <span class="oe-tag oe-tag-sector">Finance</span>
+          <span class="oe-tag">CDI</span>
+        </div>
+        <p class="oe-card-desc">Encadrer une équipe de 12 collaborateurs. Atteinte des objectifs commerciaux, gestion des risques et relation clientèle haut de gamme.</p>
+        <div class="oe-card-footer">
+          <span class="oe-card-loc">Thiès</span>
+          <span class="oe-card-cta">Postuler →</span>
+        </div>
+      </div>
+
+      <!-- Carte 5 — flou -->
+      <div class="oe-card oe-card-blur">
+        <span class="oe-card-premium">Premium</span>
+        <div class="oe-card-logo"><span>S</span></div>
+        <p class="oe-card-company">SAR Sénégal</p>
+        <h3 class="oe-card-title">Responsable HSE</h3>
+        <div class="oe-card-tags">
+          <span class="oe-tag oe-tag-sector">Énergie</span>
+          <span class="oe-tag">CDI</span>
+        </div>
+        <p class="oe-card-desc">Définir et mettre en oeuvre la politique HSE du site. Audits de sécurité, formation du personnel et gestion des situations d'urgence.</p>
+        <div class="oe-card-footer">
+          <span class="oe-card-loc">Dakar · Mbao</span>
+          <span class="oe-card-cta">Postuler →</span>
+        </div>
+      </div>
+
+      <!-- Carte 6 — flou -->
+      <div class="oe-card oe-card-blur">
+        <div class="oe-card-logo"><span>G</span></div>
+        <p class="oe-card-company">GIZ Sénégal</p>
+        <h3 class="oe-card-title">Expert Formation Professionnelle</h3>
+        <div class="oe-card-tags">
+          <span class="oe-tag oe-tag-sector">Éducation</span>
+          <span class="oe-tag">CDD 24 mois</span>
+        </div>
+        <p class="oe-card-desc">Concevoir et déployer des dispositifs de formation professionnelle continue dans le cadre du programme FONDEF. Suivi des indicateurs.</p>
+        <div class="oe-card-footer">
+          <span class="oe-card-loc">Dakar</span>
+          <span class="oe-card-cta">Postuler →</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BLOC ACCÈS RESTREINT -->
+    <div class="oe-gate">
+      <p class="oe-kicker" style="color:var(--gold-2)">— Accès Silver & Gold requis</p>
+      <h2 class="oe-gate-h2">Débloquez les<br/><em>40+ offres</em> disponibles</h2>
+      <p class="oe-gate-p">Le tableau de bord emploi complet est réservé aux abonnés Silver et Gold. Accédez à toutes les offres, postulez en un clic et activez les alertes personnalisées.</p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+        <a href="/formules" class="btn btn-gold">Voir les formules</a>
+        <a href="/connexion" class="btn btn-ghost" style="border-color:rgba(246,244,238,.3);color:var(--paper)">Se connecter</a>
+      </div>
+    </div>
+
+    <!-- SECTEURS -->
+    <div class="oe-sectors">
+      <h2 class="oe-sectors-title">Par secteur d'activité</h2>
+      <div class="oe-sectors-grid">
+        <div class="oe-sector">
+          <p class="oe-sector-name">Finance</p>
+          <p class="oe-sector-count">12 offres</p>
+        </div>
+        <div class="oe-sector">
+          <p class="oe-sector-name">Télécoms</p>
+          <p class="oe-sector-count">8 offres</p>
+        </div>
+        <div class="oe-sector">
+          <p class="oe-sector-name">Agro-alim.</p>
+          <p class="oe-sector-count">7 offres</p>
+        </div>
+        <div class="oe-sector">
+          <p class="oe-sector-name">Énergie</p>
+          <p class="oe-sector-count">6 offres</p>
+        </div>
+        <div class="oe-sector">
+          <p class="oe-sector-name">Santé</p>
+          <p class="oe-sector-count">5 offres</p>
+        </div>
+        <div class="oe-sector">
+          <p class="oe-sector-name">Commerce</p>
+          <p class="oe-sector-count">4 offres</p>
+        </div>
+        <div class="oe-sector">
+          <p class="oe-sector-name">Industrie</p>
+          <p class="oe-sector-count">4 offres</p>
+        </div>
+        <div class="oe-sector">
+          <p class="oe-sector-name">Transport</p>
+          <p class="oe-sector-count">3 offres</p>
+        </div>
+        <div class="oe-sector">
+          <p class="oe-sector-name">Éducation</p>
+          <p class="oe-sector-count">3 offres</p>
+        </div>
+        <div class="oe-sector">
+          <p class="oe-sector-name">Autres</p>
+          <p class="oe-sector-count">5 offres</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</Layout>

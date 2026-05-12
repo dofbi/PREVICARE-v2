@@ -1,0 +1,76 @@
+---
+export interface Props {
+  hasSubscription: boolean;
+  planLabel?: string | null;
+  role: 'employee' | 'employer' | 'delegate' | 'expatriate';
+  customTitle?: string;
+  customMessage?: string;
+  ctaHref?: string;
+  ctaLabel?: string;
+  gradientClass?: string;
+  gradientStyle?: string;
+}
+
+const {
+  hasSubscription,
+  planLabel,
+  role,
+  customTitle,
+  customMessage,
+  ctaHref = '/formules',
+  ctaLabel = 'Voir les offres',
+} = Astro.props;
+
+void planLabel;
+
+const defaults: Record<string, { title: string; message: string }> = {
+  employee: {
+    title: 'Protégez votre carrière dès maintenant',
+    message: "Vous n'avez pas encore d'abonnement actif. Bénéficiez de la protection juridique et de conseils personnalisés.",
+  },
+  employer: {
+    title: 'Activez votre espace employeur',
+    message: 'Souscrivez à un abonnement pour bénéficier de toutes les fonctionnalités RH et juridiques.',
+  },
+  delegate: {
+    title: 'Activez votre espace délégué',
+    message: 'Souscrivez à un abonnement pour accéder aux outils de représentation et de négociation sociale.',
+  },
+  expatriate: {
+    title: 'Protégez vos droits depuis l\'étranger',
+    message: 'Souscrivez à un abonnement pour accéder à l\'assistance juridique et aux démarches administratives à distance.',
+  },
+};
+
+const config = defaults[role] ?? defaults.employee;
+const title = customTitle ?? config.title;
+const message = customMessage ?? config.message;
+---
+
+{!hasSubscription && (
+  <div class="mb-6 rounded-xl p-5 border" style="background:var(--ink);border-color:rgba(201,169,97,.35)">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div class="flex items-start gap-4">
+        <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style="background:rgba(201,169,97,.15)">
+          <svg class="w-5 h-5" style="color:var(--gold)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-white">{title}</h3>
+          <p class="text-xs mt-1" style="color:rgba(255,255,255,.60)">{message}</p>
+        </div>
+      </div>
+      <a
+        href={ctaHref}
+        class="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg flex-shrink-0 transition-colors"
+        style="background:var(--gold);color:var(--ink)"
+      >
+        {ctaLabel}
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        </svg>
+      </a>
+    </div>
+  </div>
+)}

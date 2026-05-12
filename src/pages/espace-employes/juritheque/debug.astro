@@ -1,0 +1,40 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../components/DashboardShell.astro';
+import { JurithequeService } from '../../../lib/jurithequeService';
+import { createClient } from '../../../lib/supabase';
+
+const { user } = Astro.locals;
+
+const supabase = createClient({ request: Astro.request, cookies: Astro.cookies });
+const jurithequeService = new JurithequeService(supabase);
+
+const { index } = await jurithequeService.getIndexWithStats(user?.id);
+
+---
+
+<DashboardLayout title="Jurithèque Debug">
+  <DashboardShell title="Jurithèque - Debug">
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Debug Jurithèque</h1>
+      <div className="mb-4">
+        <p>Index null: {index === null || index === undefined ? 'OUI' : 'NON'}</p>
+        <p>Index type: {index ? typeof index : 'undefined'}</p>
+        {index && (
+          <p>Articles count: {index.articles?.length || 0}</p>
+        )}
+      </div>
+      {index && index.articles && index.articles.length > 0 && (
+        <div className="space-y-2">
+          <h2 className="text-xl font-bold">Articles:</h2>
+          {index.articles.slice(0, 3).map((article, i) => (
+            <div key={i} className="border p-3 rounded">
+              <p className="font-bold">{article.title}</p>
+              <p className="text-sm text-gray-600">{article.key}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </DashboardShell>
+</DashboardLayout>

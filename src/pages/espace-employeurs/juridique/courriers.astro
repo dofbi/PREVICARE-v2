@@ -1,0 +1,87 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../components/DashboardShell.astro';
+import { XalimaByRole } from '../../../components/shared/XalimaByRole';
+import { createClient } from '../../../lib/supabase';
+import { requireRole } from '../../../lib/guards';
+
+const guard = await requireRole(Astro, 'employer');
+if (guard) return guard;
+
+const { user } = Astro.locals;
+const supabase = createClient({ request: Astro.request, cookies: Astro.cookies });
+
+const { data: profile } = await supabase
+  .from('profiles')
+  .select('first_name, last_name, organization')
+  .eq('id', user.id)
+  .single();
+
+const { data: employerDetails } = await supabase
+  .from('employer_details')
+  .select('ninea, sector')
+  .eq('id', user.id)
+  .single();
+---
+
+<DashboardLayout title="Xalima — Rédaction Documents RH - PREVICARE EMPLOI">
+  <DashboardShell role="employer">
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+      <ol class="flex items-center space-x-4">
+        <li><a href="/espace-employeurs" class="text-gray-400 hover:text-gray-500">Tableau de bord</a></li>
+        <li><span class="text-gray-300">/</span></li>
+        <li><a href="/espace-employeurs/juridique" class="text-gray-400 hover:text-gray-500">Juridique</a></li>
+        <li><span class="text-gray-300">/</span></li>
+        <li><span class="text-gray-500">Courriers</span></li>
+      </ol>
+    </nav>
+
+    <div class="mb-8 rounded-xl p-6 shadow-lg" style="background: linear-gradient(135deg, #92400e 0%, #d97706 100%);">
+      <div class="flex flex-col md:flex-row md:items-center gap-4">
+        <div class="flex items-center gap-4">
+          <div class="flex-shrink-0 w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
+            <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-white">Xalima</h1>
+            <p class="text-white/80 text-sm">Rédaction de documents RH professionnels</p>
+          </div>
+        </div>
+        <div class="md:ml-auto">
+          <a href="/espace-employeurs/juridique/setlou" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white rounded-lg px-3 py-2 text-xs font-medium transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            Consulter SETLOU
+          </a>
+        </div>
+      </div>
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="bg-white/10 rounded-lg p-3">
+          <p class="text-white/60 text-xs mb-1">Spécialité</p>
+          <p class="text-white text-sm font-medium">Documents RH & disciplinaires</p>
+        </div>
+        <div class="bg-white/10 rounded-lg p-3">
+          <p class="text-white/60 text-xs mb-1">Base légale</p>
+          <p class="text-white text-sm font-medium">Droit du travail sénégalais</p>
+        </div>
+        <div class="bg-white/10 rounded-lg p-3">
+          <p class="text-white/60 text-xs mb-1">Types disponibles</p>
+          <p class="text-white text-sm font-medium">9 types de documents</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h3 class="text-lg font-semibold text-gray-900">Rédigez votre document RH</h3>
+        <p class="text-sm text-gray-500 mt-0.5">Sélectionnez un type, remplissez le formulaire et laissez Xalima rédiger pour vous</p>
+      </div>
+      <div class="p-6">
+        <XalimaByRole userRole="employer" client:load />
+      </div>
+    </div>
+  </DashboardShell>
+</DashboardLayout>

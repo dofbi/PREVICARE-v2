@@ -1,0 +1,16 @@
+---
+import DashboardLayout from '../../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../../components/DashboardShell.astro';
+
+const { user } = Astro.locals;
+
+---
+
+<DashboardLayout title="Jurithèque Test">
+  <DashboardShell title="Jurithèque - Test Minimal">
+    <div className="p-6">
+      <h1 className="text-2xl">Jurithèque - Test Minimal</h1>
+      <p>Import Layout sans JurithequeApp</p>
+    </div>
+  </DashboardShell>
+</DashboardLayout>

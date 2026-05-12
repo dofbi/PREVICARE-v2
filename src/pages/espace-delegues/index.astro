@@ -1,0 +1,330 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../components/DashboardShell.astro';
+import DashboardBanner from '../../components/dashboard/DashboardBanner.astro';
+import DashboardHero from '../../components/dashboard/DashboardHero.astro';
+import DashboardStats from '../../components/dashboard/DashboardStats.astro';
+import QuickAccessGrid from '../../components/dashboard/QuickAccessGrid.astro';
+import { createClient } from '../../lib/supabase';
+import { SubscriptionService } from '../../lib/subscriptionService';
+import { requireRole } from '../../lib/guards';
+import { actions } from 'astro:actions';
+
+const guard = await requireRole(Astro, 'delegate');
+if (guard) return guard;
+
+const { user } = Astro.locals;
+const supabase = createClient({ request: Astro.request, cookies: Astro.cookies });
+const subscriptionService = new SubscriptionService(supabase);
+
+const activeSubscription = await subscriptionService.getUserSubscription(user.id);
+const hasActiveSubscription = !!(activeSubscription && activeSubscription.status === 'active');
+const planLabel = activeSubscription?.plan.display_name ?? null;
+
+const { data: documentsData } = await supabase
+  .from('documents')
+  .select('id')
+  .eq('owner_id', user.id);
+const documentCount = documentsData?.length ?? 0;
+
+const { data: profileData } = await supabase
+  .from('profiles')
+  .select('organization, phone, address, country')
+  .eq('id', user.id)
+  .single();
+
+const { data: delegateDetails } = await supabase
+  .from('delegate_details')
+  .select('represented_employee_count, mandate_type, organization_id, active_claims_count')
+  .eq('id', user.id)
+  .single();
+
+const organization = profileData?.organization ?? (user.user_metadata?.organization as string | undefined) ?? 'Mon organisation';
+const representedCount = delegateDetails?.represented_employee_count ?? null;
+const mandateType = delegateDetails?.mandate_type ?? null;
+const organizationId = delegateDetails?.organization_id ?? null;
+const activeClaimsCount = delegateDetails?.active_claims_count ?? null;
+
+const updateResult = Astro.getActionResult(actions.profile.updateDelegateDetails);
+---
+
+<DashboardLayout title="Espace Délégués - PREVICARE EMPLOI">
+  <DashboardShell role="delegate">
+
+    <DashboardBanner
+      hasSubscription={hasActiveSubscription}
+      planLabel={planLabel}
+      role="delegate"
+    />
+
+    <DashboardHero
+      title={`Bienvenue, ${user.user_metadata?.first_name} ${user.user_metadata?.last_name}`}
+      subtitle="Votre espace délégué PREVICARE EMPLOI"
+      organization={organization}
+    />
+
+    <DashboardStats
+      stats={[
+        {
+          label: 'Abonnement',
+          value: hasActiveSubscription ? (planLabel ?? 'Actif') : 'Inactif',
+          sublabel: hasActiveSubscription ? 'Mandat protégé' : 'Souscription requise',
+          icon: 'check',
+          color: hasActiveSubscription ? 'green' : 'orange',
+        },
+        {
+          label: 'Documents archivés',
+          value: documentCount,
+          sublabel: 'Accords et PV archivés',
+          icon: 'document',
+          color: 'secondary',
+        },
+        {
+          label: 'Employés représentés',
+          value: representedCount !== null ? representedCount : '—',
+          sublabel: representedCount !== null ? 'Salariés représentés' : 'Non renseigné',
+          icon: 'users',
+          color: 'green',
+        },
+        {
+          label: 'Mandat',
+          value: mandateType ?? '—',
+          sublabel: mandateType ? 'Mandat en cours' : 'Non renseigné',
+          icon: 'briefcase',
+          color: 'indigo',
+        },
+        {
+          label: 'Réclamations',
+          value: activeClaimsCount !== null ? activeClaimsCount : '—',
+          sublabel: activeClaimsCount !== null ? (activeClaimsCount > 0 ? 'En cours de médiation' : 'Aucune en cours') : 'Non renseigné',
+          icon: 'message',
+          color: 'red',
+        },
+      ]}
+    />
+
+    <QuickAccessGrid
+      items={[
+        {
+          title: 'Documents',
+          description: 'Archivage sécurisé',
+          href: '/espace-delegues/documents',
+          icon: 'document',
+        },
+        {
+          title: 'SETLOU',
+          description: 'Conseil juridique social',
+          href: '/espace-delegues/juridique/setlou',
+          icon: 'shield',
+        },
+        {
+          title: 'Xalima',
+          description: 'Rédaction documents sociaux',
+          href: '/espace-delegues/juridique/courriers',
+          icon: 'edit',
+        },
+        {
+          title: 'Jurithèque',
+          description: 'Bibliothèque juridique',
+          href: '/espace-delegues/juritheque',
+          icon: 'book',
+        },
+        {
+          title: 'Assistance',
+          description: 'Support & tickets',
+          href: '/espace-delegues/assistance',
+          icon: 'support',
+        },
+        {
+          title: 'Tickets',
+          description: 'Suivi des demandes',
+          href: '/espace-delegues/tickets',
+          icon: 'message',
+        },
+      ]}
+    />
+
+    <!-- Formulaire mandat -->
+    <div class="grid md:grid-cols-2 gap-5 mb-6">
+      <div class="bg-white rounded-xl border" style="border-color:var(--rule)">
+        <div class="p-5 border-b" style="border-color:var(--rule)">
+          <h3 class="font-semibold text-sm" style="color:var(--ink)">Aperçu du mandat</h3>
+        </div>
+        <div class="p-5 space-y-4">
+          <div class="flex items-start gap-3">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style="background:rgba(201,169,97,.10)">
+              <svg class="h-4 w-4" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider" style="color:var(--ink-4)">Organisation</p>
+              <p class="text-sm mt-0.5" style="color:var(--ink)">{organization}</p>
+            </div>
+          </div>
+          {mandateType && (
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style="background:rgba(201,169,97,.10)">
+                <svg class="h-4 w-4" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wider" style="color:var(--ink-4)">Type de mandat</p>
+                <p class="text-sm mt-0.5" style="color:var(--ink)">{mandateType}</p>
+              </div>
+            </div>
+          )}
+          {representedCount !== null && (
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style="background:rgba(201,169,97,.10)">
+                <svg class="h-4 w-4" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wider" style="color:var(--ink-4)">Employés représentés</p>
+                <p class="text-sm mt-0.5" style="color:var(--ink)">{representedCount}</p>
+              </div>
+            </div>
+          )}
+          {organizationId && (
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style="background:rgba(201,169,97,.10)">
+                <svg class="h-4 w-4" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wider" style="color:var(--ink-4)">Identifiant organisation</p>
+                <p class="text-sm mt-0.5" style="color:var(--ink)">{organizationId}</p>
+              </div>
+            </div>
+          )}
+          <div class="pt-4 border-t" style="border-color:var(--rule)">
+            <p class="text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Plan souscrit</p>
+            {hasActiveSubscription ? (
+              <p class="text-sm font-semibold" style="color:var(--gold-3)">{planLabel}</p>
+            ) : (
+              <p class="text-sm" style="color:var(--ink-4)">Aucun — <a href="/formules" class="underline hover:opacity-80" style="color:var(--gold-3)">Choisir un plan</a></p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <!-- Form mise à jour données mandat -->
+      <div class="bg-white rounded-xl border" style="border-color:var(--rule)">
+        <div class="p-5 border-b flex items-center justify-between" style="border-color:var(--rule)">
+          <div>
+            <h3 class="font-semibold text-base" style="color:var(--ink)">Données du mandat</h3>
+            <p class="text-sm mt-0.5" style="color:var(--ink-4)">Effectif représenté, type de mandat et organisation</p>
+          </div>
+          <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background:rgba(201,169,97,.10)">
+            <svg class="h-4 w-4" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </div>
+        </div>
+        <div class="p-5">
+          {updateResult && !updateResult.error && updateResult.data?.success === true && (
+            <div class="mb-4 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm" style="background:rgba(22,163,74,.08);border-color:rgba(22,163,74,.25);color:#15803d">
+              <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              Données mises à jour avec succès.
+            </div>
+          )}
+          {(updateResult?.error || (updateResult && updateResult.data?.success === false)) && (
+            <div class="mb-4 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm" style="background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25);color:#dc2626">
+              <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              {updateResult?.data?.message ?? "Une erreur est survenue. Veuillez réessayer."}
+            </div>
+          )}
+          <form method="POST" action={actions.profile.updateDelegateDetails} class="space-y-4">
+            <div>
+              <label for="represented_employee_count" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Employés représentés</label>
+              <input type="number" id="represented_employee_count" name="represented_employee_count" min="0" value={representedCount ?? ''} placeholder="Ex : 120"
+                class="w-full rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                style="border-color:var(--rule);color:var(--ink);background:#fff" />
+            </div>
+            <div>
+              <label for="mandate_type_select" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Type de mandat</label>
+              <select id="mandate_type_select" name="mandate_type" data-current={mandateType ?? ''}
+                class="w-full rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                style="border-color:var(--rule);color:var(--ink);background:#fff">
+                <option value="">— Choisir un type de mandat —</option>
+                <option value="DP">DP</option>
+                <option value="CE">CE</option>
+                <option value="CHSCT">CHSCT</option>
+                <option value="Autre">Autre</option>
+              </select>
+              <input type="text" id="mandate_type_autre" placeholder="Précisez le type de mandat…"
+                class="hidden mt-2 w-full rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                style="border-color:var(--rule);color:var(--ink);background:#fff" />
+            </div>
+            <div>
+              <label for="organization_id" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Identifiant de l'organisation</label>
+              <input type="text" id="organization_id" name="organization_id" value={organizationId ?? ''} placeholder="Ex : ORG-2024-001"
+                class="w-full rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                style="border-color:var(--rule);color:var(--ink);background:#fff" />
+            </div>
+            <div class="flex justify-end">
+              <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg transition-opacity hover:opacity-90" style="background:var(--ink);color:var(--gold)">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Enregistrer
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </DashboardShell>
+</DashboardLayout>
+
+<script is:inline data-astro-rerun>
+  document.addEventListener('DOMContentLoaded', function() {
+    var mandateSelect = document.getElementById('mandate_type_select');
+    var mandateAutre = document.getElementById('mandate_type_autre');
+
+    if (mandateSelect && mandateAutre) {
+      var knownMandateOptions = Array.from(mandateSelect.options).map(function(o) { return o.value; });
+      var currentMandateVal = mandateSelect.getAttribute('data-current') || '';
+
+      if (currentMandateVal && knownMandateOptions.indexOf(currentMandateVal) !== -1) {
+        mandateSelect.value = currentMandateVal;
+      } else if (currentMandateVal) {
+        mandateSelect.value = 'Autre';
+        mandateAutre.value = currentMandateVal;
+        mandateAutre.classList.remove('hidden');
+      }
+
+      mandateSelect.addEventListener('change', function() {
+        if (this.value === 'Autre') {
+          mandateAutre.classList.remove('hidden');
+        } else {
+          mandateAutre.classList.add('hidden');
+          mandateAutre.value = '';
+        }
+      });
+
+      var mandateForm = mandateSelect.closest('form');
+      if (mandateForm) {
+        mandateForm.addEventListener('submit', function() {
+          if (mandateSelect.value === 'Autre' && mandateAutre.value.trim()) {
+            var customInput = document.createElement('input');
+            customInput.type = 'hidden';
+            customInput.name = 'mandate_type';
+            customInput.value = mandateAutre.value.trim();
+            mandateSelect.removeAttribute('name');
+            mandateForm.appendChild(customInput);
+          }
+        });
+      }
+    }
+  });
+</script>

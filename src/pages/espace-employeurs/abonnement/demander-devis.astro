@@ -1,0 +1,190 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../components/DashboardShell.astro';
+import { createClient } from '../../../lib/supabase';
+import { SubscriptionService } from '../../../lib/subscriptionService';
+import { requireRole } from '../../../lib/guards';
+import { isQuoteRequired } from '../../../types/subscription';
+
+const guard = await requireRole(Astro, 'employer');
+if (guard) return guard;
+
+const { user } = Astro.locals;
+const supabase = createClient({ request: Astro.request, cookies: Astro.cookies });
+const subscriptionService = new SubscriptionService(supabase);
+
+const planName = Astro.url.searchParams.get('plan') || 'entreprise';
+const plan = await subscriptionService.getPlanByName(planName);
+
+if (!plan) {
+  return Astro.redirect('/formules');
+}
+
+if (isQuoteRequired(plan)) {
+  // Already on the right page, keep going
+}
+
+const SERVICES_OPTIONS = [
+  'Archivage numérique sécurisé des documents RH employés',
+  'Consultant RH « SETLOU »',
+  'Visionneuse Jurithèque',
+  'Assistant « Xalima »',
+  'Canal Whistleblower',
+  'Investigations RH internes indépendantes',
+  'Médiation sociale',
+  'Gestion des permis de travail expatriés',
+  'Audit facturation sociétés intérimaires',
+  'Gestion proactive des risques RH/juridiques',
+];
+---
+
+<DashboardLayout title={`Demander un devis — ${plan.display_name} — Previcare Emploi`}>
+  <DashboardShell role="employer">
+    <div class="max-w-3xl mx-auto">
+      <nav class="flex mb-6" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-4">
+          <li><a href="/espace-employeurs" class="text-gray-400 hover:text-gray-500">Tableau de bord</a></li>
+          <li><span class="text-gray-300">/</span></li>
+          <li><a href="/espace-employeurs/abonnement" class="text-gray-400 hover:text-gray-500">Abonnement</a></li>
+          <li><span class="text-gray-300">/</span></li>
+          <li><span class="text-gray-500">Demander un devis</span></li>
+        </ol>
+      </nav>
+
+      <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+        <div class="p-6" style="background:var(--ink);color:var(--paper);">
+          <p class="text-xs font-semibold uppercase tracking-widest" style="color:var(--gold-2);margin-bottom:8px">— Offre Employeurs</p>
+          <h2 class="text-2xl font-bold" style="font-family:var(--display);font-style:italic">Demander un devis</h2>
+          <p class="mt-1" style="color:rgba(246,244,238,.75)">{plan.display_name} — Tarification sur demande</p>
+          <p class="mt-2 text-sm" style="color:rgba(246,244,238,.55)">Remplissez le formulaire ci-dessous et notre équipe vous proposera une offre personnalisée.</p>
+        </div>
+
+        <div class="p-6">
+          <form id="quoteForm" class="space-y-5">
+            <input type="hidden" name="planId" value={plan.id} />
+            <input type="hidden" name="planName" value={plan.name} />
+
+            <div>
+              <label for="companyName" class="block text-sm font-medium text-gray-700 mb-1">Nom de l'entreprise <span class="text-red-500">*</span></label>
+              <input type="text" id="companyName" name="companyName" required
+                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)] focus:border-[var(--gold)]" placeholder="Ex : Sonatel S.A." />
+            </div>
+
+            <div>
+              <label for="numberOfEmployees" class="block text-sm font-medium text-gray-700 mb-1">Nombre de salariés <span class="text-red-500">*</span></label>
+              <select id="numberOfEmployees" name="numberOfEmployees" required
+                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)] focus:border-[var(--gold)]">
+                <option value="">Sélectionnez une tranche</option>
+                <option value="10">Moins de 10</option>
+                <option value="50">10 – 50</option>
+                <option value="100">51 – 100</option>
+                <option value="250">101 – 250</option>
+                <option value="500">251 – 500</option>
+                <option value="1000">Plus de 500</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-3">Services souhaités <span class="text-red-500">*</span></label>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {SERVICES_OPTIONS.map((service) => (
+                  <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:border-[var(--gold)] transition-colors">
+                    <input type="checkbox" name="desiredServices" value={service} class="rounded border-gray-300 text-[var(--gold)] focus:ring-[var(--gold)] mr-3" />
+                    <span class="text-sm text-gray-700">{service}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message complémentaire</label>
+              <textarea id="message" name="message" rows="4"
+                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)] focus:border-[var(--gold)]"
+                placeholder="Précisez vos besoins, contraintes ou questions..."></textarea>
+            </div>
+
+            <div class="rounded-lg p-4 text-sm" style="background:rgba(11,29,58,.04);border:1px solid var(--rule)">
+              <div class="flex items-start">
+                <svg class="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p style="color:var(--ink-3)">Notre équipe commerciale vous contactera sous <strong>48 h ouvrées</strong> avec une proposition tarifaire adaptée à vos besoins.</p>
+              </div>
+            </div>
+
+            <div id="errorMessage" class="hidden rounded-lg px-4 py-3 text-sm" style="background:#fef2f2;color:#991b1b;border:1px solid #fecaca"></div>
+
+            <button type="submit" id="submitBtn" class="w-full py-4 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center" style="background:var(--gold);color:var(--ink)">
+              <span id="btnText">Envoyer la demande de devis</span>
+              <svg id="btnSpinner" class="hidden animate-spin ml-3 h-5 w-5" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="mt-6 text-center">
+        <a href="/formules" class="text-sm hover:underline" style="color:var(--ink-3)">← Retour aux formules</a>
+      </div>
+    </div>
+  </DashboardShell>
+</DashboardLayout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('quoteForm') as HTMLFormElement;
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const btnSpinner = document.getElementById('btnSpinner');
+    const errorMessage = document.getElementById('errorMessage');
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const checked = form.querySelectorAll('input[name="desiredServices"]:checked');
+      if (checked.length === 0) {
+        if (errorMessage) { errorMessage.textContent = 'Veuillez sélectionner au moins un service.'; errorMessage.classList.remove('hidden'); }
+        return;
+      }
+
+      if (submitBtn) submitBtn.setAttribute('disabled', 'true');
+      if (btnText) btnText.textContent = 'Envoi en cours...';
+      if (btnSpinner) btnSpinner.classList.remove('hidden');
+      if (errorMessage) errorMessage.classList.add('hidden');
+
+      const formData = new FormData(form);
+      const desiredServices = Array.from(checked).map((cb: any) => cb.value);
+
+      try {
+        const response = await fetch('/api/submit-quote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            planId: formData.get('planId'),
+            planName: formData.get('planName'),
+            companyName: formData.get('companyName'),
+            numberOfEmployees: formData.get('numberOfEmployees'),
+            desiredServices,
+            message: formData.get('message') || '',
+          }),
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          if (btnText) btnText.textContent = 'Demande envoyée !';
+          setTimeout(() => { window.location.href = '/espace-employeurs/abonnement'; }, 1000);
+        } else {
+          throw new Error(result.message || 'Une erreur est survenue');
+        }
+      } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : 'Une erreur est survenue. Veuillez réessayer.';
+        if (errorMessage) { errorMessage.textContent = msg; errorMessage.classList.remove('hidden'); }
+        if (submitBtn) submitBtn.removeAttribute('disabled');
+        if (btnText) btnText.textContent = 'Envoyer la demande de devis';
+        if (btnSpinner) btnSpinner.classList.add('hidden');
+      }
+    });
+  });
+</script>

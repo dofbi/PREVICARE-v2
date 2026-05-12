@@ -1,0 +1,44 @@
+---
+import { Image } from 'astro:assets';
+
+export interface Props {
+  quote: string;
+  author: string;
+  company: string;
+  rating: number;
+  image: string;
+}
+
+const { quote, author, company, image } = Astro.props;
+---
+
+<div class="border-none shadow-card hover:shadow-card-hover transition-all duration-300 group bg-white rounded-lg">
+  <div class="pt-6 p-6">
+    <div class="flex items-center mb-4">
+      {[...Array(5)].map(() => (
+        <svg class="h-4 w-4 fill-secondary text-secondary" viewBox="0 0 24 24">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      ))}
+    </div>
+
+    <blockquote class="text-primary/80 mb-6 italic">"{quote}"</blockquote>
+
+    <div class="flex items-center">
+      <div class="relative h-12 w-12 rounded-full overflow-hidden mr-4">
+        <Image 
+          src={image || "/placeholder.svg"} 
+          alt={author} 
+          class="w-full h-full object-cover" 
+          width={48}
+          height={48}
+          loading="lazy"
+        />
+      </div>
+      <div>
+        <div class="font-semibold text-primary">{author}</div>
+        <div class="text-sm text-primary/60">{company}</div>
+      </div>
+    </div>
+  </div>
+</div>

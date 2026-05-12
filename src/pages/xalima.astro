@@ -1,0 +1,432 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { XalimaForm } from '../components/employee/XalimaForm';
+const { user } = Astro.locals;
+---
+<Layout title="Xalima — Rédaction de courriers professionnels — Previcare Emploi" description="Xalima guide la rédaction de courriers professionnels conformes au droit du travail sénégalais. 10 types de courriers disponibles.">
+
+<style>
+  /* ── HERO PAPIER ─────────────────────────────────────────────── */
+  .xa-hero {
+    background: linear-gradient(160deg, #F0EAD8 0%, var(--paper) 50%, #EDE6D4 100%);
+    padding: 130px 40px 100px;
+    position: relative;
+    overflow: hidden;
+  }
+  .xa-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(201,169,97,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,169,97,.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .xa-hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .xa-kicker {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 7px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    margin-bottom: 32px;
+  }
+  .xa-h1 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(64px, 8vw, 108px);
+    line-height: .9;
+    margin: 0 0 24px;
+    color: var(--ink);
+  }
+  .xa-h1-sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 20px;
+    color: var(--ink-3);
+    margin: 0 0 40px;
+    line-height: 1.6;
+    max-width: 440px;
+  }
+  .xa-hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+
+  /* Plume animée */
+  .xa-feather-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .xa-feather-svg { width: min(360px, 90%); }
+  .xa-feather-quill { animation: xaWrite 4s ease-in-out infinite; transform-origin: 200px 310px; }
+  .xa-ink-drop { animation: xaDrop 4s ease-in-out infinite; }
+  @keyframes xaWrite {
+    0%   { transform: rotate(0deg) translate(0,0); }
+    25%  { transform: rotate(-8deg) translate(-8px, 4px); }
+    50%  { transform: rotate(5deg) translate(12px, -2px); }
+    75%  { transform: rotate(-5deg) translate(-4px, 6px); }
+    100% { transform: rotate(0deg) translate(0,0); }
+  }
+  @keyframes xaDrop {
+    0%, 100% { opacity: 0; transform: scaleY(0); transform-origin: top; }
+    40%, 60% { opacity: 1; transform: scaleY(1); }
+  }
+
+  /* ── ÉTYMOLOGIE ──────────────────────────────────────────────── */
+  .xa-etym {
+    padding: 80px 40px;
+    background: var(--ink);
+    color: var(--paper);
+    text-align: center;
+  }
+  .xa-etym-inner { max-width: 760px; margin: 0 auto; }
+  .xa-etym-word {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(52px, 7vw, 84px);
+    color: var(--gold-2);
+    display: block;
+    margin-bottom: 20px;
+    line-height: 1;
+  }
+  .xa-etym-p {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 20px;
+    color: rgba(246,244,238,.75);
+    line-height: 1.65;
+    margin: 0;
+  }
+  .xa-etym-rule {
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+    margin: 36px auto;
+    opacity: .5;
+  }
+
+  /* ── CAPACITÉS ───────────────────────────────────────────────── */
+  .xa-caps {
+    padding: 100px 40px;
+    background: var(--paper);
+  }
+  .xa-caps-inner { max-width: 1320px; margin: 0 auto; }
+  .xa-caps-head { text-align: center; margin-bottom: 64px; }
+  .xa-caps-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(36px, 4.5vw, 52px);
+    margin: 16px 0 0;
+  }
+  .xa-caps-h2 em { font-style: normal; color: var(--gold-3); }
+
+  /* Grille 5x2 */
+  .xa-cap-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin-bottom: 60px;
+  }
+  .xa-cap {
+    background: var(--paper);
+    padding: 36px 24px;
+    transition: background .25s;
+    position: relative;
+  }
+  .xa-cap:hover { background: #fff; }
+  .xa-cap-num {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 48px;
+    color: var(--rule);
+    line-height: 1;
+    margin-bottom: 12px;
+    user-select: none;
+    transition: color .25s;
+  }
+  .xa-cap:hover .xa-cap-num { color: var(--gold); opacity: .4; }
+  .xa-cap-t {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 20px;
+    color: var(--ink);
+    margin: 0 0 8px;
+    line-height: 1.2;
+  }
+  .xa-cap-d { font-size: 12px; color: var(--ink-3); line-height: 1.6; margin: 0; }
+
+  /* ── PROCESSUS 3 ÉTAPES ──────────────────────────────────────── */
+  .xa-process {
+    padding: 100px 40px;
+    background: #fff;
+  }
+  .xa-process-inner { max-width: 1000px; margin: 0 auto; }
+  .xa-process-head { text-align: center; margin-bottom: 64px; }
+  .xa-process-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(32px, 4vw, 48px);
+    margin: 16px 0 0;
+  }
+  .xa-process-h2 em { font-style: normal; color: var(--gold-3); }
+
+  .xa-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+  .xa-step { background: var(--paper); padding: 48px 36px; }
+  .xa-step-bullet {
+    width: 56px;
+    height: 56px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 24px;
+    color: var(--gold-3);
+    margin-bottom: 24px;
+  }
+  .xa-step-t {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 24px;
+    color: var(--ink);
+    margin: 0 0 14px;
+  }
+  .xa-step-d { font-size: 14px; color: var(--ink-3); line-height: 1.7; margin: 0; }
+
+  /* ── CTA ─────────────────────────────────────────────────────── */
+  .xa-cta {
+    padding: 100px 40px;
+    background: var(--paper);
+    text-align: center;
+  }
+  .xa-cta-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(36px, 5vw, 56px);
+    margin: 16px 0 20px;
+  }
+  .xa-cta-h2 em { font-style: normal; color: var(--gold-3); }
+  .xa-cta-p { font-size: 17px; color: var(--ink-3); max-width: 520px; margin: 0 auto 40px; line-height: 1.7; }
+
+  @media (max-width: 960px) {
+    .xa-hero-inner { grid-template-columns: 1fr; }
+    .xa-feather-wrap { padding-top: 40px; }
+    .xa-cap-grid { grid-template-columns: repeat(2, 1fr); }
+    .xa-steps { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .xa-cap-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<!-- HERO PAPIER -->
+<section class="xa-hero">
+  <div class="xa-hero-inner">
+    <div>
+      <p class="xa-kicker">— Outil IV · Rédaction guidée</p>
+      <h1 class="xa-h1">Xalima</h1>
+      <p class="xa-h1-sub">L'assistant qui rédige vos courriers professionnels, étape par étape, conformément au droit du travail sénégalais.</p>
+      <div class="xa-hero-btns">
+        <a href="/connexion" class="btn btn-primary">Rédiger un courrier</a>
+        <a href="/formules"  class="btn btn-ghost">Voir les formules</a>
+      </div>
+    </div>
+    <div class="xa-feather-wrap">
+      <svg class="xa-feather-svg" viewBox="0 0 400 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Feuille de papier -->
+        <rect x="60" y="80" width="280" height="320" rx="4" fill="#fff" stroke="#C9A961" stroke-width="1.5" opacity=".9"/>
+        <rect x="60" y="80" width="280" height="320" rx="4" fill="none" stroke="rgba(201,169,97,.3)" stroke-width=".5"/>
+        <!-- Lignes du papier -->
+        <g stroke="rgba(201,169,97,.15)" stroke-width="1">
+          <line x1="88" y1="140" x2="312" y2="140"/>
+          <line x1="88" y1="165" x2="312" y2="165"/>
+          <line x1="88" y1="190" x2="312" y2="190"/>
+          <line x1="88" y1="215" x2="260" y2="215"/>
+          <line x1="88" y1="240" x2="280" y2="240"/>
+          <line x1="88" y1="265" x2="240" y2="265"/>
+          <line x1="88" y1="290" x2="300" y2="290"/>
+          <line x1="88" y1="315" x2="200" y2="315"/>
+          <line x1="88" y1="340" x2="260" y2="340"/>
+          <line x1="88" y1="365" x2="220" y2="365"/>
+        </g>
+        <!-- Filet marge gauche -->
+        <line x1="100" y1="110" x2="100" y2="380" stroke="rgba(201,169,97,.3)" stroke-width="1"/>
+        <!-- Plume (quill) -->
+        <g class="xa-feather-quill">
+          <!-- Tuyau -->
+          <path d="M175 320 Q168 290 160 260 Q152 230 148 200 Q140 165 145 130 Q150 95 165 70"
+                stroke="#8B6914" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <!-- Barbes gauches -->
+          <path d="M165 70 Q130 90 120 110 Q150 115 148 200"
+                stroke="#C9A961" stroke-width="1.5" fill="rgba(201,169,97,.15)" stroke-linejoin="round"/>
+          <path d="M148 200 Q115 215 108 240 Q138 238 145 285"
+                stroke="#C9A961" stroke-width="1.2" fill="rgba(201,169,97,.1)" stroke-linejoin="round"/>
+          <!-- Barbes droites -->
+          <path d="M165 70 Q195 88 200 108 Q172 112 148 200"
+                stroke="#C9A961" stroke-width="1.5" fill="rgba(201,169,97,.12)" stroke-linejoin="round"/>
+          <path d="M148 200 Q180 210 185 240 Q155 242 145 285"
+                stroke="#C9A961" stroke-width="1.2" fill="rgba(201,169,97,.08)" stroke-linejoin="round"/>
+          <!-- Bec -->
+          <path d="M145 285 Q145 300 148 310 Q158 315 175 320"
+                stroke="#4A3200" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        </g>
+        <!-- Goutte d'encre -->
+        <ellipse class="xa-ink-drop" cx="178" cy="328" rx="4" ry="6" fill="#0B1D3A" opacity=".7"/>
+        <!-- Encrier -->
+        <rect x="200" y="295" width="80" height="70" rx="6" fill="#0B1D3A" stroke="#C9A961" stroke-width="1.5"/>
+        <ellipse cx="240" cy="298" rx="40" ry="10" fill="#142849" stroke="#C9A961" stroke-width="1"/>
+        <ellipse cx="240" cy="298" rx="28" ry="6" fill="#0B1D3A"/>
+        <path d="M212 315 Q240 308 268 315" stroke="rgba(201,169,97,.3)" stroke-width="1" fill="none"/>
+        <!-- Texte XALIMA sur l'encrier -->
+        <text x="222" y="345" font-family="Georgia" font-style="italic" font-size="11" fill="#C9A961" opacity=".7" letter-spacing="2">Xalima</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ÉTYMOLOGIE -->
+<section class="xa-etym">
+  <div class="xa-etym-inner">
+    <span class="xa-etym-word">Xalima</span>
+    <p class="xa-etym-p">
+      Du wolof <em>xam-xam</em> — la connaissance — et <em>limu</em> — l'écrit qui reste.
+      Xalima est la plume qui transforme votre situation en mots justes, reconnus par le droit.
+    </p>
+    <div class="xa-etym-rule"></div>
+    <p style="font-family:var(--sans);font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(246,244,238,.45)">
+      Conseiller de rédaction · Previcare Emploi
+    </p>
+  </div>
+</section>
+
+<!-- CAPACITÉS (10 types) -->
+<section class="xa-caps">
+  <div class="xa-caps-inner">
+    <div class="xa-caps-head">
+      <p class="xa-kicker">— Dix types de courriers</p>
+      <h2 class="xa-caps-h2">Ce que Xalima <em>rédige</em></h2>
+    </div>
+    <div class="xa-cap-grid">
+      <div class="xa-cap">
+        <p class="xa-cap-num">01</p>
+        <h3 class="xa-cap-t">Demande de congé</h3>
+        <p class="xa-cap-d">Congé annuel, sans solde, maternité, paternité ou exceptionnel</p>
+      </div>
+      <div class="xa-cap">
+        <p class="xa-cap-num">02</p>
+        <h3 class="xa-cap-t">Contestation de sanction</h3>
+        <p class="xa-cap-d">Avertissement, mise à pied, blâme — réponse structurée et argumentée</p>
+      </div>
+      <div class="xa-cap">
+        <p class="xa-cap-num">03</p>
+        <h3 class="xa-cap-t">Réclamation de salaire</h3>
+        <p class="xa-cap-d">Salaire impayé, retard, contestation de calcul ou de prime</p>
+      </div>
+      <div class="xa-cap">
+        <p class="xa-cap-num">04</p>
+        <h3 class="xa-cap-t">Lettre de démission</h3>
+        <p class="xa-cap-d">Démission normale ou pour faute grave de l'employeur</p>
+      </div>
+      <div class="xa-cap">
+        <p class="xa-cap-num">05</p>
+        <h3 class="xa-cap-t">Demande d'attestation</h3>
+        <p class="xa-cap-d">Attestation de travail, de salaire ou d'emploi en cours</p>
+      </div>
+      <div class="xa-cap">
+        <p class="xa-cap-num">06</p>
+        <h3 class="xa-cap-t">Réponse à explication</h3>
+        <p class="xa-cap-d">Lettre d'explication disciplinaire — réponse factuelle et défensive</p>
+      </div>
+      <div class="xa-cap">
+        <p class="xa-cap-num">07</p>
+        <h3 class="xa-cap-t">Demande de mutation</h3>
+        <p class="xa-cap-d">Demande de changement de poste, de service ou de région</p>
+      </div>
+      <div class="xa-cap">
+        <p class="xa-cap-num">08</p>
+        <h3 class="xa-cap-t">Contestation de licenciement</h3>
+        <p class="xa-cap-d">Lettre de contestation formelle avant saisine du tribunal du travail</p>
+      </div>
+      <div class="xa-cap">
+        <p class="xa-cap-num">09</p>
+        <h3 class="xa-cap-t">Demande d'avancement</h3>
+        <p class="xa-cap-d">Promotion, changement de classification ou de coefficient CCN</p>
+      </div>
+      <div class="xa-cap">
+        <p class="xa-cap-num">10</p>
+        <h3 class="xa-cap-t">Courrier libre</h3>
+        <p class="xa-cap-d">Toute situation non couverte : Xalima s'adapte à votre besoin spécifique</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESSUS 3 ÉTAPES -->
+<section class="xa-process">
+  <div class="xa-process-inner">
+    <div class="xa-process-head">
+      <p class="xa-kicker">— Comment ça fonctionne</p>
+      <h2 class="xa-process-h2">Votre courrier en <em>trois étapes</em></h2>
+    </div>
+    <div class="xa-steps">
+      <div class="xa-step">
+        <div class="xa-step-bullet">1</div>
+        <h3 class="xa-step-t">Choisissez le type</h3>
+        <p class="xa-step-d">Sélectionnez parmi les 10 catégories de courriers. Xalima adapte automatiquement le formulaire à votre situation.</p>
+      </div>
+      <div class="xa-step">
+        <div class="xa-step-bullet">2</div>
+        <h3 class="xa-step-t">Remplissez le formulaire</h3>
+        <p class="xa-step-d">Questions simples et guidées. Pas de jargon juridique. Vos réponses en 3 à 5 minutes maximum.</p>
+      </div>
+      <div class="xa-step">
+        <div class="xa-step-bullet">3</div>
+        <h3 class="xa-step-t">Obtenez votre courrier</h3>
+        <p class="xa-step-d">Xalima génère un courrier complet, structuré et conforme aux usages professionnels sénégalais. Export PDF, archivage dans votre coffre-fort.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA / OUTIL -->
+{user ? (
+  <section style="background:var(--paper);padding:80px 40px">
+    <div style="max-width:1100px;margin:0 auto">
+      <p style="font-family:var(--sans);font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold-3);margin-bottom:16px">— Rédaction guidée</p>
+      <h2 style="font-family:var(--display);font-style:italic;font-size:clamp(32px,4vw,52px);color:var(--ink);margin:0 0 40px;line-height:1.1">
+        Rédigez votre <em style="color:var(--gold-3)">courrier</em>
+      </h2>
+      <XalimaForm client:load />
+    </div>
+  </section>
+) : (
+  <section class="xa-cta">
+    <p class="xa-kicker">— Formules d'accès</p>
+    <h2 class="xa-cta-h2">Rédigez votre<br/>premier <em>courrier</em></h2>
+    <p class="xa-cta-p">Formule Basique : 1 courrier/mois. Formules Silver et Gold : courriers illimités avec modèles sauvegardés et archivage automatique.</p>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <a href="/connexion" class="btn btn-primary">Commencer avec Xalima</a>
+      <a href="/formules"  class="btn btn-ghost">Voir les formules</a>
+    </div>
+  </section>
+)}
+
+</Layout>

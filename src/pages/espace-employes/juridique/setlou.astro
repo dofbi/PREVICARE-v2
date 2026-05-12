@@ -1,0 +1,130 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../components/DashboardShell.astro';
+import { AssistanceChat } from '../../../components/employee/AssistanceChat.tsx';
+
+const { user } = Astro.locals;
+
+if (!user) {
+  return Astro.redirect('/connexion');
+}
+---
+
+<DashboardLayout title="SETLOU — Conseiller Juridique IA - PREVICARE EMPLOI">
+  <DashboardShell title="SETLOU — Conseiller Juridique IA">
+
+    <!-- Breadcrumbs -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+      <ol class="flex items-center gap-2 text-sm" style="color:var(--ink-4)">
+        <li><a href="/espace-employes" class="hover:opacity-80 transition-opacity" style="color:var(--ink-4)">Tableau de bord</a></li>
+        <li><span>/</span></li>
+        <li><a href="/espace-employes/juridique" class="hover:opacity-80 transition-opacity" style="color:var(--ink-4)">Juridique</a></li>
+        <li><span>/</span></li>
+        <li class="font-medium" style="color:var(--ink)">SETLOU</li>
+      </ol>
+    </nav>
+
+    <!-- En-tête SETLOU -->
+    <div class="mb-6 rounded-xl p-6 border" style="background:var(--ink);border-color:rgba(201,169,97,.25)">
+      <div class="flex flex-col md:flex-row md:items-center gap-4">
+        <div class="flex items-center gap-4">
+          <div class="flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center" style="background:rgba(201,169,97,.15)">
+            <svg class="w-8 h-8" style="color:var(--gold)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-white" style="font-family:var(--display)">SETLOU</h1>
+            <p class="text-sm" style="color:rgba(255,255,255,.60)">Votre conseiller IA en droit du travail sénégalais</p>
+          </div>
+        </div>
+        <div class="md:ml-auto flex flex-wrap gap-3">
+          <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background:rgba(255,255,255,.08)">
+            <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+            <span class="text-white text-xs">En ligne</span>
+          </div>
+          <a href="/espace-employes/juridique/courriers" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-opacity hover:opacity-90" style="background:var(--gold);color:var(--ink)">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Rédiger avec Xalima
+          </a>
+        </div>
+      </div>
+      <div class="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3">
+        {[
+          { label: 'Spécialité', value: 'Droit du travail sénégalais' },
+          { label: 'Base légale', value: 'Code du Travail — Loi n° 97-17' },
+          { label: 'Disponibilité', value: '24h/24 — Réponse instantanée' },
+        ].map((item) => (
+          <div class="rounded-lg p-3" style="background:rgba(255,255,255,.07)">
+            <p class="text-[10px] uppercase tracking-wider mb-1" style="color:rgba(255,255,255,.45)">{item.label}</p>
+            <p class="text-white text-sm font-medium">{item.value}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Distinction rôles assistants -->
+    <div class="grid gap-3 mb-6 md:grid-cols-3">
+      <div class="rounded-xl p-4 border" style="background:var(--paper);border-color:rgba(201,169,97,.30)">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(201,169,97,.15)">
+            <svg class="w-4 h-4" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <p class="font-semibold text-sm" style="color:var(--ink)">SETLOU — ici</p>
+        </div>
+        <p class="text-sm leading-relaxed" style="color:var(--ink-4)">Conseils juridiques, droits des employés, procédures RH et démarches administratives</p>
+      </div>
+
+      <div class="rounded-xl p-4 border" style="border-color:var(--rule)">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(201,169,97,.10)">
+            <svg class="w-4 h-4" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </div>
+          <p class="font-semibold text-sm" style="color:var(--ink)">Xalima — Juridique</p>
+        </div>
+        <p class="text-sm leading-relaxed" style="color:var(--ink-4)">Génération guidée de courriers professionnels (congé, contestation, réclamation…)</p>
+        <a href="/espace-employes/juridique/courriers" class="text-xs font-medium mt-2 block hover:opacity-80" style="color:var(--gold-3)">Accéder à Xalima →</a>
+      </div>
+
+      <div class="rounded-xl p-4 border" style="border-color:var(--rule)">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(11,29,58,.07)">
+            <svg class="w-4 h-4" style="color:var(--ink-4)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+          </div>
+          <p class="font-semibold text-sm" style="color:var(--ink)">Assistant PREVICARE</p>
+        </div>
+        <p class="text-sm leading-relaxed" style="color:var(--ink-4)">Guide de navigation et prise en main de l'application (bulle flottante en bas à droite)</p>
+      </div>
+    </div>
+
+    <!-- Chat SETLOU -->
+    <div class="bg-white rounded-xl border mb-6" style="border-color:var(--rule)">
+      <div class="px-6 py-4 border-b flex items-center justify-between" style="border-color:var(--rule)">
+        <div>
+          <h3 class="font-semibold" style="color:var(--ink)">Posez votre question à SETLOU</h3>
+          <p class="text-sm mt-0.5" style="color:var(--ink-4)">Droit du travail, procédures RH, droits et démarches</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+          <span class="text-xs" style="color:var(--ink-4)">SETLOU est disponible</span>
+        </div>
+      </div>
+      <div class="p-4">
+        <AssistanceChat
+          variant="full"
+          assistantType="setlou"
+          client:load
+        />
+      </div>
+    </div>
+
+  </DashboardShell>
+</DashboardLayout>

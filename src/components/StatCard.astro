@@ -1,0 +1,35 @@
+---
+export interface Props {
+  number: string;
+  label: string;
+  description: string;
+  trend?: "up" | "down";
+}
+
+const { number, label, description, trend } = Astro.props;
+---
+
+<div class="bg-white rounded-xl border transition-shadow hover:shadow-md group" style="border-color:var(--rule)">
+  <div class="p-6 text-center">
+    <div class="flex items-center justify-center gap-2 mb-2">
+      <span class="text-3xl font-bold" style="font-family:var(--display);color:var(--ink)">
+        {number}
+      </span>
+      {trend && (
+        <div>
+          {trend === "up" ? (
+            <svg class="h-5 w-5" style="color:#16a34a" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+            </svg>
+          ) : (
+            <svg class="h-5 w-5" style="color:#dc2626" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
+            </svg>
+          )}
+        </div>
+      )}
+    </div>
+    <h3 class="font-semibold text-sm mb-1" style="color:var(--ink)">{label}</h3>
+    <p class="text-xs uppercase tracking-wider" style="color:var(--ink-4)">{description}</p>
+  </div>
+</div>

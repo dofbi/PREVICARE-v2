@@ -1,0 +1,317 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../components/DashboardShell.astro';
+import DashboardBanner from '../../components/dashboard/DashboardBanner.astro';
+import DashboardHero from '../../components/dashboard/DashboardHero.astro';
+import DashboardStats from '../../components/dashboard/DashboardStats.astro';
+import QuickAccessGrid from '../../components/dashboard/QuickAccessGrid.astro';
+import { createClient } from '../../lib/supabase';
+import { SubscriptionService } from '../../lib/subscriptionService';
+import { requireRole } from '../../lib/guards';
+import { actions } from 'astro:actions';
+
+const guard = await requireRole(Astro, 'employer');
+if (guard) return guard;
+
+const { user } = Astro.locals;
+const supabase = createClient({ request: Astro.request, cookies: Astro.cookies });
+const subscriptionService = new SubscriptionService(supabase);
+
+const activeSubscription = await subscriptionService.getUserSubscription(user.id);
+const hasActiveSubscription = !!(activeSubscription && activeSubscription.status === 'active');
+const planLabel = activeSubscription?.plan.display_name ?? null;
+
+const { data: documentsData } = await supabase
+  .from('documents')
+  .select('id')
+  .eq('owner_id', user.id);
+const documentCount = documentsData?.length ?? 0;
+
+const { data: profileData } = await supabase
+  .from('profiles')
+  .select('organization, phone, address, country')
+  .eq('id', user.id)
+  .single();
+
+const { data: employerDetails } = await supabase
+  .from('employer_details')
+  .select('employee_count, ninea, sector, active_claims_count')
+  .eq('id', user.id)
+  .single();
+
+const organization = profileData?.organization ?? (user.user_metadata?.organization as string | undefined) ?? 'Mon entreprise';
+const employeeCount = employerDetails?.employee_count ?? null;
+const ninea = employerDetails?.ninea ?? null;
+const sector = employerDetails?.sector ?? null;
+const activeClaimsCount = employerDetails?.active_claims_count ?? null;
+
+const updateResult = Astro.getActionResult(actions.profile.updateEmployerDetails);
+---
+
+<DashboardLayout title="Espace Employeurs - PREVICARE EMPLOI">
+  <DashboardShell role="employer">
+
+    <DashboardBanner
+      hasSubscription={hasActiveSubscription}
+      planLabel={planLabel}
+      role="employer"
+    />
+
+    <DashboardHero
+      title={`Bienvenue, ${user.user_metadata?.first_name} ${user.user_metadata?.last_name}`}
+      subtitle="Votre espace entreprise PREVICARE EMPLOI"
+      organization={organization}
+    />
+
+    <DashboardStats
+      stats={[
+        {
+          label: 'Abonnement',
+          value: hasActiveSubscription ? (planLabel ?? 'Actif') : 'Inactif',
+          sublabel: hasActiveSubscription ? 'Protection active' : 'Souscription requise',
+          icon: 'check',
+          color: hasActiveSubscription ? 'green' : 'orange',
+        },
+        {
+          label: 'Documents archivés',
+          value: documentCount,
+          sublabel: 'Documents RH sécurisés',
+          icon: 'document',
+          color: 'secondary',
+        },
+        {
+          label: 'Effectif déclaré',
+          value: employeeCount !== null ? employeeCount : '—',
+          sublabel: employeeCount !== null ? 'Employés enregistrés' : 'Non renseigné',
+          icon: 'users',
+          color: 'green',
+        },
+        {
+          label: 'Secteur',
+          value: sector ?? '—',
+          sublabel: sector ? "Secteur d'activité" : 'Non renseigné',
+          icon: 'building',
+          color: 'orange',
+        },
+        {
+          label: 'Réclamations',
+          value: activeClaimsCount !== null ? activeClaimsCount : '—',
+          sublabel: activeClaimsCount !== null ? (activeClaimsCount > 0 ? 'En cours de traitement' : 'Aucune en cours') : 'Non renseigné',
+          icon: 'message',
+          color: 'red',
+        },
+      ]}
+    />
+
+    <QuickAccessGrid
+      items={[
+        {
+          title: 'Documents RH',
+          description: 'Archivage sécurisé',
+          href: '/espace-employeurs/documents',
+          icon: 'document',
+        },
+        {
+          title: 'SETLOU',
+          description: 'Conseil RH digital',
+          href: '/espace-employeurs/juridique/setlou',
+          icon: 'shield',
+        },
+        {
+          title: 'Xalima',
+          description: 'Rédaction documents RH',
+          href: '/espace-employeurs/juridique/courriers',
+          icon: 'edit',
+        },
+        {
+          title: 'Assistance',
+          description: 'Support & tickets',
+          href: '/espace-employeurs/assistance',
+          icon: 'support',
+        },
+      ]}
+    />
+
+    <!-- Aperçu entreprise + form mise à jour -->
+    <div class="grid md:grid-cols-2 gap-5 mb-6">
+      <div class="bg-white rounded-xl border" style="border-color:var(--rule)">
+        <div class="p-5 border-b" style="border-color:var(--rule)">
+          <h3 class="font-semibold text-sm" style="color:var(--ink)">Aperçu de l'entreprise</h3>
+        </div>
+        <div class="p-5 space-y-4">
+          <div class="flex items-start gap-3">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style="background:rgba(201,169,97,.10)">
+              <svg class="h-4 w-4" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider" style="color:var(--ink-4)">Raison sociale</p>
+              <p class="text-sm mt-0.5" style="color:var(--ink)">{organization}</p>
+            </div>
+          </div>
+          {ninea && (
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style="background:rgba(201,169,97,.10)">
+                <svg class="h-4 w-4" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wider" style="color:var(--ink-4)">NINEA</p>
+                <p class="text-sm mt-0.5" style="color:var(--ink)">{ninea}</p>
+              </div>
+            </div>
+          )}
+          {sector && (
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style="background:rgba(201,169,97,.10)">
+                <svg class="h-4 w-4" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wider" style="color:var(--ink-4)">Secteur</p>
+                <p class="text-sm mt-0.5" style="color:var(--ink)">{sector}</p>
+              </div>
+            </div>
+          )}
+          {profileData?.country && (
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style="background:rgba(201,169,97,.10)">
+                <svg class="h-4 w-4" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wider" style="color:var(--ink-4)">Pays</p>
+                <p class="text-sm mt-0.5" style="color:var(--ink)">{profileData.country}</p>
+              </div>
+            </div>
+          )}
+          <div class="pt-4 border-t" style="border-color:var(--rule)">
+            <p class="text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Plan souscrit</p>
+            {hasActiveSubscription ? (
+              <p class="text-sm font-semibold" style="color:var(--gold-3)">{planLabel}</p>
+            ) : (
+              <p class="text-sm" style="color:var(--ink-4)">Aucun — <a href="/formules" class="underline hover:opacity-80" style="color:var(--gold-3)">Choisir un plan</a></p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <!-- Form mise à jour données entreprise -->
+      <div class="bg-white rounded-xl border" style="border-color:var(--rule)">
+        <div class="p-5 border-b flex items-center justify-between" style="border-color:var(--rule)">
+          <div>
+            <h3 class="font-semibold text-base" style="color:var(--ink)">Données d'entreprise</h3>
+            <p class="text-sm mt-0.5" style="color:var(--ink-4)">Effectif, NINEA et secteur d'activité</p>
+          </div>
+          <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background:rgba(201,169,97,.10)">
+            <svg class="h-4 w-4" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </div>
+        </div>
+        <div class="p-5">
+          {updateResult && !updateResult.error && updateResult.data?.success === true && (
+            <div class="mb-4 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm" style="background:rgba(22,163,74,.08);border-color:rgba(22,163,74,.25);color:#15803d">
+              <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              Données mises à jour avec succès.
+            </div>
+          )}
+          {(updateResult?.error || (updateResult && updateResult.data?.success === false)) && (
+            <div class="mb-4 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm" style="background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25);color:#dc2626">
+              <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              {updateResult?.data?.message ?? "Une erreur est survenue. Veuillez réessayer."}
+            </div>
+          )}
+          <form method="POST" action={actions.profile.updateEmployerDetails} class="space-y-4">
+            <div>
+              <label for="employee_count" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Effectif salarié</label>
+              <input type="number" id="employee_count" name="employee_count" min="0" value={employeeCount ?? ''} placeholder="Ex : 45"
+                class="w-full rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                style="border-color:var(--rule);color:var(--ink);background:#fff" />
+            </div>
+            <div>
+              <label for="ninea" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">NINEA</label>
+              <input type="text" id="ninea" name="ninea" value={ninea ?? ''} placeholder="Ex : 123456789"
+                class="w-full rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                style="border-color:var(--rule);color:var(--ink);background:#fff" />
+            </div>
+            <div>
+              <label for="sector_select" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--ink-4)">Secteur d'activité</label>
+              <select id="sector_select" name="sector" data-current={sector ?? ''}
+                class="w-full rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                style="border-color:var(--rule);color:var(--ink);background:#fff">
+                <option value="">— Choisir un secteur —</option>
+                <option value="Agriculture et pêche">Agriculture et pêche</option>
+                <option value="Bâtiment et travaux publics (BTP)">Bâtiment et travaux publics (BTP)</option>
+                <option value="Commerce et distribution">Commerce et distribution</option>
+                <option value="Éducation et formation">Éducation et formation</option>
+                <option value="Énergie et mines">Énergie et mines</option>
+                <option value="Finance et assurance">Finance et assurance</option>
+                <option value="Hôtellerie et tourisme">Hôtellerie et tourisme</option>
+                <option value="Industrie manufacturière">Industrie manufacturière</option>
+                <option value="Informatique et télécommunications">Informatique et télécommunications</option>
+                <option value="Santé et pharmacie">Santé et pharmacie</option>
+                <option value="Services aux entreprises">Services aux entreprises</option>
+                <option value="Transport et logistique">Transport et logistique</option>
+                <option value="Autre">Autre</option>
+              </select>
+              <input type="text" id="sector_autre" placeholder="Précisez votre secteur…"
+                class="hidden mt-2 w-full rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)] transition-shadow"
+                style="border-color:var(--rule);color:var(--ink);background:#fff" />
+            </div>
+            <div class="flex justify-end">
+              <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg transition-opacity hover:opacity-90" style="background:var(--ink);color:var(--gold)">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Enregistrer
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </DashboardShell>
+</DashboardLayout>
+
+<script is:inline data-astro-rerun>
+  document.addEventListener('DOMContentLoaded', function() {
+    var sectorSelect = document.getElementById('sector_select');
+    var sectorAutre = document.getElementById('sector_autre');
+    if (sectorSelect && sectorAutre) {
+      var knownOptions = Array.from(sectorSelect.options).map(function(o) { return o.value; });
+      var currentVal = sectorSelect.getAttribute('data-current') || '';
+      if (currentVal && knownOptions.indexOf(currentVal) !== -1) {
+        sectorSelect.value = currentVal;
+      } else if (currentVal) {
+        sectorSelect.value = 'Autre';
+        sectorAutre.value = currentVal;
+        sectorAutre.classList.remove('hidden');
+      }
+      sectorSelect.addEventListener('change', function() {
+        if (this.value === 'Autre') { sectorAutre.classList.remove('hidden'); }
+        else { sectorAutre.classList.add('hidden'); sectorAutre.value = ''; }
+      });
+      var sectorForm = sectorSelect.closest('form');
+      if (sectorForm) {
+        sectorForm.addEventListener('submit', function() {
+          if (sectorSelect.value === 'Autre' && sectorAutre.value.trim()) {
+            var customInput = document.createElement('input');
+            customInput.type = 'hidden'; customInput.name = 'sector'; customInput.value = sectorAutre.value.trim();
+            sectorSelect.removeAttribute('name');
+            sectorForm.appendChild(customInput);
+          }
+        });
+      }
+    }
+  });
+</script>

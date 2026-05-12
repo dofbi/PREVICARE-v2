@@ -1,0 +1,178 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="404 — Page introuvable — Previcare Emploi" noNavFooter={true}>
+
+<style>
+  :global(body) {
+    background: var(--ink);
+    color: var(--paper);
+    min-height: 100vh;
+  }
+  .nf-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    background: var(--ink);
+  }
+  .nf-page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 30% 40%, rgba(201,169,97,.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 60%, rgba(201,169,97,.06) 0%, transparent 50%);
+  }
+  .nf-inner { position: relative; z-index: 2; max-width: 640px; }
+
+  /* Logo */
+  .nf-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(246,244,238,.6);
+    text-decoration: none;
+    margin-bottom: 80px;
+    transition: color .2s;
+  }
+  .nf-logo:hover { color: var(--gold-2); }
+  .nf-logo-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Grand 404 */
+  .nf-num {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(120px, 20vw, 220px);
+    line-height: .85;
+    margin: 0;
+    color: var(--paper);
+    opacity: .08;
+    user-select: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  /* Contenu principal */
+  .nf-kicker {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 7px;
+    text-transform: uppercase;
+    color: var(--gold-2);
+    margin-bottom: 28px;
+  }
+  .nf-h1 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 1.05;
+    margin: 0 0 24px;
+  }
+  .nf-h1 em { font-style: normal; color: var(--gold-2); }
+  .nf-p {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 18px;
+    color: rgba(246,244,238,.65);
+    line-height: 1.65;
+    margin: 0 0 48px;
+  }
+  .nf-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 64px; }
+  .nf-btn {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    padding: 13px 28px;
+    border-radius: 99px;
+    transition: .25s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .nf-btn-gold { background: var(--gold); color: var(--ink); border: 1px solid var(--gold-2); }
+  .nf-btn-gold:hover { background: var(--gold-2); }
+  .nf-btn-ghost { background: transparent; color: var(--paper); border: 1px solid rgba(246,244,238,.25); }
+  .nf-btn-ghost:hover { border-color: var(--gold); color: var(--gold-2); }
+
+  /* Liens rapides */
+  .nf-links {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .nf-links a {
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(246,244,238,.4);
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .nf-links a:hover { color: var(--gold-2); }
+
+  /* Filet décoratif */
+  .nf-rule {
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+    margin: 32px auto;
+    opacity: .3;
+  }
+</style>
+
+<div class="nf-page">
+  <!-- Grand 404 en fond -->
+  <p class="nf-num" aria-hidden="true">404</p>
+
+  <div class="nf-inner">
+    <a href="/" class="nf-logo">
+      <span class="nf-logo-dot"></span>
+      Previcare Emploi
+    </a>
+
+    <p class="nf-kicker">— Erreur 404</p>
+    <h1 class="nf-h1">Page <em>introuvable</em></h1>
+    <p class="nf-p">La page que vous cherchez n'existe pas ou a été déplacée. Revenez à l'accueil pour retrouver votre chemin.</p>
+
+    <div class="nf-btns">
+      <a href="/"       class="nf-btn nf-btn-gold">Retour à l'accueil →</a>
+      <a href="/outils" class="nf-btn nf-btn-ghost">Voir les outils</a>
+    </div>
+
+    <div class="nf-rule"></div>
+
+    <nav class="nf-links" aria-label="Navigation rapide">
+      <a href="/formules">Formules</a>
+      <a href="/souscripteurs">Souscripteurs</a>
+      <a href="/offres-emploi">Offres</a>
+      <a href="/setlou">Setlou</a>
+      <a href="/xalima">Xalima</a>
+      <a href="/coffre-fort">Coffre-fort</a>
+      <a href="/connexion">Connexion</a>
+    </nav>
+  </div>
+</div>
+
+</Layout>

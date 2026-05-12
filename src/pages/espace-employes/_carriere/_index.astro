@@ -1,0 +1,104 @@
+
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../components/DashboardShell.astro';
+import { CareerTimeline } from '../../../components/employee/_CareerTimeline.tsx';
+
+const { user } = Astro.locals;
+
+if (!user) {
+  return Astro.redirect('/connexion');
+}
+---
+
+<DashboardLayout title="Gestion de Carrière - PREVICARE EMPLOI">
+  <DashboardShell title="Ma Carrière">
+    
+    <!-- Breadcrumbs -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+      <ol class="flex items-center space-x-4">
+        <li><a href="/espace-employes" class="text-gray-400 hover:text-gray-500">Tableau de bord</a></li>
+        <li><span class="text-gray-300">/</span></li>
+        <li><span class="text-gray-500">Carrière</span></li>
+      </ol>
+    </nav>
+
+    <!-- Vue d'ensemble -->
+    <div class="grid gap-6 mb-8 md:grid-cols-3">
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Expérience totale</h3>
+        <p class="text-3xl font-bold text-blue-600">8 ans</p>
+        <p class="text-sm text-gray-500">Depuis le début de carrière</p>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Poste actuel</h3>
+        <p class="text-lg font-semibold text-gray-900">Développeur Senior</p>
+        <p class="text-sm text-gray-500">Depuis Mars 2022</p>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Formations suivies</h3>
+        <p class="text-3xl font-bold text-green-600">12</p>
+        <p class="text-sm text-gray-500">Certifications obtenues</p>
+      </div>
+    </div>
+
+    <!-- Timeline de carrière -->
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Parcours professionnel</h3>
+        <p class="text-sm text-gray-500">Historique de votre évolution de carrière</p>
+      </div>
+      <div class="p-6">
+        <CareerTimeline client:load />
+      </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <a href="/espace-employes/carriere/contrats" class="block bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h4 class="text-lg font-medium text-gray-900">Mes contrats</h4>
+            <p class="text-sm text-gray-500">Gérer mes contrats de travail</p>
+          </div>
+        </div>
+      </a>
+
+      <a href="/espace-employes/carriere/formations" class="block bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h4 class="text-lg font-medium text-gray-900">Formations</h4>
+            <p class="text-sm text-gray-500">Mes formations et certifications</p>
+          </div>
+        </div>
+      </a>
+
+      <button class="block bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6 w-full text-left">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h4 class="text-lg font-medium text-gray-900">Bilan de carrière</h4>
+            <p class="text-sm text-gray-500">Évaluation et objectifs</p>
+          </div>
+        </div>
+      </button>
+    </div>
+
+  </DashboardShell>
+</DashboardLayout>

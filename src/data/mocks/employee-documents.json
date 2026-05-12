@@ -1,0 +1,68 @@
+
+[
+  {
+    "id": "doc_001",
+    "title": "Contrat de travail CDI",
+    "type": "contract",
+    "category": "Contrats",
+    "date": "2024-01-15",
+    "status": "valid",
+    "expires_at": "2025-01-14",
+    "file_size": "245 KB",
+    "file_type": "PDF",
+    "tags": ["contrat", "CDI", "officiel"],
+    "description": "Contrat de travail à durée indéterminée signé le 15 janvier 2024"
+  },
+  {
+    "id": "doc_002", 
+    "title": "Certificat médical",
+    "type": "medical",
+    "category": "Santé",
+    "date": "2024-03-10",
+    "status": "valid",
+    "expires_at": "2025-03-10",
+    "file_size": "180 KB",
+    "file_type": "PDF",
+    "tags": ["médical", "aptitude"],
+    "description": "Certificat d'aptitude médicale pour le poste"
+  },
+  {
+    "id": "doc_003",
+    "title": "Fiche de paie Mars 2024",
+    "type": "payslip",
+    "category": "Paie",
+    "date": "2024-03-31",
+    "status": "valid",
+    "expires_at": null,
+    "file_size": "156 KB",
+    "file_type": "PDF",
+    "tags": ["paie", "mars", "2024"],
+    "description": "Bulletin de salaire du mois de mars 2024"
+  },
+  {
+    "id": "doc_004",
+    "title": "Attestation de formation",
+    "type": "training",
+    "category": "Formation",
+    "date": "2024-02-20",
+    "status": "valid",
+    "expires_at": null,
+    "file_size": "95 KB",
+    "file_type": "PDF",
+    "tags": ["formation", "certification"],
+    "description": "Attestation de formation en sécurité au travail"
+  },
+  {
+    "id": "doc_005",
+    "title": "Avenant au contrat",
+    "type": "amendment",
+    "category": "Contrats",
+    "date": "2024-06-01",
+    "status": "pending",
+    "expires_at": null,
+    "file_size": "89 KB",
+    "file_type": "PDF",
+    "tags": ["avenant", "modification"],
+    "description": "Avenant pour modification du salaire"
+  }
+]

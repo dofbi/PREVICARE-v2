@@ -1,0 +1,130 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../components/DashboardShell.astro';
+import DocumentsManager from '../../../components/DocumentsManager';
+import { createClient } from '../../../lib/supabase';
+import { requireRole } from '../../../lib/guards';
+
+const guard = await requireRole(Astro, 'employer');
+if (guard) return guard;
+
+const { user } = Astro.locals;
+const supabase = createClient({ request: Astro.request, cookies: Astro.cookies });
+
+const { data: documentsData } = await supabase
+  .from('user_documents')
+  .select('*')
+  .eq('owner_id', user.id)
+  .order('uploaded_at', { ascending: false });
+
+const documents = documentsData || [];
+
+const now = new Date();
+const thirtyDaysFromNow = new Date();
+thirtyDaysFromNow.setDate(now.getDate() + 30);
+
+let validDocuments = 0, expiredDocuments = 0, toRenewDocuments = 0, totalSize = 0;
+
+documents.forEach((doc) => {
+  totalSize += doc.metadata?.size || 0;
+  if (doc.metadata?.expiry_date) {
+    const expirationDate = new Date(doc.metadata.expiry_date);
+    if (expirationDate > now) {
+      validDocuments++;
+      if (expirationDate <= thirtyDaysFromNow) toRenewDocuments++;
+    } else {
+      expiredDocuments++;
+    }
+  }
+});
+
+const stats = { totalDocuments: documents.length, validDocuments, expiredDocuments, toRenewDocuments, totalSize };
+
+const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+};
+---
+
+<DashboardLayout title="Documents - PREVICARE EMPLOI">
+  <DashboardShell role="employer">
+
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+      <ol class="flex items-center gap-2 text-sm" style="color:var(--ink-4)">
+        <li><a href="/espace-employeurs" class="hover:opacity-80 transition-opacity" style="color:var(--ink-4)">Tableau de bord</a></li>
+        <li><span>/</span></li>
+        <li class="font-medium" style="color:var(--ink)">Documents</li>
+      </ol>
+    </nav>
+
+    <div class="grid gap-4 md:grid-cols-4 mb-6">
+      <div class="bg-white rounded-xl border p-4" style="border-color:var(--rule)">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider" style="color:var(--ink-4)">Total documents</p>
+            <p class="text-2xl font-bold mt-1" style="color:var(--ink)">{stats.totalDocuments}</p>
+          </div>
+          <div class="h-10 w-10 rounded-lg flex items-center justify-center" style="background:rgba(201,169,97,.12)">
+            <svg class="h-5 w-5" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border p-4" style="border-color:var(--rule)">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider" style="color:var(--ink-4)">Valides</p>
+            <p class="text-2xl font-bold mt-1" style="color:#15803d">{stats.validDocuments}</p>
+            <p class="text-xs mt-1" style="color:var(--ink-4)">Non expirés avec date</p>
+          </div>
+          <div class="h-10 w-10 rounded-lg flex items-center justify-center" style="background:rgba(22,163,74,.10)">
+            <svg class="h-5 w-5" style="color:#16a34a" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border p-4" style="border-color:var(--rule)">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider" style="color:var(--ink-4)">À renouveler</p>
+            <p class="text-2xl font-bold mt-1" style="color:#c2410c">{stats.toRenewDocuments}</p>
+            <p class="text-xs mt-1" style="color:var(--ink-4)">Expire sous 30 jours</p>
+          </div>
+          <div class="h-10 w-10 rounded-lg flex items-center justify-center" style="background:rgba(234,88,12,.10)">
+            <svg class="h-5 w-5" style="color:#ea580c" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border p-4" style="border-color:var(--rule)">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider" style="color:var(--ink-4)">Taille totale</p>
+            <p class="text-2xl font-bold mt-1" style="color:var(--ink)">{formatFileSize(stats.totalSize)}</p>
+          </div>
+          <div class="h-10 w-10 rounded-lg flex items-center justify-center" style="background:rgba(201,169,97,.12)">
+            <svg class="h-5 w-5" style="color:var(--gold-3)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border" style="border-color:var(--rule)">
+      <div class="p-6 border-b" style="border-color:var(--rule)">
+        <h3 class="font-semibold" style="color:var(--ink)">Documents d'entreprise</h3>
+        <p class="text-sm mt-0.5" style="color:var(--ink-4)">Gérez et organisez vos documents RH en toute sécurité</p>
+      </div>
+      <div class="p-6">
+        <DocumentsManager client:load initialDocuments={documents} />
+      </div>
+    </div>
+  </DashboardShell>
+</DashboardLayout>

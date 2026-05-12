@@ -1,0 +1,59 @@
+
+[
+  {
+    "id": "ipres_001",
+    "month": "2024-03",
+    "month_label": "Mars 2024",
+    "employee_contribution": 450000,
+    "employer_contribution": 675000,
+    "total_contribution": 1125000,
+    "salary_base": 7500000,
+    "rate_employee": 6.0,
+    "rate_employer": 9.0,
+    "status": "paid",
+    "payment_date": "2024-04-05",
+    "receipt_number": "IPRES-2024-03-001"
+  },
+  {
+    "id": "ipres_002",
+    "month": "2024-02",
+    "month_label": "Février 2024",
+    "employee_contribution": 450000,
+    "employer_contribution": 675000,
+    "total_contribution": 1125000,
+    "salary_base": 7500000,
+    "rate_employee": 6.0,
+    "rate_employer": 9.0,
+    "status": "paid",
+    "payment_date": "2024-03-05",
+    "receipt_number": "IPRES-2024-02-001"
+  },
+  {
+    "id": "ipres_003",
+    "month": "2024-01",
+    "month_label": "Janvier 2024",
+    "employee_contribution": 450000,
+    "employer_contribution": 675000,
+    "total_contribution": 1125000,
+    "salary_base": 7500000,
+    "rate_employee": 6.0,
+    "rate_employer": 9.0,
+    "status": "paid",
+    "payment_date": "2024-02-05",
+    "receipt_number": "IPRES-2024-01-001"
+  },
+  {
+    "id": "ipres_004",
+    "month": "2023-12",
+    "month_label": "Décembre 2023",
+    "employee_contribution": 420000,
+    "employer_contribution": 630000,
+    "total_contribution": 1050000,
+    "salary_base": 7000000,
+    "rate_employee": 6.0,
+    "rate_employer": 9.0,
+    "status": "paid",
+    "payment_date": "2024-01-05",
+    "receipt_number": "IPRES-2023-12-001"
+  }
+]

@@ -1,0 +1,40 @@
+
+[
+  {
+    "id": "ticket_001",
+    "title": "Problème d'accès aux documents",
+    "category": "technique",
+    "priority": "medium",
+    "status": "open",
+    "created_at": "2024-03-15T10:30:00Z",
+    "updated_at": "2024-03-16T14:20:00Z",
+    "description": "Je n'arrive plus à accéder à mes documents archivés depuis hier.",
+    "assigned_to": "Support Technique",
+    "messages": [
+      {
+        "id": "msg_001",
+        "author": "Utilisateur",
+        "message": "Je n'arrive plus à accéder à mes documents archivés depuis hier.",
+        "timestamp": "2024-03-15T10:30:00Z"
+      },
+      {
+        "id": "msg_002", 
+        "author": "Support",
+        "message": "Nous avons identifié le problème et travaillons sur une solution. Merci de votre patience.",
+        "timestamp": "2024-03-16T14:20:00Z"
+      }
+    ]
+  },
+  {
+    "id": "ticket_002",
+    "title": "Question sur les cotisations IPRES",
+    "category": "juridique",
+    "priority": "low",
+    "status": "resolved",
+    "created_at": "2024-03-10T09:15:00Z",
+    "updated_at": "2024-03-12T16:45:00Z",
+    "description": "J'aimerais comprendre le calcul de mes cotisations IPRES.",
+    "assigned_to": "Conseil Juridique",
+    "resolution": "Explication détaillée fournie par email avec documentation annexe."
+  }
+]

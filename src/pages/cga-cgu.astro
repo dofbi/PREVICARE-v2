@@ -1,0 +1,289 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="CGA / CGU — Conditions Générales — Previcare Emploi" description="Conditions Générales d'Abonnement (CGA), Conditions Générales d'Utilisation (CGU), Mentions légales et protection des données personnelles.">
+
+<style>
+  /* ── HERO ────────────────────────────────────────────────────── */
+  .lg-hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 120px 40px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .lg-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(201,169,97,.08) 0%, transparent 55%);
+  }
+  .lg-hero-inner { position: relative; z-index: 2; max-width: 760px; }
+  .lg-kicker {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 7px;
+    text-transform: uppercase;
+    color: var(--gold-2);
+    margin-bottom: 28px;
+  }
+  .lg-h1 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(44px, 6vw, 80px);
+    line-height: .95;
+    margin: 0 0 24px;
+  }
+  .lg-h1 em { font-style: normal; color: var(--gold-2); }
+  .lg-sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 17px;
+    color: rgba(246,244,238,.65);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* ── CONTENU ─────────────────────────────────────────────────── */
+  .lg-content {
+    padding: 80px 40px 120px;
+    background: var(--paper);
+  }
+  .lg-content-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  /* Navigation ancrée */
+  .lg-nav {
+    position: sticky;
+    top: 100px;
+  }
+  .lg-nav-title {
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .lg-nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .lg-nav-links li { margin-bottom: 2px; }
+  .lg-nav-links a {
+    display: block;
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--ink-3);
+    padding: 10px 12px;
+    border-left: 2px solid transparent;
+    text-decoration: none;
+    transition: .2s;
+    line-height: 1.4;
+  }
+  .lg-nav-links a:hover {
+    color: var(--ink);
+    border-left-color: var(--gold);
+    background: rgba(201,169,97,.05);
+  }
+  .lg-nav-links a.active {
+    color: var(--gold-3);
+    border-left-color: var(--gold);
+  }
+
+  /* Article de loi */
+  .lg-article {
+    margin-bottom: 72px;
+    scroll-margin-top: 120px;
+  }
+  .lg-article:last-child { margin-bottom: 0; }
+  .lg-article-label {
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    margin-bottom: 16px;
+  }
+  .lg-article-h2 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(28px, 3.5vw, 40px);
+    color: var(--ink);
+    margin: 0 0 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .lg-article-body { max-width: 680px; }
+  .lg-article-body p {
+    font-size: 15px;
+    color: var(--ink-3);
+    line-height: 1.8;
+    margin: 0 0 20px;
+  }
+  .lg-article-body p:last-child { margin-bottom: 0; }
+  .lg-article-body strong { color: var(--ink); }
+
+  .lg-section-block {
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--gold);
+    padding: 20px 24px;
+    margin: 24px 0;
+    border-radius: 0 4px 4px 0;
+  }
+  .lg-section-block h3 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 20px;
+    color: var(--ink);
+    margin: 0 0 8px;
+  }
+  .lg-section-block p {
+    font-size: 14px !important;
+    color: var(--ink-3);
+    line-height: 1.7 !important;
+    margin: 0 !important;
+  }
+
+  @media (max-width: 900px) {
+    .lg-content-inner { grid-template-columns: 1fr; }
+    .lg-nav { position: static; }
+    .lg-nav-links { display: flex; flex-wrap: wrap; gap: 4px; }
+    .lg-nav-links a { border-left: none; border-bottom: 2px solid transparent; padding: 8px 12px; }
+    .lg-nav-links a:hover { border-left: none; border-bottom-color: var(--gold); }
+  }
+</style>
+
+<!-- HERO -->
+<section class="lg-hero">
+  <div class="lg-hero-inner">
+    <p class="lg-kicker">— Transparence légale</p>
+    <h1 class="lg-h1"><em>CGA</em> / <em>CGU</em><br/>& Mentions légales</h1>
+    <p class="lg-sub">Conditions régissant l'abonnement et l'utilisation de la plateforme Previcare Emploi, ainsi que la protection de vos données personnelles.</p>
+  </div>
+</section>
+
+<!-- CONTENU -->
+<section class="lg-content">
+  <div class="lg-content-inner">
+
+    <!-- Sidebar nav -->
+    <nav class="lg-nav" aria-label="Navigation des sections">
+      <p class="lg-nav-title">Sommaire</p>
+      <ul class="lg-nav-links">
+        <li><a href="#cga">Conditions d'abonnement (CGA)</a></li>
+        <li><a href="#cgu">Conditions d'utilisation (CGU)</a></li>
+        <li><a href="#mentions">Mentions légales</a></li>
+        <li><a href="#donnees">Protection des données</a></li>
+      </ul>
+    </nav>
+
+    <!-- Contenu principal -->
+    <div>
+
+      <!-- CGA -->
+      <article class="lg-article" id="cga">
+        <p class="lg-article-label">Section I</p>
+        <h2 class="lg-article-h2">Conditions Générales d'Abonnement (CGA)</h2>
+        <div class="lg-article-body">
+          <p>Les présentes Conditions Générales d'Abonnement régissent la souscription aux services de la plateforme Previcare Emploi, éditée par Previcare SARL, société enregistrée au Sénégal (RCCM Dakar).</p>
+
+          <div class="lg-section-block">
+            <h3>Durée et renouvellement</h3>
+            <p>L'abonnement est conclu pour une durée d'un mois, renouvelable tacitement à la date anniversaire. Il peut être résilié à tout moment depuis l'espace personnel, avec prise d'effet à la fin de la période en cours.</p>
+          </div>
+
+          <div class="lg-section-block">
+            <h3>Tarifs et paiement</h3>
+            <p>Les tarifs sont exprimés en Francs CFA (FCFA), toutes taxes comprises le cas échéant. Les paiements sont traités via les opérateurs agréés : Orange Money, Wave et carte bancaire internationale. Aucune donnée bancaire n'est stockée sur les serveurs Previcare.</p>
+          </div>
+
+          <div class="lg-section-block">
+            <h3>Modification des formules</h3>
+            <p>Previcare Emploi se réserve le droit de modifier les tarifs et le contenu des formules moyennant un préavis de 30 jours communiqué par e-mail. L'abonné dispose d'un droit de résiliation sans pénalité en cas de refus des nouvelles conditions.</p>
+          </div>
+
+          <p>En cas de litige relatif à la facturation, l'abonné dispose d'un délai de 60 jours à compter de la date de débit pour contester par écrit auprès du service client de Previcare Emploi.</p>
+        </div>
+      </article>
+
+      <!-- CGU -->
+      <article class="lg-article" id="cgu">
+        <p class="lg-article-label">Section II</p>
+        <h2 class="lg-article-h2">Conditions Générales d'Utilisation (CGU)</h2>
+        <div class="lg-article-body">
+          <p>En accédant à la plateforme Previcare Emploi, l'utilisateur s'engage à utiliser les services conformément aux présentes CGU, à la législation sénégalaise en vigueur — notamment le Code du Travail (Loi n° 97-17), la loi 2008-08 sur les transactions électroniques et la loi 2008-12 sur la protection des données — ainsi qu'aux bonnes pratiques de l'usage d'internet.</p>
+
+          <div class="lg-section-block">
+            <h3>Responsabilité de l'utilisateur</h3>
+            <p>L'utilisateur est seul responsable de la confidentialité de ses identifiants. Il s'engage à ne pas partager ses accès et à informer immédiatement Previcare de toute utilisation non autorisée. Toute utilisation frauduleuse ou abusive peut entraîner la suspension immédiate du compte.</p>
+          </div>
+
+          <div class="lg-section-block">
+            <h3>Portée des conseils SETLOU</h3>
+            <p>Les informations juridiques fournies par l'assistant SETLOU sont à titre indicatif uniquement et ne constituent pas un avis juridique professionnel au sens de la loi sénégalaise sur la profession d'avocat. Pour toute situation contentieuse ou complexe, il est recommandé de consulter un avocat inscrit au Barreau du Sénégal.</p>
+          </div>
+
+          <div class="lg-section-block">
+            <h3>Propriété intellectuelle</h3>
+            <p>L'ensemble des contenus de la plateforme (textes, logiciels, bases de données, design) est la propriété de Previcare SARL ou fait l'objet de licences. Toute reproduction, même partielle, sans autorisation écrite préalable est interdite.</p>
+          </div>
+
+          <p>Previcare Emploi se réserve le droit de modifier les présentes CGU à tout moment. Les modifications prennent effet dès leur publication, avec notification par e-mail pour les changements substantiels.</p>
+        </div>
+      </article>
+
+      <!-- Mentions légales -->
+      <article class="lg-article" id="mentions">
+        <p class="lg-article-label">Section III</p>
+        <h2 class="lg-article-h2">Mentions légales</h2>
+        <div class="lg-article-body">
+          <p><strong>Éditeur :</strong> Previcare SARL — Dakar, République du Sénégal. Société à responsabilité limitée immatriculée au RCCM de Dakar. Capital social : 500 000 FCFA.</p>
+          <p><strong>Directeur de la publication :</strong> Le gérant de Previcare SARL.</p>
+          <p><strong>Hébergement :</strong> Netlify Inc. — 2325 3rd Street, Suite 215, San Francisco, CA 94107, États-Unis. Données hébergées en Europe (région UE) conformément aux engagements RGPD de Netlify.</p>
+          <p><strong>Contact légal :</strong> Pour toute notification légale, contactez le service juridique de Previcare Emploi via le formulaire de contact disponible dans votre espace personnel.</p>
+          <p><strong>Médiation :</strong> En cas de litige non résolu, l'utilisateur peut recourir à la médiation du Centre d'Arbitrage, de Médiation et de Conciliation de Dakar (CAMC-O) avant toute action judiciaire.</p>
+        </div>
+      </article>
+
+      <!-- Protection des données -->
+      <article class="lg-article" id="donnees">
+        <p class="lg-article-label">Section IV</p>
+        <h2 class="lg-article-h2">Protection des données personnelles</h2>
+        <div class="lg-article-body">
+          <p>Previcare Emploi collecte et traite les données personnelles de ses utilisateurs dans le strict respect de la <strong>loi sénégalaise n° 2008-12</strong> sur la protection des données personnelles et du <strong>Règlement Général sur la Protection des Données (RGPD)</strong> européen, applicable aux utilisateurs résidents dans l'Union Européenne ou l'espace CEDEAO.</p>
+
+          <div class="lg-section-block">
+            <h3>Données collectées</h3>
+            <p>Données d'identification (nom, prénom, adresse e-mail, numéro de téléphone), données professionnelles saisies par l'utilisateur, documents archivés dans le coffre-fort, et données de navigation anonymisées à des fins statistiques.</p>
+          </div>
+
+          <div class="lg-section-block">
+            <h3>Finalités du traitement</h3>
+            <p>Les données sont traitées exclusivement pour la fourniture des services souscrits, la gestion de la relation client et l'amélioration de la plateforme. Elles ne sont ni vendues, ni cédées à des tiers, ni utilisées à des fins publicitaires.</p>
+          </div>
+
+          <div class="lg-section-block">
+            <h3>Vos droits</h3>
+            <p>Conformément à la loi 2008-12 et au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, de portabilité et d'opposition sur vos données. Ces droits s'exercent depuis votre espace personnel ou par demande écrite à l'éditeur. Délai de réponse : 30 jours maximum.</p>
+          </div>
+
+          <p>Previcare Emploi a procédé à la déclaration de ses traitements auprès de la Commission des Données Personnelles (CDP) du Sénégal, conformément à l'article 14 de la loi n° 2008-12.</p>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+</Layout>

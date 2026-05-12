@@ -1,0 +1,271 @@
+---
+import Layout from '../layouts/Layout.astro';
+import DashboardShell from '../components/DashboardShell.astro';
+import { DocumentList } from '../components/DocumentList.tsx';
+// import { IPRESStatus } from '../components/_IPRESStatus.tsx';
+import { NotificationList } from '../components/NotificationList.tsx';
+import { createClient } from '../lib/supabase';
+
+const { user } = Astro.locals;
+
+// Vérifier si l'utilisateur est connecté
+if (!user) {
+  return Astro.redirect('/connexion');
+}
+
+// Vérifier si l'utilisateur a le bon rôle
+const userRole = user.user_metadata?.role;
+
+if (userRole !== 'employee' ) {
+  return Astro.redirect('/connexion');
+}
+
+const supabase = createClient({
+  request: Astro.request,
+  cookies: Astro.cookies,
+});
+
+// Récupérer les données du profil pour vérifier sa complétude
+const { data: profile } = await supabase
+  .from('profiles')
+  .select('*')
+  .eq('id', user.id)
+  .single();
+
+// Vérifier si le profil est complet
+const isProfileComplete = profile && 
+  profile.first_name && 
+  profile.last_name && 
+  profile.email && 
+  profile.phone && 
+  profile.address && 
+  profile.country;
+---
+
+<Layout title="Espace Employés - PREVICARE EMPLOI">
+  <DashboardShell title="Tableau de bord Employé">
+    
+    <!-- Alerte profil incomplet -->
+    {!isProfileComplete && (
+      <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-yellow-800">Profil incomplet</h3>
+            <div class="mt-1 text-sm text-yellow-700">
+              <p>Veuillez compléter vos informations personnelles pour accéder à tous les services.</p>
+              <div class="mt-3">
+                <a href="/espace-employes/parametres" class="inline-flex items-center px-3 py-2 text-xs font-medium text-yellow-800 bg-yellow-100 border border-yellow-200 rounded-md hover:bg-yellow-200">
+                  Gérer mon profil
+                  <svg class="ml-1 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+
+
+    <!-- Stats Cards -->
+    <div class="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4 mb-6">
+      <div class="bg-white rounded-lg border shadow-sm p-4">
+        <div class="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
+          <h3 class="text-xs sm:text-sm font-medium">Documents archivés</h3>
+          <svg class="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="text-lg sm:text-2xl font-bold">12</div>
+          <p class="text-[10px] sm:text-xs text-muted-foreground">Dernière mise à jour: 16/03/2025</p>
+        </div>
+      </div>
+
+      {/* _ipres */}
+      {/*
+      <div class="bg-white rounded-lg border shadow-sm p-4">
+        <div class="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
+          <h3 class="text-xs sm:text-sm font-medium">Statut IPRES</h3>
+          <svg class="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="text-lg sm:text-2xl font-bold text-green-500">À jour</div>
+          <p class="text-[10px] sm:text-xs text-muted-foreground">Dernière cotisation: Mars 2025</p>
+        </div>
+      </div>
+      */}
+
+      <div class="bg-white rounded-lg border shadow-sm p-4">
+        <div class="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
+          <h3 class="text-xs sm:text-sm font-medium">Consultations juridiques</h3>
+          <svg class="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="text-lg sm:text-2xl font-bold">3</div>
+          <p class="text-[10px] sm:text-xs text-muted-foreground">Dernière consultation: 10/03/2025</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg border shadow-sm p-4">
+        <div class="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
+          <h3 class="text-xs sm:text-sm font-medium">Notifications</h3>
+          <svg class="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM10.5 17H8a2 2 0 01-2-2V5a2 2 0 012-2h8a2 2 0 012 2v4.5"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="text-lg sm:text-2xl font-bold">2</div>
+          <p class="text-[10px] sm:text-xs text-muted-foreground">Nouvelles notifications</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs Section - Exact match with React version -->
+    <div class="mt-4 sm:mt-6">
+      <div class="bg-muted p-1 rounded-lg w-full grid grid-cols-3">
+        <button
+          class="tab-button active flex items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-xs sm:text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-background text-foreground shadow"
+          data-tab="documents"
+        >
+          Documents
+        </button>
+        {/* _ipres */}
+        {/*
+        <button
+          class="tab-button flex items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-xs sm:text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow"
+          data-tab="ipres"
+        >
+          Suivi IPRES
+        </button>
+        */}
+        <button
+          class="tab-button flex items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-xs sm:text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow"
+          data-tab="notifications"
+        >
+          Notifications
+        </button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="mt-4 space-y-4">
+        <!-- Documents Tab -->
+        <div id="documents-tab" class="tab-content">
+          <div class="bg-white rounded-lg border shadow-sm">
+            <div class="p-6 border-b">
+              <h3 class="text-lg font-semibold">Mes documents archivés</h3>
+              <p class="text-sm text-muted-foreground">Gérez vos documents RH importants en toute sécurité</p>
+            </div>
+            <div class="p-6">
+              <DocumentList client:load />
+            </div>
+            <div class="p-6 border-t flex justify-between">
+              <button class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                Télécharger
+              </button>
+              <button class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-md text-sm font-medium hover:bg-primary/90">
+                <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                Ajouter un document
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* _ipres */}
+        {/*
+        <!-- IPRES Tab -->
+        <div id="ipres-tab" class="tab-content hidden">
+          <div class="bg-white rounded-lg border shadow-sm">
+            <div class="p-6 border-b">
+              <h3 class="text-lg font-semibold">Suivi des cotisations IPRES</h3>
+              <p class="text-sm text-muted-foreground">Visualisez l'historique de vos cotisations et leur statut</p>
+            </div>
+            <div class="p-6">
+              <IPRESStatus client:load />
+            </div>
+            <div class="p-6 border-t flex justify-between">
+              <button class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4M3 21h18M5 21l1-9h12l1 9"></path>
+                </svg>
+                Historique complet
+              </button>
+              <button class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-md text-sm font-medium hover:bg-primary/90">
+                <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                Signaler un problème
+              </button>
+            </div>
+          </div>
+        </div>
+        */}
+
+        <!-- Notifications Tab -->
+        <div id="notifications-tab" class="tab-content hidden">
+          <div class="bg-white rounded-lg border shadow-sm">
+            <div class="p-6 border-b">
+              <h3 class="text-lg font-semibold">Mes notifications</h3>
+              <p class="text-sm text-muted-foreground">Restez informé des mises à jour importantes</p>
+            </div>
+            <div class="p-6">
+              <NotificationList client:load />
+            </div>
+            <div class="p-6 border-t">
+              <button class="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                Marquer tout comme lu
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(tab => {
+          tab.addEventListener('click', function(this: HTMLElement) {
+            const targetTab = this.getAttribute('data-tab');
+
+            // Remove active class from all buttons
+            tabButtons.forEach(btn => {
+              btn.classList.remove('active', 'bg-background', 'text-foreground', 'shadow');
+            });
+
+            // Add active class to clicked button
+            this.classList.add('active', 'bg-background', 'text-foreground', 'shadow');
+
+            // Hide all tab contents
+            tabContents.forEach(content => {
+              content.classList.add('hidden');
+            });
+
+            // Show target tab content
+            const targetContent = document.getElementById(targetTab + '-tab');
+            if (targetContent) {
+              targetContent.classList.remove('hidden');
+            }
+          });
+        });
+      });
+    </script>
+  </DashboardShell>
+</Layout>

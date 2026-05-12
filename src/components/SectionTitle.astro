@@ -1,0 +1,46 @@
+---
+import { cn } from "../lib/utils";
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  badge?: string;
+  badgeVariant?: "primary" | "secondary" | "tertiary" | "highlight";
+  align?: "left" | "center";
+}
+
+const {
+  title,
+  subtitle,
+  badge,
+  badgeVariant = "primary",
+  align = "center",
+} = Astro.props;
+
+const badgeClasses = {
+  primary: "bg-primary/10 text-primary",
+  secondary: "bg-secondary/10 text-secondary-dark",
+  tertiary: "bg-tertiary/10 text-tertiary-dark",
+  highlight: "bg-highlight/10 text-highlight-dark",
+};
+
+const alignClasses = {
+  left: "text-left",
+  center: "text-center",
+};
+---
+
+<div class={cn("mb-12", alignClasses[align])}>
+  {badge && (
+    <div
+      class={cn(
+        "inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mb-4",
+        badgeClasses[badgeVariant],
+      )}
+    >
+      {badge}
+    </div>
+  )}
+  <h2 class="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-primary mb-4">{title}</h2>
+  {subtitle && <p class="text-xl text-primary/80 max-w-3xl mx-auto">{subtitle}</p>}
+</div>

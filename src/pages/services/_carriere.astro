@@ -1,0 +1,160 @@
+
+---
+import Layout from '../../layouts/Layout.astro';
+import SectionContainer from '../../components/SectionContainer.astro';
+import SectionTitle from '../../components/SectionTitle.astro';
+import { Card, CardContent } from '../../components/ui/card';
+import { Award, BookOpen, Briefcase, ArrowRight, GraduationCap, LineChart, Target } from 'lucide-react';
+---
+
+<Layout title="Gestion de Carrière - PREVICARE EMPLOI">
+  <main class="flex min-h-screen flex-col">
+    <!-- Hero Section -->
+    <section class="relative w-full py-20 md:py-28 overflow-hidden">
+      <!-- Image de fond -->
+      <div
+        class="absolute inset-0 z-0"
+        style="background-image: url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center;"
+      >
+        <!-- Overlay pour améliorer la lisibilité -->
+        <div class="absolute inset-0 bg-gradient-to-r from-secondary/90 to-secondary/70"></div>
+      </div>
+
+      <div class="container relative px-4 md:px-6 z-10">
+        <div class="grid gap-12 lg:grid-cols-2 items-center">
+          <div class="space-y-6">
+            <div class="badge badge-primary inline-flex items-center mb-2">
+              Service Carrière
+            </div>
+            <h1 class="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl text-white">
+              Gestion de Carrière
+            </h1>
+            <p class="text-xl text-white/90 max-w-[600px]">
+              Accompagnement personnalisé pour développer votre carrière professionnelle au Sénégal.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3 pt-4">
+              <a
+                href="/inscription"
+                class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-md bg-white text-blue-900 hover:bg-white/90 shadow-button-glow btn-glow transition-all"
+              >
+                Commencer maintenant 
+                <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </a>
+              <a
+                href="/contact"
+                class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-md border border-white text-white bg-white/20 hover:bg-white/30 transition-colors"
+              >
+                Nous contacter
+              </a>
+            </div>
+          </div>
+          <div class="relative">
+            <div class="absolute -top-6 -left-6 w-24 h-24 bg-white/10 rounded-full animate-pulse-slow"></div>
+            <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-white/10 rounded-full animate-pulse-slow animation-delay-1000"></div>
+
+            <div class="relative rounded-2xl overflow-hidden shadow-card card-3d">
+              <img
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop"
+                alt="Gestion de carrière"
+                class="w-full h-auto object-cover aspect-video"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-blue-900/30 to-transparent"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Section -->
+    <SectionContainer background="accent">
+      <SectionTitle
+        title="Nos services de gestion de carrière"
+        badge="Services"
+        badgeVariant="secondary"
+        subtitle="Des solutions complètes pour vous accompagner à chaque étape de votre parcours professionnel."
+      />
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {[
+          {
+            icon: Target,
+            title: "Bilan de compétences",
+            description: "Évaluation approfondie de vos compétences, aspirations et potentiel d'évolution.",
+          },
+          {
+            icon: LineChart,
+            title: "Plan de carrière",
+            description: "Élaboration d'une stratégie personnalisée pour atteindre vos objectifs professionnels.",
+          },
+          {
+            icon: Briefcase,
+            title: "Coaching professionnel",
+            description:
+              "Accompagnement individuel pour développer votre leadership et vos compétences managériales.",
+          },
+          {
+            icon: GraduationCap,
+            title: "Formation continue",
+            description: "Accès à des programmes de formation adaptés à vos besoins et objectifs.",
+          },
+          {
+            icon: BookOpen,
+            title: "Préparation aux entretiens",
+            description: "Techniques et conseils pour réussir vos entretiens d'embauche et d'évaluation.",
+          },
+          {
+            icon: Award,
+            title: "Valorisation des acquis",
+            description: "Accompagnement dans la reconnaissance et certification de vos compétences.",
+          },
+        ].map((service, index) => (
+          <Card
+            key={index}
+            className="border-none shadow-card transition-all duration-300 hover:shadow-lg group card-hover"
+            client:load
+          >
+            <CardContent className="p-6 flex flex-col items-center text-center">
+              <div class="p-3 rounded-full bg-yellow-500/10 group-hover:bg-yellow-500/20 transition-colors mb-4">
+                <div class="group-hover:animate-wave">
+                  <service.icon className="h-8 w-8 text-yellow-600" />
+                </div>
+              </div>
+              <h3 class="text-xl font-bold mb-2 text-blue-900 group-hover:text-yellow-600 transition-colors">
+                {service.title}
+              </h3>
+              <p class="text-gray-600">{service.description}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </SectionContainer>
+
+    <!-- CTA Section -->
+    <SectionContainer background="gradient-secondary">
+      <div class="flex flex-col items-center justify-center space-y-4 text-center">
+        <h2 class="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-blue-900">
+          Prêt à faire évoluer votre carrière ?
+        </h2>
+        <p class="max-w-[700px] md:text-xl/relaxed text-blue-900">
+          Prenez en main votre avenir professionnel avec notre accompagnement personnalisé.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 mt-6">
+          <a
+            href="/inscription"
+            class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-md bg-blue-900 text-white hover:bg-blue-800 shadow-button-glow btn-glow transition-all"
+          >
+            Commencer maintenant
+          </a>
+          <a
+            href="/contact" 
+            class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-md border border-blue-900 text-blue-900 hover:bg-blue-900/10 transition-colors"
+          >
+            Nous contacter
+          </a>
+        </div>
+      </div>
+    </SectionContainer>
+  </main>
+</Layout>

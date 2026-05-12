@@ -1,0 +1,58 @@
+---
+import DashboardLayout from '../../../../../layouts/DashboardLayout.astro';
+import DashboardShell from '../../../../../components/DashboardShell.astro';
+import JurithequeViewerClient from '../../../../../components/employee/JurithequeViewerClient';
+import type { JurithequeArticle } from '../../../../../types/juritheque';
+import { JurithequeService } from '../../../../../lib/jurithequeService';
+import { createClient } from '../../../../../lib/supabase';
+
+const { key } = Astro.params;
+const { user } = Astro.locals;
+
+const supabase = createClient({ request: Astro.request, cookies: Astro.cookies });
+const jurithequeService = new JurithequeService(supabase);
+
+const { index, favoriteKeys } = await jurithequeService.getIndexWithStats(user?.id);
+const article = index?.articles.find((a) => a.key === key) || null;
+
+if (!article) {
+  return Astro.redirect('/espace-employes/juridique/juritheque');
+}
+
+const articleWithStats = {
+  ...article,
+  is_favorite: favoriteKeys.includes(key),
+  view_count: 0,
+};
+
+const currentUserId: string | undefined = user?.id;
+
+// Récupérer l'URL signée PDF et incrementer vues
+let pdfUrl = '';
+let pdfError = false;
+try {
+  pdfUrl = await jurithequeService.getPdfUrl(key);
+  await jurithequeService.incrementView(key);
+  if (!pdfUrl) {
+    pdfError = true;
+  }
+} catch (e) {
+  console.error('Erreur récupération PDF:', e);
+  pdfError = true;
+}
+
+---
+
+<DashboardLayout title={`${article.title} - Jurithèque - PREVICARE EMPLOI`}>
+  <DashboardShell>
+    <div client:load>
+      <JurithequeViewerClient 
+        article={articleWithStats}
+        pdfUrl={pdfUrl}
+        pdfError={pdfError}
+        currentUserId={currentUserId}
+      />
+    </div>
+  </DashboardShell>
+</DashboardLayout>
+
